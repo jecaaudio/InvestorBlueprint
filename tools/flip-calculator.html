@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flip Calculator | InvestorBlueprint</title>
+    <meta name="description" content="Analyze fix-and-flip deals with MAO, profit, ROI, cost breakdowns, and sensitivity scenarios." />
     <link rel="stylesheet" href="tool-styles.css" />
   </head>
   <body data-tool="flip">
@@ -27,28 +28,25 @@
     <main class="container">
       <section class="card">
         <h1 data-i18n="flipTitle">🧮 Flip Calculator</h1>
-        <p data-i18n="flipDesc">
-          Underwrite flips with acquisition, rehab, financing, holding and sale assumptions.
-          Use quick MAO checks and sensitivity ranges before submitting an offer.
-        </p>
-        <form id="tool-form">
+        <p data-i18n="flipDesc">Underwrite flips with acquisition, rehab, financing, holding and sale assumptions. Use quick MAO checks and sensitivity ranges before submitting an offer.</p>
+        <form id="tool-form" novalidate>
           <fieldset>
-            <legend>Plan mode</legend>
+            <legend data-i18n="flipPlanMode">Plan mode</legend>
             <div class="plan-toggle" role="radiogroup" aria-label="Calculator plan mode">
               <label class="plan-option">
                 <input type="radio" name="planMode" value="free" checked />
-                <span>Free · Basic</span>
+                <span data-i18n="flipFreePlan">Free · Basic</span>
               </label>
               <label class="plan-option">
                 <input type="radio" name="planMode" value="pro" />
-                <span>Pro · Full underwriting</span>
+                <span data-i18n="flipProPlan">Pro · Full underwriting</span>
               </label>
             </div>
-            <p class="plan-hint" id="plan-hint">Free mode shows a fast, lightweight calculation. Switch to Pro for financing structure, MAO strategy and sensitivities.</p>
+            <p class="plan-hint" id="plan-hint"></p>
           </fieldset>
 
           <fieldset>
-            <legend>Quick deal data</legend>
+            <legend data-i18n="flipQuickDeal">Quick deal data</legend>
             <div class="form-grid">
               <label>Property / Market <input name="market" type="text" placeholder="123 Main St, Austin TX" /></label>
               <label>Purchase Type
@@ -65,7 +63,7 @@
           </fieldset>
 
           <fieldset>
-            <legend>A) Compra y adquisición</legend>
+            <legend>Acquisition</legend>
             <div class="form-grid">
               <label>Purchase Price <input name="purchasePrice" type="number" min="0" required /></label>
               <label>Earnest Deposit / Option Fee <input name="earnestDeposit" type="number" min="0" value="0" /></label>
@@ -77,7 +75,7 @@
           </fieldset>
 
           <fieldset>
-            <legend>B) Rehab budget + calendar</legend>
+            <legend>Rehab budget + calendar</legend>
             <div class="form-grid">
               <label>Total Rehab Base Budget <input name="rehabCost" type="number" min="0" required /></label>
               <label>Contingency (%) <input name="contingencyPct" type="number" min="0" value="15" /></label>
@@ -87,7 +85,7 @@
           </fieldset>
 
           <fieldset>
-            <legend>C) Holding costs (monthly)</legend>
+            <legend>Holding costs (monthly)</legend>
             <div class="form-grid">
               <label>Total Holding Months <input name="holdingMonths" type="number" min="0" step="0.1" value="6" /></label>
               <label>Insurance / month <input name="insuranceMonthly" type="number" min="0" value="0" /></label>
@@ -100,7 +98,7 @@
           </fieldset>
 
           <fieldset>
-            <legend>D) Sale / disposition costs</legend>
+            <legend>Sale / disposition costs</legend>
             <div class="form-grid">
               <label>Realtor Commission (%) <input name="realtorPct" type="number" min="0" step="0.1" value="6" /></label>
               <label>Buyer Concessions (%) <input name="concessionPct" type="number" min="0" step="0.1" value="0" /></label>
@@ -111,7 +109,7 @@
           </fieldset>
 
           <fieldset class="pro-only">
-            <legend>E) Financing</legend>
+            <legend>Financing</legend>
             <div class="form-grid">
               <label>Financing Type
                 <select name="financingType">
@@ -135,7 +133,7 @@
           </fieldset>
 
           <fieldset class="pro-only">
-            <legend>F) Strategy targets + tax estimate</legend>
+            <legend>Strategy targets + tax estimate</legend>
             <div class="form-grid">
               <label>Entity Type
                 <select name="entityType">
@@ -152,7 +150,7 @@
           </fieldset>
 
           <fieldset class="pro-only">
-            <legend>G) Sensitivities</legend>
+            <legend>Sensitivities</legend>
             <div class="form-grid">
               <label>ARV Low (%) <input name="arvLowPct" type="number" step="0.1" value="-5" /></label>
               <label>ARV High (%) <input name="arvHighPct" type="number" step="0.1" value="5" /></label>
@@ -163,9 +161,25 @@
             </div>
           </fieldset>
 
-          <button type="submit" data-i18n="calculateDeal">Calculate Deal</button>
+          <div class="tool-actions">
+            <button type="submit" data-i18n="calculateDeal">Calculate Deal</button>
+            <button type="button" class="secondary" id="load-sample">Load Sample</button>
+            <button type="reset" class="secondary">Reset</button>
+          </div>
         </form>
-        <div class="result" id="result" data-i18n="resultPrompt">Enter your numbers and click calculate.</div>
+
+        <section class="result" id="result">
+          <h3>Results</h3>
+          <div class="result-grid" id="result-cards">
+            <div class="metric"><strong>Profit</strong><span>$0</span></div>
+            <div class="metric"><strong>MAO</strong><span>$0</span></div>
+            <div class="metric"><strong>Cash to Close</strong><span>$0</span></div>
+            <div class="metric"><strong>Total Costs</strong><span>$0</span></div>
+            <div class="metric"><strong>ROI</strong><span>0.0%</span></div>
+            <div class="metric"><strong>Break-even</strong><span>$0</span></div>
+          </div>
+          <div id="result-detail" data-i18n="resultPrompt">Enter your numbers and click calculate.</div>
+        </section>
       </section>
     </main>
     <script src="../lang.js"></script>

@@ -247,3 +247,8 @@ td {
 .pro-only.is-hidden {
   display: none;
 }
+
+
+.tool-actions { display:flex; gap:0.6rem; flex-wrap:wrap; }
+button.secondary { background: transparent; border:1px solid var(--border); color:var(--text); }
+#result { position: sticky; bottom: 1rem; }
