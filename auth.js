@@ -234,6 +234,7 @@
   const subscriptionDetail = document.getElementById('subscription-detail');
   const accountPaymentMethod = document.getElementById('account-payment-method');
   const enrollmentPaymentStatus = document.getElementById('enrollment-payment-status');
+  const savedCalculationsList = document.getElementById('saved-calculations-list');
 
   if (registerForm) {
     registerForm.addEventListener('submit', (event) => {
@@ -347,6 +348,28 @@
           : currentLang === 'es'
             ? 'Pendiente'
             : 'Pending';
+      }
+
+      if (savedCalculationsList) {
+        const savedCalculations = Array.isArray(user?.savedCalculations)
+          ? [...user.savedCalculations].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+          : [];
+
+        if (!savedCalculations.length) {
+          savedCalculationsList.innerHTML = currentLang === 'es'
+            ? '<li>Aún no tienes cálculos guardados.</li>'
+            : '<li>You have no saved calculations yet.</li>' ;
+        } else {
+          savedCalculationsList.innerHTML = savedCalculations
+            .map((item) => {
+              const updated = formatDate(item.updatedAt, currentLang === 'es' ? 'es-ES' : 'en-US');
+              const toolUrl = item.tool === 'flip'
+                ? `tools/flip-calculator.html?flip=${encodeURIComponent(btoa(JSON.stringify(item.state)))}`
+                : '#';
+              return `<li><a href="${toolUrl}">${item.name}</a> · ${updated}</li>`;
+            })
+            .join('');
+        }
       }
 
       if (subscriptionStatus && subscriptionDetail) {

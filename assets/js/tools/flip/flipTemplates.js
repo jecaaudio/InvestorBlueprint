@@ -18,6 +18,14 @@
           <button id="copy-link" type="button">Copiar link</button>
         </div>
       </div>
+      <div class="saved-calculations-panel">
+        <input id="scenario-name" type="text" maxlength="60" placeholder="Nombre del cálculo" />
+        <button id="save-scenario" type="button">Guardar en mi perfil</button>
+        <select id="saved-scenarios"></select>
+        <button id="load-scenario" type="button">Cargar</button>
+        <button id="delete-scenario" type="button">Eliminar</button>
+      </div>
+      <p id="saved-scenario-message" class="saved-scenario-message"></p>
       <div id="flip-errors"></div>
       <div id="flip-summary" class="flip-summary"></div>
       <div id="flip-inputs"></div>
