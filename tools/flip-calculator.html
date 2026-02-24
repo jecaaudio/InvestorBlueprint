@@ -6,6 +6,7 @@
     <title>Flip Calculator | InvestorBlueprint</title>
     <meta name="description" content="Analyze fix-and-flip deals with MAO, profit, ROI, cost breakdowns, and sensitivity scenarios." />
     <link rel="stylesheet" href="tool-styles.css" />
+    <link rel="stylesheet" href="../assets/css/tools/flipCalculator.css" />
   </head>
   <body data-tool="flip">
     <header class="tool-navbar">
@@ -27,163 +28,18 @@
 
     <main class="container">
       <section class="card">
-        <h1 data-i18n="flipTitle">🧮 Flip Calculator</h1>
-        <p data-i18n="flipDesc">Underwrite flips with acquisition, rehab, financing, holding and sale assumptions. Use quick MAO checks and sensitivity ranges before submitting an offer.</p>
-        <form id="tool-form" novalidate>
-          <fieldset>
-            <legend data-i18n="flipPlanMode">Plan mode</legend>
-            <div class="plan-toggle" role="radiogroup" aria-label="Calculator plan mode">
-              <label class="plan-option">
-                <input type="radio" name="planMode" value="free" checked />
-                <span data-i18n="flipFreePlan">Free · Basic</span>
-              </label>
-              <label class="plan-option">
-                <input type="radio" name="planMode" value="pro" />
-                <span data-i18n="flipProPlan">Pro · Full underwriting</span>
-              </label>
-            </div>
-            <p class="plan-hint" id="plan-hint"></p>
-          </fieldset>
-
-          <fieldset>
-            <legend data-i18n="flipQuickDeal">Quick deal data</legend>
-            <div class="form-grid">
-              <label>Property / Market <input name="market" type="text" placeholder="123 Main St, Austin TX" /></label>
-              <label>Purchase Type
-                <select name="purchaseType">
-                  <option value="retail">Retail</option>
-                  <option value="auction">Auction</option>
-                  <option value="wholesale">Wholesale</option>
-                  <option value="reo">REO</option>
-                </select>
-              </label>
-              <label>Square Footage <input name="sqft" type="number" min="0" value="0" /></label>
-              <label>Expected Sale Price (ARV) <input name="salePrice" type="number" min="0" required /></label>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Acquisition</legend>
-            <div class="form-grid">
-              <label>Purchase Price <input name="purchasePrice" type="number" min="0" required /></label>
-              <label>Earnest Deposit / Option Fee <input name="earnestDeposit" type="number" min="0" value="0" /></label>
-              <label>Buyer Closing Costs <input name="buyerClosing" type="number" min="0" value="0" /></label>
-              <label>Title / Attorney / Escrow / Recording <input name="titleFees" type="number" min="0" value="0" /></label>
-              <label>Prorated Taxes + HOA <input name="prorations" type="number" min="0" value="0" /></label>
-              <label>Inspection + Appraisal <input name="inspectionCost" type="number" min="0" value="0" /></label>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Rehab budget + calendar</legend>
-            <div class="form-grid">
-              <label>Total Rehab Base Budget <input name="rehabCost" type="number" min="0" required /></label>
-              <label>Contingency (%) <input name="contingencyPct" type="number" min="0" value="15" /></label>
-              <label>Draw Count (#) <input name="drawCount" type="number" min="0" value="0" /></label>
-              <label>Rehab Duration (months) <input name="rehabMonths" type="number" min="0" step="0.1" value="4" /></label>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Holding costs (monthly)</legend>
-            <div class="form-grid">
-              <label>Total Holding Months <input name="holdingMonths" type="number" min="0" step="0.1" value="6" /></label>
-              <label>Insurance / month <input name="insuranceMonthly" type="number" min="0" value="0" /></label>
-              <label>Taxes / month <input name="taxesMonthly" type="number" min="0" value="0" /></label>
-              <label>Utilities / month <input name="utilitiesMonthly" type="number" min="0" value="0" /></label>
-              <label>Maintenance / lawn / snow / month <input name="maintenanceMonthly" type="number" min="0" value="0" /></label>
-              <label>HOA / month <input name="hoaMonthly" type="number" min="0" value="0" /></label>
-              <label>Security / vacancy / misc / month <input name="miscMonthly" type="number" min="0" value="0" /></label>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Sale / disposition costs</legend>
-            <div class="form-grid">
-              <label>Realtor Commission (%) <input name="realtorPct" type="number" min="0" step="0.1" value="6" /></label>
-              <label>Buyer Concessions (%) <input name="concessionPct" type="number" min="0" step="0.1" value="0" /></label>
-              <label>Seller Closing Costs (%) <input name="sellerClosingPct" type="number" min="0" step="0.1" value="1" /></label>
-              <label>Staging + Photos + Inspection Repairs ($) <input name="stagingCost" type="number" min="0" value="0" /></label>
-              <label>Transfer Tax ($) <input name="transferTax" type="number" min="0" value="0" /></label>
-            </div>
-          </fieldset>
-
-          <fieldset class="pro-only">
-            <legend>Financing</legend>
-            <div class="form-grid">
-              <label>Financing Type
-                <select name="financingType">
-                  <option value="cash">Cash</option>
-                  <option value="hard-money">Hard Money</option>
-                  <option value="loan">Conventional / DSCR / Private</option>
-                </select>
-              </label>
-              <label>Loan Amount ($) <input name="loanAmount" type="number" min="0" value="0" /></label>
-              <label>Loan Covers Purchase (%) <input name="loanPurchasePct" type="number" min="0" max="100" step="0.1" value="85" /></label>
-              <label>Loan Covers Rehab (%) <input name="loanRehabPct" type="number" min="0" max="100" step="0.1" value="100" /></label>
-              <label>Down Payment (%) <input name="downPaymentPct" type="number" min="0" max="100" step="0.1" value="15" /></label>
-              <label>Interest Rate Annual (%) <input name="interestRate" type="number" min="0" step="0.01" value="12" /></label>
-              <label>Points (%) <input name="pointsPct" type="number" min="0" step="0.1" value="2" /></label>
-              <label>Origination/Processing Fees ($) <input name="originationFees" type="number" min="0" value="0" /></label>
-              <label>Draw Fee per Draw ($) <input name="drawFee" type="number" min="0" value="0" /></label>
-              <label>Inspection Fee per Draw ($) <input name="drawInspectionFee" type="number" min="0" value="0" /></label>
-              <label>Prepayment Penalty ($) <input name="prepayPenalty" type="number" min="0" value="0" /></label>
-              <label>Loan Closing Costs ($) <input name="loanClosingCosts" type="number" min="0" value="0" /></label>
-            </div>
-          </fieldset>
-
-          <fieldset class="pro-only">
-            <legend>Strategy targets + tax estimate</legend>
-            <div class="form-grid">
-              <label>Entity Type
-                <select name="entityType">
-                  <option value="llc">LLC</option>
-                  <option value="individual">Individual</option>
-                </select>
-              </label>
-              <label>Capital Gains / Tax Rate (%) <input name="taxRate" type="number" min="0" max="100" step="0.1" value="0" /></label>
-              <label>Opportunity Cost / Hurdle Rate Annual (%) <input name="hurdleRate" type="number" min="0" step="0.1" value="10" /></label>
-              <label>Target Min Profit ($) <input name="targetProfit" type="number" min="0" value="25000" /></label>
-              <label>Target ROI on Cash (%) <input name="targetRoi" type="number" min="0" step="0.1" value="25" /></label>
-              <label>Risk Buffer (%) <input name="riskBufferPct" type="number" min="0" step="0.1" value="5" /></label>
-            </div>
-          </fieldset>
-
-          <fieldset class="pro-only">
-            <legend>Sensitivities</legend>
-            <div class="form-grid">
-              <label>ARV Low (%) <input name="arvLowPct" type="number" step="0.1" value="-5" /></label>
-              <label>ARV High (%) <input name="arvHighPct" type="number" step="0.1" value="5" /></label>
-              <label>Rehab Low (%) <input name="rehabLowPct" type="number" step="0.1" value="-10" /></label>
-              <label>Rehab High (%) <input name="rehabHighPct" type="number" step="0.1" value="10" /></label>
-              <label>Alt Hold Months (low) <input name="holdLowMonths" type="number" min="0" step="0.1" value="4" /></label>
-              <label>Alt Hold Months (high) <input name="holdHighMonths" type="number" min="0" step="0.1" value="8" /></label>
-            </div>
-          </fieldset>
-
-          <div class="tool-actions">
-            <button type="submit" data-i18n="calculateDeal">Calculate Deal</button>
-            <button type="button" class="secondary" id="load-sample">Load Sample</button>
-            <button type="reset" class="secondary">Reset</button>
-          </div>
-        </form>
-
-        <section class="result" id="result">
-          <h3>Results</h3>
-          <div class="result-grid" id="result-cards">
-            <div class="metric"><strong>Profit</strong><span>$0</span></div>
-            <div class="metric"><strong>MAO</strong><span>$0</span></div>
-            <div class="metric"><strong>Cash to Close</strong><span>$0</span></div>
-            <div class="metric"><strong>Total Costs</strong><span>$0</span></div>
-            <div class="metric"><strong>ROI</strong><span>0.0%</span></div>
-            <div class="metric"><strong>Break-even</strong><span>$0</span></div>
-          </div>
-          <div id="result-detail" data-i18n="resultPrompt">Enter your numbers and click calculate.</div>
-        </section>
+        <p>Calculadora de flip intuitiva con modo Básico/Pro, escenarios, MAO y detalle total de costos.</p>
+        <section id="flip-calculator"></section>
       </section>
     </main>
+
     <script src="../lang.js"></script>
     <script src="../script.js"></script>
-    <script src="tool-script.js"></script>
+    <script src="../assets/js/tools/flip/flipDefaults.js"></script>
+    <script src="../assets/js/tools/flip/flipValidation.js"></script>
+    <script src="../assets/js/tools/flip/flipEngine.js"></script>
+    <script src="../assets/js/tools/flip/flipStorage.js"></script>
+    <script src="../assets/js/tools/flip/flipTemplates.js"></script>
+    <script src="../assets/js/tools/flip/flipCalculator.js"></script>
   </body>
 </html>
