@@ -390,3 +390,19 @@ main {
   color: var(--primary);
   font-weight: 600;
 }
+
+.saved-calculations-list {
+  margin: 0.4rem 0 0.8rem;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.saved-calculations-list a {
+  color: #7dd3fc;
+  text-decoration: none;
+}
+
+.saved-calculations-list a:hover {
+  text-decoration: underline;
+}

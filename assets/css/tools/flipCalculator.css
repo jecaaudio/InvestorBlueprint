@@ -9,3 +9,10 @@
 @media (max-width: 640px){
   #flip-calculator .flip-summary{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
+#flip-calculator .saved-calculations-panel { display:grid; grid-template-columns:2fr auto 2fr auto auto; gap:0.5rem; margin:0.75rem 0; }
+#flip-calculator .saved-calculations-panel input,
+#flip-calculator .saved-calculations-panel select { background:#0f172a; color:var(--text); border:1px solid var(--border); border-radius:0.6rem; padding:0.5rem 0.6rem; }
+#flip-calculator .saved-scenario-message { min-height:1.2rem; color:#7dd3fc; margin:0 0 0.6rem; font-size:0.92rem; }
+@media (max-width: 900px){
+  #flip-calculator .saved-calculations-panel{grid-template-columns:1fr 1fr;}
+}
