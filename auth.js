@@ -27,6 +27,92 @@
 
   const getUserByEmail = (email) => getUsers().find((u) => u.email === email);
 
+  const getCurrentLang = () => (document.documentElement.lang === 'es' ? 'es' : 'en');
+
+  const authMessages = {
+    emailAlreadyRegistered: {
+      es: 'Este correo ya está registrado.',
+      en: 'This email is already registered.'
+    },
+    accountCreatedTrialActive: {
+      es: 'Cuenta creada. Tu prueba gratis de 30 días está activa.',
+      en: 'Account created. Your 30-day free trial is active.'
+    },
+    accountCreatedNoTrial: {
+      es: 'Cuenta creada correctamente. Ya puedes activar tu prueba gratis.',
+      en: 'Account created successfully. You can now activate your free trial.'
+    },
+    invalidCredentials: {
+      es: 'Correo o contraseña inválidos.',
+      en: 'Invalid email or password.'
+    },
+    trialActivated: {
+      es: 'Prueba gratis activada por 30 días.',
+      en: 'Free trial activated for 30 days.'
+    },
+    trialAlreadyActive: {
+      es: 'Tu cuenta ya tiene una prueba activa o un plan de pago.',
+      en: 'Your account already has an active trial or paid plan.'
+    },
+    loginSuccess: {
+      es: 'Sesión iniciada correctamente.',
+      en: 'Signed in successfully.'
+    },
+    loginFirst: {
+      es: 'Primero inicia sesión.',
+      en: 'Please sign in first.'
+    },
+    paidActivated: {
+      es: 'Suscripción de pago activada correctamente.',
+      en: 'Paid subscription activated successfully.'
+    }
+  };
+
+  const accountPlanText = {
+    paid: {
+      status: {
+        es: 'Plan activo: Suscripción de pago',
+        en: 'Active plan: Paid subscription'
+      },
+      detail: {
+        es: 'Tienes acceso completo a todas las herramientas.',
+        en: 'You have full access to all tools.'
+      }
+    },
+    trial: {
+      status: {
+        es: 'Plan activo: Prueba gratis (30 días)',
+        en: 'Active plan: Free trial (30 days)'
+      },
+      detailPrefix: {
+        es: 'Tu prueba vence el',
+        en: 'Your trial ends on'
+      }
+    },
+    expired: {
+      status: {
+        es: 'Tu prueba gratis terminó',
+        en: 'Your free trial has ended'
+      },
+      detail: {
+        es: 'Para continuar con acceso completo, activa la suscripción de pago.',
+        en: 'To continue with full access, activate the paid subscription.'
+      }
+    },
+    none: {
+      status: {
+        es: 'Sin plan activo',
+        en: 'No active plan'
+      },
+      detail: {
+        es: 'Activa tu prueba gratis desde el botón “Start Free”.',
+        en: 'Activate your free trial from the “Start Free” button.'
+      }
+    }
+  };
+
+  const tAuth = (key) => authMessages[key]?.[getCurrentLang()] || authMessages[key]?.es || '';
+
   const getPaymentMethodLabel = (paymentMethod, lang = 'es') => {
     const labels = {
       card: { es: 'Tarjeta de crédito/débito', en: 'Credit/Debit card' },
@@ -111,7 +197,7 @@
   const updateLoginLinks = () => {
     const loginLinks = document.querySelectorAll('[data-auth-link]');
     const user = getSession();
-    const currentLang = document.documentElement.lang === 'es' ? 'es' : 'en';
+    const currentLang = getCurrentLang();
     const accountLabel = currentLang === 'es' ? 'Mi cuenta' : 'My account';
     const loginLabel = currentLang === 'es' ? 'Ingresar' : 'Login';
 
@@ -160,7 +246,7 @@
 
       const users = getUsers();
       if (users.some((u) => u.email === email)) {
-        authMessage.textContent = 'Este correo ya está registrado.';
+        authMessage.textContent = tAuth('emailAlreadyRegistered');
         return;
       }
 
@@ -177,9 +263,9 @@
 
       if (window.location.hash === '#trial') {
         startTrial(email);
-        authMessage.textContent = 'Cuenta creada. Tu prueba gratis de 30 días está activa.';
+        authMessage.textContent = tAuth('accountCreatedTrialActive');
       } else {
-        authMessage.textContent = 'Cuenta creada correctamente. Ya puedes activar tu prueba gratis.';
+        authMessage.textContent = tAuth('accountCreatedNoTrial');
       }
 
       registerForm.reset();
@@ -198,7 +284,7 @@
 
       const user = getUsers().find((u) => u.email === email && u.password === password);
       if (!user) {
-        authMessage.textContent = 'Correo o contraseña inválidos.';
+        authMessage.textContent = tAuth('invalidCredentials');
         return;
       }
 
@@ -207,10 +293,10 @@
       if (window.location.hash === '#trial') {
         const started = startTrial(user.email);
         authMessage.textContent = started
-          ? 'Prueba gratis activada por 30 días.'
-          : 'Tu cuenta ya tiene una prueba activa o un plan de pago.';
+          ? tAuth('trialActivated')
+          : tAuth('trialAlreadyActive');
       } else {
-        authMessage.textContent = 'Sesión iniciada correctamente.';
+        authMessage.textContent = tAuth('loginSuccess');
       }
 
       loginForm.reset();
@@ -224,12 +310,12 @@
     activatePaidBtn.addEventListener('click', () => {
       const current = getSession();
       if (!current) {
-        authMessage.textContent = 'Primero inicia sesión.';
+        authMessage.textContent = tAuth('loginFirst');
         return;
       }
 
       activatePaidPlan(current);
-      authMessage.textContent = 'Suscripción de pago activada correctamente.';
+      authMessage.textContent = tAuth('paidActivated');
       window.location.reload();
     });
   }
@@ -247,7 +333,7 @@
     const current = getSession();
     if (current) {
       const user = getUserByEmail(current);
-      const currentLang = document.documentElement.lang === 'es' ? 'es' : 'en';
+      const currentLang = getCurrentLang();
       const status = getSubscriptionStatus(user);
       accountPanel.hidden = false;
       accountEmail.textContent = current;
@@ -265,17 +351,17 @@
 
       if (subscriptionStatus && subscriptionDetail) {
         if (status === 'paid') {
-          subscriptionStatus.textContent = 'Plan activo: Suscripción de pago';
-          subscriptionDetail.textContent = 'Tienes acceso completo a todas las herramientas.';
+          subscriptionStatus.textContent = accountPlanText.paid.status[currentLang];
+          subscriptionDetail.textContent = accountPlanText.paid.detail[currentLang];
         } else if (status === 'trial') {
-          subscriptionStatus.textContent = 'Plan activo: Prueba gratis (30 días)';
-          subscriptionDetail.textContent = `Tu prueba vence el ${formatDate(user.trialEndsAt)}.`;
+          subscriptionStatus.textContent = accountPlanText.trial.status[currentLang];
+          subscriptionDetail.textContent = `${accountPlanText.trial.detailPrefix[currentLang]} ${formatDate(user.trialEndsAt, currentLang === 'es' ? 'es-ES' : 'en-US')}.`;
         } else if (status === 'expired') {
-          subscriptionStatus.textContent = 'Tu prueba gratis terminó';
-          subscriptionDetail.textContent = 'Para continuar con acceso completo, activa la suscripción de pago.';
+          subscriptionStatus.textContent = accountPlanText.expired.status[currentLang];
+          subscriptionDetail.textContent = accountPlanText.expired.detail[currentLang];
         } else {
-          subscriptionStatus.textContent = 'Sin plan activo';
-          subscriptionDetail.textContent = 'Activa tu prueba gratis desde el botón “Start Free”.';
+          subscriptionStatus.textContent = accountPlanText.none.status[currentLang];
+          subscriptionDetail.textContent = accountPlanText.none.detail[currentLang];
         }
       }
 
