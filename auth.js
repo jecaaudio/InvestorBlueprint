@@ -27,15 +27,29 @@
   const updateLoginLinks = () => {
     const loginLinks = document.querySelectorAll('[data-auth-link]');
     const user = getSession();
+    const currentLang = document.documentElement.lang === 'es' ? 'es' : 'en';
+    const accountLabel = currentLang === 'es' ? 'Mi cuenta' : 'My account';
+    const loginLabel = currentLang === 'es' ? 'Ingresar' : 'Login';
 
     loginLinks.forEach((link) => {
       if (user) {
-        link.textContent = `Mi cuenta (${user})`;
+        link.textContent = `${accountLabel} (${user})`;
         link.setAttribute('href', 'login.html#account');
       } else {
-        link.textContent = 'Login';
+        link.textContent = loginLabel;
         link.setAttribute('href', 'login.html');
       }
+    });
+  };
+
+  const observeLanguageChanges = () => {
+    const observer = new MutationObserver(() => {
+      updateLoginLinks();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['lang']
     });
   };
 
@@ -113,4 +127,5 @@
   }
 
   updateLoginLinks();
+  observeLanguageChanges();
 })();
