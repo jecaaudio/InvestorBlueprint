@@ -29,7 +29,7 @@
       <section class="section auth-layout">
         <article class="card auth-card">
           <h2>Crear cuenta</h2>
-          <p>Regístrate para tener tu propio acceso.</p>
+          <p>Regístrate para activar tu prueba gratis de 30 días.</p>
           <form id="register-form" class="auth-form">
             <label>Nombre
               <input type="text" name="name" required />
@@ -46,7 +46,7 @@
 
         <article class="card auth-card">
           <h2>Iniciar sesión</h2>
-          <p>Accede con tu correo y contraseña.</p>
+          <p>Si entras desde “Start Free”, activas tu prueba por 1 mes.</p>
           <form id="login-form" class="auth-form">
             <label>Correo
               <input type="email" name="email" required />
@@ -63,7 +63,12 @@
         <article class="card" id="account-panel" hidden>
           <h2>Mi cuenta</h2>
           <p>Sesión activa con: <strong id="account-email"></strong></p>
-          <button id="logout-btn" class="card-btn" type="button">Cerrar sesión</button>
+          <p><strong id="subscription-status"></strong></p>
+          <p id="subscription-detail"></p>
+          <div class="hero-actions">
+            <button id="activate-paid-btn" class="btn btn-primary" type="button">Activar suscripción de pago</button>
+            <button id="logout-btn" class="card-btn" type="button">Cerrar sesión</button>
+          </div>
         </article>
         <p id="auth-message"></p>
       </section>
