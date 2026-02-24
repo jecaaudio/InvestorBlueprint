@@ -2,30 +2,30 @@
   const createFlipDefaults = () => ({
     mode: 'basic',
     purchase: {
-      offerPrice: 150000,
-      arv: 250000,
-      buyClosingPct: 0.03,
+      offerPrice: 0,
+      arv: 0,
+      buyClosingPct: 0,
       buyClosingOverride: null,
       inspectionOther: 0
     },
     rehab: {
-      rehabBudget: 40000,
-      contingencyPct: 0.1,
-      rehabMonths: 4
+      rehabBudget: 0,
+      contingencyPct: 0,
+      rehabMonths: 0
     },
     financing: {
       type: 'cash',
-      loanToPurchasePct: 0.9,
-      loanToRehabPct: 1,
-      downPaymentPct: 0.1,
-      interestApr: 0.12,
-      pointsPct: 0.02,
+      loanToPurchasePct: 0,
+      loanToRehabPct: 0,
+      downPaymentPct: 0,
+      interestApr: 0,
+      pointsPct: 0,
       originationFees: 0,
       interestOnly: true,
       useDrawInterest: false
     },
     holding: {
-      holdMonths: 5,
+      holdMonths: 0,
       taxesPerMonth: 0,
       insurancePerMonth: 0,
       utilitiesPerMonth: 0,
@@ -36,15 +36,15 @@
       holdingMonthlyOverride: null
     },
     exit: {
-      salePrice: 250000,
+      salePrice: 0,
       salePriceTouched: false,
-      realtorCommissionPct: 0.06,
-      sellerClosingPct: 0.02,
+      realtorCommissionPct: 0,
+      sellerClosingPct: 0,
       concessions: 0,
       staging: 0
     },
     assumptions: {
-      maoRulePct: 0.7,
+      maoRulePct: 0,
       maoProfitTarget: 0
     }
   });

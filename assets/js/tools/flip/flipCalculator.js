@@ -7,7 +7,7 @@
 
     mount.innerHTML = window.FlipTemplates.appTemplate();
 
-    let state = window.FlipStorage.load() || window.FlipDefaults.createFlipDefaults();
+    let state = window.FlipDefaults.createFlipDefaults();
     let debounceId;
 
     const mergeDefaults = () => {
