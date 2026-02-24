@@ -1,6 +1,7 @@
 (function () {
   const USERS_KEY = 'ibUsers';
   const SESSION_KEY = 'ibCurrentUser';
+  const TRIAL_DAYS = 30;
 
   const getUsers = () => {
     try {
@@ -22,6 +23,79 @@
 
   const clearSession = () => {
     localStorage.removeItem(SESSION_KEY);
+  };
+
+  const getUserByEmail = (email) => getUsers().find((u) => u.email === email);
+
+  const getSubscriptionStatus = (user) => {
+    if (!user) {
+      return 'none';
+    }
+
+    if (user.subscriptionPlan === 'paid') {
+      return 'paid';
+    }
+
+    if (!user.trialEndsAt) {
+      return 'none';
+    }
+
+    return new Date(user.trialEndsAt).getTime() > Date.now() ? 'trial' : 'expired';
+  };
+
+  const formatDate = (isoDate, locale = 'es-ES') => {
+    if (!isoDate) {
+      return '—';
+    }
+
+    const date = new Date(isoDate);
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString(locale);
+  };
+
+  const startTrial = (email) => {
+    const users = getUsers();
+    const idx = users.findIndex((u) => u.email === email);
+
+    if (idx === -1) {
+      return false;
+    }
+
+    const status = getSubscriptionStatus(users[idx]);
+    if (status === 'trial' || status === 'paid') {
+      return false;
+    }
+
+    const startsAt = new Date();
+    const endsAt = new Date(startsAt);
+    endsAt.setDate(endsAt.getDate() + TRIAL_DAYS);
+
+    users[idx] = {
+      ...users[idx],
+      trialStartsAt: startsAt.toISOString(),
+      trialEndsAt: endsAt.toISOString(),
+      subscriptionPlan: 'trial'
+    };
+
+    saveUsers(users);
+    return true;
+  };
+
+  const activatePaidPlan = (email) => {
+    const users = getUsers();
+    const idx = users.findIndex((u) => u.email === email);
+
+    if (idx === -1) {
+      return false;
+    }
+
+    users[idx] = {
+      ...users[idx],
+      subscriptionPlan: 'paid',
+      paidActivatedAt: new Date().toISOString()
+    };
+
+    saveUsers(users);
+    return true;
   };
 
   const updateLoginLinks = () => {
@@ -56,9 +130,12 @@
   const registerForm = document.getElementById('register-form');
   const loginForm = document.getElementById('login-form');
   const logoutBtn = document.getElementById('logout-btn');
+  const activatePaidBtn = document.getElementById('activate-paid-btn');
   const authMessage = document.getElementById('auth-message');
   const accountPanel = document.getElementById('account-panel');
   const accountEmail = document.getElementById('account-email');
+  const subscriptionStatus = document.getElementById('subscription-status');
+  const subscriptionDetail = document.getElementById('subscription-detail');
 
   if (registerForm) {
     registerForm.addEventListener('submit', (event) => {
@@ -74,10 +151,17 @@
         return;
       }
 
-      users.push({ name, email, password });
+      users.push({ name, email, password, subscriptionPlan: 'none' });
       saveUsers(users);
       setSession(email);
-      authMessage.textContent = 'Cuenta creada correctamente. Sesión iniciada.';
+
+      if (window.location.hash === '#trial') {
+        startTrial(email);
+        authMessage.textContent = 'Cuenta creada. Tu prueba gratis de 30 días está activa.';
+      } else {
+        authMessage.textContent = 'Cuenta creada correctamente. Ya puedes activar tu prueba gratis.';
+      }
+
       registerForm.reset();
       updateLoginLinks();
       window.location.hash = 'account';
@@ -99,10 +183,33 @@
       }
 
       setSession(user.email);
-      authMessage.textContent = 'Sesión iniciada correctamente.';
+
+      if (window.location.hash === '#trial') {
+        const started = startTrial(user.email);
+        authMessage.textContent = started
+          ? 'Prueba gratis activada por 30 días.'
+          : 'Tu cuenta ya tiene una prueba activa o un plan de pago.';
+      } else {
+        authMessage.textContent = 'Sesión iniciada correctamente.';
+      }
+
       loginForm.reset();
       updateLoginLinks();
       window.location.hash = 'account';
+      window.location.reload();
+    });
+  }
+
+  if (activatePaidBtn) {
+    activatePaidBtn.addEventListener('click', () => {
+      const current = getSession();
+      if (!current) {
+        authMessage.textContent = 'Primero inicia sesión.';
+        return;
+      }
+
+      activatePaidPlan(current);
+      authMessage.textContent = 'Suscripción de pago activada correctamente.';
       window.location.reload();
     });
   }
@@ -119,8 +226,30 @@
   if (accountPanel && accountEmail) {
     const current = getSession();
     if (current) {
+      const user = getUserByEmail(current);
+      const status = getSubscriptionStatus(user);
       accountPanel.hidden = false;
       accountEmail.textContent = current;
+
+      if (subscriptionStatus && subscriptionDetail) {
+        if (status === 'paid') {
+          subscriptionStatus.textContent = 'Plan activo: Suscripción de pago';
+          subscriptionDetail.textContent = 'Tienes acceso completo a todas las herramientas.';
+        } else if (status === 'trial') {
+          subscriptionStatus.textContent = 'Plan activo: Prueba gratis (30 días)';
+          subscriptionDetail.textContent = `Tu prueba vence el ${formatDate(user.trialEndsAt)}.`;
+        } else if (status === 'expired') {
+          subscriptionStatus.textContent = 'Tu prueba gratis terminó';
+          subscriptionDetail.textContent = 'Para continuar con acceso completo, activa la suscripción de pago.';
+        } else {
+          subscriptionStatus.textContent = 'Sin plan activo';
+          subscriptionDetail.textContent = 'Activa tu prueba gratis desde el botón “Start Free”.';
+        }
+      }
+
+      if (activatePaidBtn) {
+        activatePaidBtn.hidden = status === 'paid';
+      }
     } else {
       accountPanel.hidden = true;
     }

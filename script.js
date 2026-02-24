@@ -27,9 +27,11 @@
   const preferred = localStorage.getItem('preferredLanguage') || browserLanguage;
   applyLanguage(preferred === 'es' ? 'es' : 'en');
 
-  toggle.addEventListener('click', () => {
-    applyLanguage(nextLanguage());
-  });
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      applyLanguage(nextLanguage());
+    });
+  }
 
   if (menuToggle && nav) {
     const closeMenu = () => {
@@ -52,4 +54,43 @@
       }
     });
   }
+
+  const getUsers = () => {
+    try {
+      return JSON.parse(localStorage.getItem('ibUsers') || '[]');
+    } catch {
+      return [];
+    }
+  };
+
+  const currentSession = localStorage.getItem('ibCurrentUser');
+  const currentUser = getUsers().find((user) => user.email === currentSession);
+
+  const hasActiveAccess = () => {
+    if (!currentUser) {
+      return false;
+    }
+
+    if (currentUser.subscriptionPlan === 'paid') {
+      return true;
+    }
+
+    if (!currentUser.trialEndsAt) {
+      return false;
+    }
+
+    return new Date(currentUser.trialEndsAt).getTime() > Date.now();
+  };
+
+  document.querySelectorAll('[data-pro-tool="true"]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (hasActiveAccess()) {
+        return;
+      }
+
+      event.preventDefault();
+      alert('Este módulo Pro requiere prueba activa o suscripción de pago. Inicia en “Start Free”.');
+      window.location.href = 'login.html#trial';
+    });
+  });
 })();
