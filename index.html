@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Investor Blueprint | Real Estate Tools</title>
+    <meta
+      name="description"
+      content="Interactive bilingual platform for real estate investors with calculators, education, and scalable SaaS-ready architecture."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="logo">InvestorBlueprint</div>
+      <nav>
+        <a href="#tools" data-i18n="navTools">Tools</a>
+        <a href="#learn" data-i18n="navLearn">Learn</a>
+        <a href="#pricing" data-i18n="navPricing">Pricing</a>
+        <a href="#" data-i18n="navLogin">Login</a>
+      </nav>
+      <button id="lang-toggle" class="lang-toggle" aria-label="Toggle language">
+        🇺🇸 EN | 🇪🇸 ES
+      </button>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow" data-i18n="heroTagline">Interactive platform for modern investors</p>
+        <h1 data-i18n="heroTitle">Build Wealth Through Real Estate, Smarter.</h1>
+        <p class="hero-copy" data-i18n="heroDescription">
+          Analyze deals, compare scenarios, and learn professional investing frameworks in one place.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#pricing" data-i18n="heroStart">Start Free</a>
+          <a class="btn btn-secondary" href="#tools" data-i18n="heroExplore">Explore Tools</a>
+        </div>
+      </section>
+
+      <section id="tools" class="section">
+        <div class="section-heading">
+          <h2 data-i18n="toolsTitle">Tools Preview</h2>
+          <p data-i18n="toolsDescription">Real calculators for real decisions.</p>
+        </div>
+        <div class="tool-grid">
+          <article class="card">
+            <span class="badge free">FREE</span>
+            <h3 data-i18n="toolFlipTitle">🧮 Flip Calculator</h3>
+            <p data-i18n="toolFlipDesc">Estimate renovation spread, profit margin, and exit risk before you buy.</p>
+            <button class="card-btn" data-i18n="tryTool">Open Tool</button>
+          </article>
+          <article class="card">
+            <span class="badge free">FREE</span>
+            <h3 data-i18n="toolRentalTitle">📈 Rental Cash Flow</h3>
+            <p data-i18n="toolRentalDesc">Project monthly cash flow with taxes, vacancies, and maintenance assumptions.</p>
+            <button class="card-btn" data-i18n="tryTool">Open Tool</button>
+          </article>
+          <article class="card">
+            <span class="badge pro">PRO</span>
+            <h3 data-i18n="toolArvTitle">🏠 ARV Estimator</h3>
+            <p data-i18n="toolArvDesc">Model comparable sales and confidence ranges to price your exit correctly.</p>
+            <button class="card-btn" data-i18n="tryTool">Open Tool</button>
+          </article>
+          <article class="card">
+            <span class="badge pro">PRO</span>
+            <h3 data-i18n="toolHardMoneyTitle">💰 Hard Money Analyzer</h3>
+            <p data-i18n="toolHardMoneyDesc">Understand lender points, interest carry, and blended deal cost in seconds.</p>
+            <button class="card-btn" data-i18n="tryTool">Open Tool</button>
+          </article>
+        </div>
+      </section>
+
+      <section id="learn" class="section learn">
+        <div class="section-heading">
+          <h2 data-i18n="learnTitle">Learn</h2>
+          <p data-i18n="learnDescription">Mini guides to build investor judgment.</p>
+        </div>
+        <ul class="article-list">
+          <li data-i18n="article1">How to Structure a Cash Offer</li>
+          <li data-i18n="article2">What is a HELOC and when should you use it?</li>
+          <li data-i18n="article3">How to Calculate ARV Correctly</li>
+        </ul>
+      </section>
+
+      <section id="pricing" class="section pricing">
+        <div class="section-heading">
+          <h2 data-i18n="pricingTitle">Pricing</h2>
+          <p data-i18n="pricingDescription">Start free, upgrade when you're ready to scale.</p>
+        </div>
+        <div class="pricing-grid">
+          <article class="price-card">
+            <h3 data-i18n="freePlan">Free Plan</h3>
+            <ul>
+              <li data-i18n="free1">Basic calculators</li>
+              <li data-i18n="free2">Limited access</li>
+            </ul>
+          </article>
+          <article class="price-card featured">
+            <h3 data-i18n="proPlan">Pro Plan</h3>
+            <ul>
+              <li data-i18n="pro1">All tools included</li>
+              <li data-i18n="pro2">Save projects</li>
+              <li data-i18n="pro3">Export PDF reports</li>
+              <li data-i18n="pro4">Scenario comparison</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script src="lang.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
