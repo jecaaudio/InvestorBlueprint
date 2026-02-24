@@ -27,6 +27,16 @@
 
   const getUserByEmail = (email) => getUsers().find((u) => u.email === email);
 
+  const getPaymentMethodLabel = (paymentMethod, lang = 'es') => {
+    const labels = {
+      card: { es: 'Tarjeta de crédito/débito', en: 'Credit/Debit card' },
+      transfer: { es: 'Transferencia bancaria', en: 'Bank transfer' },
+      paypal: { es: 'PayPal', en: 'PayPal' }
+    };
+
+    return labels[paymentMethod]?.[lang] || (lang === 'es' ? 'No definido' : 'Not set');
+  };
+
   const getSubscriptionStatus = (user) => {
     if (!user) {
       return 'none';
@@ -136,6 +146,8 @@
   const accountEmail = document.getElementById('account-email');
   const subscriptionStatus = document.getElementById('subscription-status');
   const subscriptionDetail = document.getElementById('subscription-detail');
+  const accountPaymentMethod = document.getElementById('account-payment-method');
+  const enrollmentPaymentStatus = document.getElementById('enrollment-payment-status');
 
   if (registerForm) {
     registerForm.addEventListener('submit', (event) => {
@@ -144,6 +156,7 @@
       const name = String(data.get('name') || '').trim();
       const email = String(data.get('email') || '').trim().toLowerCase();
       const password = String(data.get('password') || '').trim();
+      const paymentMethod = String(data.get('paymentMethod') || '').trim();
 
       const users = getUsers();
       if (users.some((u) => u.email === email)) {
@@ -151,7 +164,14 @@
         return;
       }
 
-      users.push({ name, email, password, subscriptionPlan: 'none' });
+      users.push({
+        name,
+        email,
+        password,
+        paymentMethod,
+        enrollmentPaidAt: new Date().toISOString(),
+        subscriptionPlan: 'none'
+      });
       saveUsers(users);
       setSession(email);
 
@@ -227,9 +247,21 @@
     const current = getSession();
     if (current) {
       const user = getUserByEmail(current);
+      const currentLang = document.documentElement.lang === 'es' ? 'es' : 'en';
       const status = getSubscriptionStatus(user);
       accountPanel.hidden = false;
       accountEmail.textContent = current;
+
+      if (accountPaymentMethod && enrollmentPaymentStatus) {
+        accountPaymentMethod.textContent = getPaymentMethodLabel(user?.paymentMethod, currentLang);
+        enrollmentPaymentStatus.textContent = user?.enrollmentPaidAt
+          ? currentLang === 'es'
+            ? `Pagada el ${formatDate(user.enrollmentPaidAt)}`
+            : `Paid on ${formatDate(user.enrollmentPaidAt, 'en-US')}`
+          : currentLang === 'es'
+            ? 'Pendiente'
+            : 'Pending';
+      }
 
       if (subscriptionStatus && subscriptionDetail) {
         if (status === 'paid') {

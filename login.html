@@ -44,6 +44,13 @@
             <label><span data-i18n="labelPassword">Password</span>
               <input type="password" name="password" minlength="4" required />
             </label>
+            <label><span data-i18n="registerPaymentMethod">Payment method for enrollment</span>
+              <select name="paymentMethod" required>
+                <option value="card" data-i18n="paymentOptionCard">Credit/Debit card</option>
+                <option value="transfer" data-i18n="paymentOptionTransfer">Bank transfer</option>
+                <option value="paypal" data-i18n="paymentOptionPaypal">PayPal</option>
+              </select>
+            </label>
             <button class="btn btn-primary" type="submit" data-i18n="registerBtn">Create account</button>
           </form>
         </article>
@@ -67,6 +74,8 @@
         <article class="card" id="account-panel" hidden>
           <h2 data-i18n="accountTitle">My account</h2>
           <p><span data-i18n="accountActiveSession">Active session with:</span> <strong id="account-email"></strong></p>
+          <p><span data-i18n="accountPaymentMethod">Enrollment payment method:</span> <strong id="account-payment-method"></strong></p>
+          <p><span data-i18n="accountEnrollmentStatus">Enrollment payment status:</span> <strong id="enrollment-payment-status"></strong></p>
           <p><strong id="subscription-status"></strong></p>
           <p id="subscription-detail"></p>
           <div class="hero-actions">
