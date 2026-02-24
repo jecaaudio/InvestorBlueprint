@@ -74,7 +74,7 @@ body {
 }
 
 .container {
-  width: min(780px, 92vw);
+  width: min(980px, 92vw);
   margin: 2rem auto;
 }
 
@@ -95,6 +95,19 @@ h1 { margin-top: 0.5rem; }
 
 p { color: var(--muted); }
 
+fieldset {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  margin: 0.95rem 0;
+  padding: 0.75rem;
+}
+
+legend {
+  padding: 0 0.4rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -107,7 +120,8 @@ label {
   font-size: 0.95rem;
 }
 
-input {
+input,
+select {
   border: 1px solid var(--border);
   background: var(--panel);
   color: var(--text);
@@ -133,3 +147,57 @@ button {
   padding: 0.9rem;
   background: rgba(15, 23, 42, 0.5);
 }
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.6rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.metric {
+  border: 1px solid var(--border);
+  background: rgba(2, 6, 23, 0.45);
+  border-radius: 0.65rem;
+  padding: 0.55rem;
+}
+
+.metric strong {
+  display: block;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.metric span {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.7rem 0;
+}
+
+th,
+td {
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+}
+
+.badge.green { background: rgba(22, 163, 74, 0.2); color: #86efac; }
+.badge.yellow { background: rgba(234, 179, 8, 0.2); color: #fde68a; }
+.badge.red { background: rgba(220, 38, 38, 0.2); color: #fca5a5; }
