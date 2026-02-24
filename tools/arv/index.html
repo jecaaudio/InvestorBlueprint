@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ARV Tool | InvestorBlueprint</title>
+    <link rel="stylesheet" href="../tool-styles.css" />
+    <link rel="stylesheet" href="arv.css" />
+  </head>
+  <body>
+    <header class="tool-navbar">
+      <div class="brand-menu">
+        <a class="tool-logo" href="../../index.html">InvestorBlueprint</a>
+        <nav class="brand-dropdown" aria-label="Quick navigation">
+          <a href="../../index.html">Home</a>
+          <a href="../../index.html#tools">Tools</a>
+          <a href="../../index.html#learn">Learn</a>
+          <a href="../../index.html#pricing">Pricing</a>
+          <a href="../../login.html">Login</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card arv-shell">
+        <h1>🏠 Automated ARV Tool</h1>
+        <p>Enter an address to get subject details, sold comps, and an ARV estimate.</p>
+
+        <form id="arv-form" class="arv-form">
+          <label>
+            Address
+            <input id="address" name="address" type="text" placeholder="123 Main St, Miami, FL" required />
+          </label>
+          <button type="submit" id="calculate-btn">Calcular ARV</button>
+        </form>
+
+        <div id="status" class="status" aria-live="polite">Ready.</div>
+        <div id="error" class="error" role="alert" hidden></div>
+
+        <section class="result-grid" id="results" hidden>
+          <article class="metric-block">
+            <h2>Subject</h2>
+            <div id="subject-fields" class="kv-grid"></div>
+          </article>
+
+          <article class="metric-block">
+            <h2>ARV</h2>
+            <div id="arv-fields" class="kv-grid"></div>
+          </article>
+        </section>
+
+        <div class="action-row" id="action-row" hidden>
+          <button type="button" id="copy-btn">Copiar reporte</button>
+          <button type="button" id="export-btn">Export JSON</button>
+        </div>
+
+        <div class="table-wrap" id="comps-wrap" hidden>
+          <table>
+            <thead>
+              <tr>
+                <th>Address</th>
+                <th>Distance (mi)</th>
+                <th>Sold Date</th>
+                <th>Sold Price</th>
+                <th>Beds</th>
+                <th>Baths</th>
+                <th>Sqft</th>
+                <th>Price/Sqft</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody id="comps-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="arv.js"></script>
+  </body>
+</html>
