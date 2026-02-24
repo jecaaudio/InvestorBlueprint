@@ -186,13 +186,19 @@ main {
 }
 
 .card-btn {
+  display: inline-block;
   margin-top: 0.7rem;
   background: transparent;
   color: var(--text);
+  text-decoration: none;
   border: 1px solid var(--border);
   border-radius: 0.6rem;
   padding: 0.45rem 0.85rem;
   cursor: pointer;
+}
+
+.card-btn:hover {
+  border-color: var(--primary);
 }
 
 .article-list {
@@ -248,4 +254,37 @@ main {
     max-width: 320px;
     text-align: center;
   }
+}
+
+.auth-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.auth-card {
+  min-height: 100%;
+}
+
+.auth-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.auth-form label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.auth-form input {
+  border: 1px solid var(--border);
+  background: #0f172a;
+  color: var(--text);
+  border-radius: 0.6rem;
+  padding: 0.55rem 0.7rem;
+}
+
+#auth-message {
+  color: var(--primary);
+  font-weight: 600;
 }

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | InvestorBlueprint</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="logo">InvestorBlueprint</div>
+      <nav id="primary-nav" class="is-open">
+        <a href="index.html#tools">Herramientas</a>
+        <a href="index.html#learn">Aprender</a>
+        <a href="index.html#pricing">Precios</a>
+        <a href="login.html" data-auth-link>Login</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section auth-layout">
+        <article class="card auth-card">
+          <h2>Crear cuenta</h2>
+          <p>Regístrate para tener tu propio acceso.</p>
+          <form id="register-form" class="auth-form">
+            <label>Nombre
+              <input type="text" name="name" required />
+            </label>
+            <label>Correo
+              <input type="email" name="email" required />
+            </label>
+            <label>Contraseña
+              <input type="password" name="password" minlength="4" required />
+            </label>
+            <button class="btn btn-primary" type="submit">Crear cuenta</button>
+          </form>
+        </article>
+
+        <article class="card auth-card">
+          <h2>Iniciar sesión</h2>
+          <p>Accede con tu correo y contraseña.</p>
+          <form id="login-form" class="auth-form">
+            <label>Correo
+              <input type="email" name="email" required />
+            </label>
+            <label>Contraseña
+              <input type="password" name="password" required />
+            </label>
+            <button class="btn btn-secondary" type="submit">Entrar</button>
+          </form>
+        </article>
+      </section>
+
+      <section id="account" class="section" aria-live="polite">
+        <article class="card" id="account-panel" hidden>
+          <h2>Mi cuenta</h2>
+          <p>Sesión activa con: <strong id="account-email"></strong></p>
+          <button id="logout-btn" class="card-btn" type="button">Cerrar sesión</button>
+        </article>
+        <p id="auth-message"></p>
+      </section>
+    </main>
+
+    <script src="auth.js"></script>
+  </body>
+</html>

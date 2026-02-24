@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rental Cash Flow | InvestorBlueprint</title>
+    <link rel="stylesheet" href="tool-styles.css" />
+  </head>
+  <body data-tool="rental">
+    <main class="container">
+      <a class="back-link" href="../index.html">← Back to tools</a>
+      <section class="card">
+        <h1>📈 Rental Cash Flow</h1>
+        <p>Fill your income and expenses to project monthly and annual cash flow.</p>
+        <form id="tool-form">
+          <div class="form-grid">
+            <label>Monthly Rent <input name="monthlyRent" type="number" min="0" required /></label>
+            <label>Property Taxes / month <input name="taxes" type="number" min="0" value="0" /></label>
+            <label>Insurance / month <input name="insurance" type="number" min="0" value="0" /></label>
+            <label>Maintenance / month <input name="maintenance" type="number" min="0" value="0" /></label>
+            <label>Property Management / month <input name="management" type="number" min="0" value="0" /></label>
+            <label>Vacancy Rate (%) <input name="vacancyRate" type="number" min="0" max="100" value="5" /></label>
+          </div>
+          <button type="submit">Calculate</button>
+        </form>
+        <div class="result" id="result">Enter your numbers and click calculate.</div>
+      </section>
+    </main>
+    <script src="tool-script.js"></script>
+  </body>
+</html>
