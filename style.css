@@ -110,18 +110,35 @@ nav a {
   padding: 0.25rem 0;
 }
 
-.lang-toggle {
+.lang-switcher {
   margin-left: 1rem;
+  display: inline-flex;
   border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.lang-option {
+  border: 0;
   background: transparent;
   color: var(--text);
-  border-radius: 999px;
-  padding: 0.45rem 0.85rem;
+  padding: 0.45rem 0.75rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
 }
 
+.lang-option + .lang-option {
+  border-left: 1px solid var(--border);
+}
+
+.lang-option.is-active {
+  background: rgba(14, 165, 233, 0.22);
+  color: #fff;
+}
 
 .flag-emoji {
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
@@ -342,7 +359,7 @@ main {
     padding-top: 0.3rem;
   }
 
-  .lang-toggle {
+  .lang-switcher {
     margin-left: auto;
   }
 
