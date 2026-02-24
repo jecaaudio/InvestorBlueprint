@@ -1,0 +1,11 @@
+#flip-calculator .flip-header { display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; align-items:center; }
+#flip-calculator .flip-controls { display:flex; flex-wrap:wrap; gap:0.5rem; }
+#flip-calculator .mode-btn.active { outline:2px solid #0ea5e9; }
+#flip-calculator .flip-summary { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:0.6rem; margin:1rem 0; }
+#flip-calculator .card-block { border:1px solid var(--border); border-radius:0.75rem; padding:0.75rem; margin:0.75rem 0; background:rgba(2,6,23,.3); }
+#flip-calculator .form-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:0.7rem; margin-bottom:0.8rem; }
+#flip-calculator .error { color:#fca5a5; font-size:.9rem; }
+#flip-calculator .warning { color:#fde68a; font-size:.9rem; }
+@media (max-width: 640px){
+  #flip-calculator .flip-summary{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
