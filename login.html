@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acceso | InvestorBlueprint</title>
+    <meta name="description" content="Registro e inicio de sesión de InvestorBlueprint." />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="logo">InvestorBlueprint</div>
+      <button
+        id="menu-toggle"
+        class="menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="primary-nav"
+      >
+        ☰ Menu
+      </button>
+      <nav id="primary-nav">
+        <a href="index.html#tools">Herramientas</a>
+        <a href="index.html#learn">Aprender</a>
+        <a href="index.html#pricing">Precios</a>
+        <a href="login.html" data-auth-link>Login</a>
+      </nav>
+      <a class="lang-toggle" href="index.html">Volver al inicio</a>
+    </header>
+
+    <main>
+      <section class="section auth-hero">
+        <p class="eyebrow">Tu espacio personal</p>
+        <h1>Accede a tus herramientas</h1>
+        <p class="hero-copy">Crea tu cuenta o inicia sesión para gestionar tus cálculos y continuar donde lo dejaste en este dispositivo.</p>
+      </section>
+
+      <section class="section auth-layout" aria-live="polite">
+        <article class="card auth-card">
+          <div class="auth-tabs" role="tablist" aria-label="Formularios de acceso">
+            <button class="auth-tab is-active" type="button" data-auth-tab="login" role="tab" aria-selected="true">Iniciar sesión</button>
+            <button class="auth-tab" type="button" data-auth-tab="register" role="tab" aria-selected="false">Crear cuenta</button>
+          </div>
+
+          <form id="login-form" class="auth-form" data-auth-panel="login">
+            <label>Correo
+              <input type="email" name="email" autocomplete="email" required />
+            </label>
+            <label>Contraseña
+              <input type="password" name="password" minlength="6" autocomplete="current-password" required />
+            </label>
+            <label class="inline-check"><input type="checkbox" id="show-login-password" /> Mostrar contraseña</label>
+            <button class="btn btn-primary" type="submit">Entrar</button>
+          </form>
+
+          <form id="register-form" class="auth-form" data-auth-panel="register" hidden>
+            <label>Nombre completo
+              <input type="text" name="name" minlength="2" autocomplete="name" required />
+            </label>
+            <label>Correo
+              <input type="email" name="email" autocomplete="email" required />
+            </label>
+            <label>Contraseña
+              <input type="password" name="password" minlength="6" autocomplete="new-password" required />
+            </label>
+            <label>Confirmar contraseña
+              <input type="password" name="confirmPassword" minlength="6" autocomplete="new-password" required />
+            </label>
+            <label class="inline-check"><input type="checkbox" id="show-register-password" /> Mostrar contraseñas</label>
+            <button class="btn btn-secondary" type="submit">Crear cuenta</button>
+          </form>
+
+          <p id="auth-message" class="auth-message" role="status"></p>
+        </article>
+
+        <article class="card auth-card auth-account" id="account-panel" hidden>
+          <h2>Mi cuenta</h2>
+          <p>Sesión activa como <strong id="account-email"></strong></p>
+          <p class="muted">Tu sesión queda guardada en este navegador.</p>
+          <button id="logout-btn" class="card-btn" type="button">Cerrar sesión</button>
+        </article>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script src="auth.js"></script>
+  </body>
+</html>

@@ -26,7 +26,7 @@
         <a href="#tools" data-i18n="navTools">Tools</a>
         <a href="#learn" data-i18n="navLearn">Learn</a>
         <a href="#pricing" data-i18n="navPricing">Pricing</a>
-        <a href="#" data-i18n="navLogin">Login</a>
+        <a href="login.html" data-i18n="navLogin" data-auth-link>Login</a>
       </nav>
       <button id="lang-toggle" class="lang-toggle" aria-label="Toggle language">
         <span class="flag-emoji" aria-hidden="true">🇺🇸</span> EN |
@@ -57,25 +57,25 @@
             <span class="badge free">FREE</span>
             <h3 data-i18n="toolFlipTitle">🧮 Flip Calculator</h3>
             <p data-i18n="toolFlipDesc">Estimate renovation spread, profit margin, and exit risk before you buy.</p>
-            <button class="card-btn" data-i18n="tryTool">Open Tool</button>
+            <a class="card-btn" href="tools/flip-calculator.html" data-i18n="tryTool">Open Tool</a>
           </article>
           <article class="card">
             <span class="badge free">FREE</span>
             <h3 data-i18n="toolRentalTitle">📈 Rental Cash Flow</h3>
             <p data-i18n="toolRentalDesc">Project monthly cash flow with taxes, vacancies, and maintenance assumptions.</p>
-            <button class="card-btn" data-i18n="tryTool">Open Tool</button>
+            <a class="card-btn" href="tools/rental-cash-flow.html" data-i18n="tryTool">Open Tool</a>
           </article>
           <article class="card">
             <span class="badge pro">PRO</span>
             <h3 data-i18n="toolArvTitle">🏠 ARV Estimator</h3>
             <p data-i18n="toolArvDesc">Model comparable sales and confidence ranges to price your exit correctly.</p>
-            <button class="card-btn" data-i18n="tryTool">Open Tool</button>
+            <a class="card-btn" href="tools/arv-estimator.html" data-i18n="tryTool">Open Tool</a>
           </article>
           <article class="card">
             <span class="badge pro">PRO</span>
             <h3 data-i18n="toolHardMoneyTitle">💰 Hard Money Analyzer</h3>
             <p data-i18n="toolHardMoneyDesc">Understand lender points, interest carry, and blended deal cost in seconds.</p>
-            <button class="card-btn" data-i18n="tryTool">Open Tool</button>
+            <a class="card-btn" href="tools/hard-money-analyzer.html" data-i18n="tryTool">Open Tool</a>
           </article>
         </div>
       </section>
@@ -120,5 +120,6 @@
 
     <script src="lang.js"></script>
     <script src="script.js"></script>
+    <script src="auth.js"></script>
   </body>
 </html>
