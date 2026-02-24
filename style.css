@@ -377,7 +377,8 @@ main {
   gap: 0.35rem;
 }
 
-.auth-form input {
+.auth-form input,
+.auth-form select {
   border: 1px solid var(--border);
   background: #0f172a;
   color: var(--text);
