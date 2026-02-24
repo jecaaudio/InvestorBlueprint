@@ -2,6 +2,7 @@
   const form = document.getElementById('tool-form');
   const output = document.getElementById('result');
   const type = document.body.dataset.tool;
+  const planHint = document.getElementById('plan-hint');
 
   if (!form || !output || !type) {
     return;
@@ -11,6 +12,33 @@
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 
   const pct = (value) => `${value.toFixed(1)}%`;
+
+  const syncPlanMode = () => {
+    if (type !== 'flip') {
+      return;
+    }
+
+    const selected = form.querySelector('input[name="planMode"]:checked')?.value || 'free';
+    const proSections = form.querySelectorAll('.pro-only');
+    const isPro = selected === 'pro';
+
+    proSections.forEach((section) => {
+      section.classList.toggle('is-hidden', !isPro);
+    });
+
+    if (planHint) {
+      planHint.textContent = isPro
+        ? 'Pro mode enabled: includes financing stack, MAO strategy checks, risk buffer and sensitivity table.'
+        : 'Free mode: quick estimate with purchase, rehab, holding and sale costs only.';
+    }
+  };
+
+  if (type === 'flip') {
+    form.querySelectorAll('input[name="planMode"]').forEach((input) => {
+      input.addEventListener('change', syncPlanMode);
+    });
+    syncPlanMode();
+  }
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -38,6 +66,7 @@
   }[lang];
 
     if (type === 'flip') {
+      const planMode = values.planMode || 'free';
       const purchase = num('purchasePrice');
       const earnest = num('earnestDeposit');
       const buyerClosing = num('buyerClosing');
@@ -69,6 +98,27 @@
 
       const acquisitionTotal = purchase + earnest + buyerClosing + titleFees + prorations + inspection;
       const projectCostBeforeFinancing = acquisitionTotal + rehabTotal + holdingTotal + sellingTotal;
+
+      if (planMode === 'free') {
+        const quickNet = sale - projectCostBeforeFinancing;
+        const marginQuick = sale ? (quickNet / sale) * 100 : 0;
+        const simpleMao = sale * 0.7 - rehabTotal;
+        const statusClass = quickNet > 0 ? 'green' : 'red';
+        const statusLabel = quickNet > 0 ? 'Basic deal looks profitable' : 'Basic deal is negative';
+
+        output.innerHTML = `
+          <div class="badge ${statusClass}">${statusLabel}</div>
+          <h3>Free quick result</h3>
+          <div class="result-grid">
+            <div class="metric"><strong>Total project cost</strong><span>${money(projectCostBeforeFinancing)}</span></div>
+            <div class="metric"><strong>Estimated net profit</strong><span>${money(quickNet)}</span></div>
+            <div class="metric"><strong>Profit margin</strong><span>${pct(marginQuick)}</span></div>
+            <div class="metric"><strong>Simple MAO (70% rule)</strong><span>${money(simpleMao)}</span></div>
+          </div>
+          <p>Upgrade to Pro mode in this same calculator to unlock financing costs, cash-required analysis, target-based MAO and sensitivity scenarios.</p>
+        `;
+        return;
+      }
 
       const financingType = values.financingType || 'cash';
       const loanAmountInput = num('loanAmount');
