@@ -72,7 +72,29 @@
       return `<label>${label}<input inputmode="decimal" data-path="${path}" type="number" step="${type === 'int' ? '1' : '0.01'}" value="${value}"></label>`;
     };
 
+    const getFocusedField = () => {
+      const active = document.activeElement;
+      if (!active || active.tagName !== 'INPUT' || !active.dataset.path) return null;
+      return {
+        path: active.dataset.path,
+        type: active.type,
+        selectionStart: typeof active.selectionStart === 'number' ? active.selectionStart : null,
+        selectionEnd: typeof active.selectionEnd === 'number' ? active.selectionEnd : null
+      };
+    };
+
+    const restoreFocusedField = (focusState) => {
+      if (!focusState) return;
+      const next = mount.querySelector(`input[data-path="${focusState.path}"]`);
+      if (!next) return;
+      next.focus({ preventScroll: true });
+      if (focusState.type !== 'checkbox' && focusState.selectionStart != null && focusState.selectionEnd != null) {
+        next.setSelectionRange(focusState.selectionStart, focusState.selectionEnd);
+      }
+    };
+
     const render = () => {
+      const focusState = getFocusedField();
       const validation = window.FlipValidation.validate(state);
       const result = window.FlipEngine.compute(state);
       const scenarios = window.FlipEngine.computeScenarios(state);
@@ -170,6 +192,8 @@
           render();
         });
       });
+
+      restoreFocusedField(focusState);
     };
 
     const queueSave = () => {
