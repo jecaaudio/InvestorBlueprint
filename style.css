@@ -186,13 +186,19 @@ main {
 }
 
 .card-btn {
+  display: inline-block;
   margin-top: 0.7rem;
   background: transparent;
   color: var(--text);
+  text-decoration: none;
   border: 1px solid var(--border);
   border-radius: 0.6rem;
   padding: 0.45rem 0.85rem;
   cursor: pointer;
+}
+
+.card-btn:hover {
+  border-color: var(--primary);
 }
 
 .article-list {
