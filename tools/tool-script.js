@@ -17,6 +17,26 @@
     const values = Object.fromEntries(new FormData(form).entries());
     const num = (name) => Number(values[name] || 0);
 
+  const lang = document.documentElement.lang === 'es' ? 'es' : 'en';
+  const copy = {
+    en: {
+      monthlyCashFlow: 'Monthly Cash Flow',
+      annualCashFlow: 'Annual Cash Flow',
+      estimatedArv: 'Estimated ARV',
+      maxOffer: 'Maximum Offer (70% Rule)',
+      totalFinancingCost: 'Total Financing Cost',
+      monthlyInterestCarry: 'Monthly Interest Carry'
+    },
+    es: {
+      monthlyCashFlow: 'Flujo de caja mensual',
+      annualCashFlow: 'Flujo de caja anual',
+      estimatedArv: 'ARV estimado',
+      maxOffer: 'Oferta máxima (regla del 70%)',
+      totalFinancingCost: 'Costo total del financiamiento',
+      monthlyInterestCarry: 'Carga mensual de intereses'
+    }
+  }[lang];
+
     if (type === 'flip') {
       const purchase = num('purchasePrice');
       const earnest = num('earnestDeposit');
@@ -183,7 +203,7 @@
       const management = num('management');
       const adjustedRent = rent * (1 - vacancyRate);
       const cashFlow = adjustedRent - taxes - insurance - maintenance - management;
-      output.innerHTML = `<strong>Monthly Cash Flow:</strong> ${money(cashFlow)}<br><strong>Annual Cash Flow:</strong> ${money(cashFlow * 12)}`;
+      output.innerHTML = `<strong>${copy.monthlyCashFlow}:</strong> ${money(cashFlow)}<br><strong>${copy.annualCashFlow}:</strong> ${money(cashFlow * 12)}`;
       return;
     }
 
@@ -194,7 +214,7 @@
       const repairs = num('repairs');
       const average = (comp1 + comp2 + comp3) / 3;
       const buyMax = average * 0.7 - repairs;
-      output.innerHTML = `<strong>Estimated ARV:</strong> ${money(average)}<br><strong>Maximum Offer (70% Rule):</strong> ${money(buyMax)}`;
+      output.innerHTML = `<strong>${copy.estimatedArv}:</strong> ${money(average)}<br><strong>${copy.maxOffer}:</strong> ${money(buyMax)}`;
       return;
     }
 
@@ -206,7 +226,7 @@
       const pointCost = loan * points;
       const interestCost = loan * interest * (months / 12);
       const totalCost = pointCost + interestCost;
-      output.innerHTML = `<strong>Total Financing Cost:</strong> ${money(totalCost)}<br><strong>Monthly Interest Carry:</strong> ${money(interestCost / Math.max(months, 1))}`;
+      output.innerHTML = `<strong>${copy.totalFinancingCost}:</strong> ${money(totalCost)}<br><strong>${copy.monthlyInterestCarry}:</strong> ${money(interestCost / Math.max(months, 1))}`;
     }
   });
 })();
