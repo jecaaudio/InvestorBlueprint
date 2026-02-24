@@ -33,6 +33,21 @@
         </p>
         <form id="tool-form">
           <fieldset>
+            <legend>Plan mode</legend>
+            <div class="plan-toggle" role="radiogroup" aria-label="Calculator plan mode">
+              <label class="plan-option">
+                <input type="radio" name="planMode" value="free" checked />
+                <span>Free · Basic</span>
+              </label>
+              <label class="plan-option">
+                <input type="radio" name="planMode" value="pro" />
+                <span>Pro · Full underwriting</span>
+              </label>
+            </div>
+            <p class="plan-hint" id="plan-hint">Free mode shows a fast, lightweight calculation. Switch to Pro for financing structure, MAO strategy and sensitivities.</p>
+          </fieldset>
+
+          <fieldset>
             <legend>Quick deal data</legend>
             <div class="form-grid">
               <label>Property / Market <input name="market" type="text" placeholder="123 Main St, Austin TX" /></label>
@@ -95,7 +110,7 @@
             </div>
           </fieldset>
 
-          <fieldset>
+          <fieldset class="pro-only">
             <legend>E) Financing</legend>
             <div class="form-grid">
               <label>Financing Type
@@ -119,7 +134,7 @@
             </div>
           </fieldset>
 
-          <fieldset>
+          <fieldset class="pro-only">
             <legend>F) Strategy targets + tax estimate</legend>
             <div class="form-grid">
               <label>Entity Type
@@ -136,7 +151,7 @@
             </div>
           </fieldset>
 
-          <fieldset>
+          <fieldset class="pro-only">
             <legend>G) Sensitivities</legend>
             <div class="form-grid">
               <label>ARV Low (%) <input name="arvLowPct" type="number" step="0.1" value="-5" /></label>

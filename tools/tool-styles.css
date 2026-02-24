@@ -217,3 +217,33 @@ td {
 .badge.green { background: rgba(22, 163, 74, 0.2); color: #86efac; }
 .badge.yellow { background: rgba(234, 179, 8, 0.2); color: #fde68a; }
 .badge.red { background: rgba(220, 38, 38, 0.2); color: #fca5a5; }
+
+.plan-toggle {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.plan-option {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  background: rgba(15, 23, 42, 0.45);
+  width: fit-content;
+}
+
+.plan-option input {
+  margin: 0;
+}
+
+.plan-hint {
+  margin-top: 0.65rem;
+  font-size: 0.92rem;
+}
+
+.pro-only.is-hidden {
+  display: none;
+}
