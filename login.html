@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,69 +11,75 @@
       <div class="brand-menu has-primary-nav">
         <a class="logo home-link" href="index.html">InvestorBlueprint</a>
         <div class="brand-dropdown" role="menu" aria-label="Quick navigation">
-          <a href="index.html#tools">Herramientas</a>
-          <a href="index.html#learn">Aprender</a>
-          <a href="index.html#pricing">Precios</a>
-          <a href="login.html" data-auth-link>Login</a>
+          <a href="index.html#tools" data-i18n="navTools">Tools</a>
+          <a href="index.html#learn" data-i18n="navLearn">Learn</a>
+          <a href="index.html#pricing" data-i18n="navPricing">Pricing</a>
+          <a href="login.html" data-i18n="navLogin" data-auth-link>Login</a>
         </div>
       </div>
       <nav id="primary-nav" class="is-open">
-        <a href="index.html#tools">Herramientas</a>
-        <a href="index.html#learn">Aprender</a>
-        <a href="index.html#pricing">Precios</a>
-        <a href="login.html" data-auth-link>Login</a>
+        <a href="index.html#tools" data-i18n="navTools">Tools</a>
+        <a href="index.html#learn" data-i18n="navLearn">Learn</a>
+        <a href="index.html#pricing" data-i18n="navPricing">Pricing</a>
+        <a href="login.html" data-i18n="navLogin" data-auth-link>Login</a>
       </nav>
+      <button id="lang-toggle" class="lang-toggle" aria-label="Toggle language">
+        <span class="flag-emoji" aria-hidden="true">🇺🇸</span> EN |
+        <span class="flag-emoji" aria-hidden="true">🇪🇸</span> ES
+      </button>
     </header>
 
     <main>
       <section class="section auth-layout">
         <article class="card auth-card">
-          <h2>Crear cuenta</h2>
-          <p>Regístrate para activar tu prueba gratis de 30 días.</p>
+          <h2 data-i18n="registerTitle">Create account</h2>
+          <p data-i18n="registerDesc">Sign up to activate your 30-day free trial.</p>
           <form id="register-form" class="auth-form">
-            <label>Nombre
+            <label><span data-i18n="registerName">Name</span>
               <input type="text" name="name" required />
             </label>
-            <label>Correo
+            <label><span data-i18n="labelEmail">Email</span>
               <input type="email" name="email" required />
             </label>
-            <label>Contraseña
+            <label><span data-i18n="labelPassword">Password</span>
               <input type="password" name="password" minlength="4" required />
             </label>
-            <button class="btn btn-primary" type="submit">Crear cuenta</button>
+            <button class="btn btn-primary" type="submit" data-i18n="registerBtn">Create account</button>
           </form>
         </article>
 
         <article class="card auth-card">
-          <h2>Iniciar sesión</h2>
-          <p>Si entras desde “Start Free”, activas tu prueba por 1 mes.</p>
+          <h2 data-i18n="loginTitle">Sign in</h2>
+          <p data-i18n="loginDesc">If you come from “Start Free”, your 1-month trial is activated.</p>
           <form id="login-form" class="auth-form">
-            <label>Correo
+            <label><span data-i18n="labelEmail">Email</span>
               <input type="email" name="email" required />
             </label>
-            <label>Contraseña
+            <label><span data-i18n="labelPassword">Password</span>
               <input type="password" name="password" required />
             </label>
-            <button class="btn btn-secondary" type="submit">Entrar</button>
+            <button class="btn btn-secondary" type="submit" data-i18n="loginBtn">Sign in</button>
           </form>
         </article>
       </section>
 
       <section id="account" class="section" aria-live="polite">
         <article class="card" id="account-panel" hidden>
-          <h2>Mi cuenta</h2>
-          <p>Sesión activa con: <strong id="account-email"></strong></p>
+          <h2 data-i18n="accountTitle">My account</h2>
+          <p><span data-i18n="accountActiveSession">Active session with:</span> <strong id="account-email"></strong></p>
           <p><strong id="subscription-status"></strong></p>
           <p id="subscription-detail"></p>
           <div class="hero-actions">
-            <button id="activate-paid-btn" class="btn btn-primary" type="button">Activar suscripción de pago</button>
-            <button id="logout-btn" class="card-btn" type="button">Cerrar sesión</button>
+            <button id="activate-paid-btn" class="btn btn-primary" type="button" data-i18n="activatePaidBtn">Activate paid subscription</button>
+            <button id="logout-btn" class="card-btn" type="button" data-i18n="logoutBtn">Log out</button>
           </div>
         </article>
         <p id="auth-message"></p>
       </section>
     </main>
 
+    <script src="lang.js"></script>
+    <script src="script.js"></script>
     <script src="auth.js"></script>
   </body>
 </html>

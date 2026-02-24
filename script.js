@@ -4,8 +4,10 @@
   const nav = document.getElementById('primary-nav');
   const translatable = document.querySelectorAll('[data-i18n]');
 
+  const getMessages = (lang) => window.translations?.[lang] || window.translations?.en || {};
+
   const applyLanguage = (lang) => {
-    const messages = window.translations?.[lang] || window.translations.en;
+    const messages = getMessages(lang);
 
     translatable.forEach((element) => {
       const key = element.dataset.i18n;
@@ -89,7 +91,9 @@
       }
 
       event.preventDefault();
-      alert('Este módulo Pro requiere prueba activa o suscripción de pago. Inicia en “Start Free”.');
+      const lang = document.documentElement.lang === 'es' ? 'es' : 'en';
+      const messages = getMessages(lang);
+      alert(messages.proRequiredAlert || 'This Pro module requires an active trial or paid subscription. Start from “Start Free”.');
       window.location.href = 'login.html#trial';
     });
   });

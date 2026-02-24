@@ -11,33 +11,39 @@
       <div class="brand-menu">
         <a class="tool-logo" href="../index.html">InvestorBlueprint</a>
         <nav class="brand-dropdown" aria-label="Quick navigation">
-          <a href="../index.html#tools">Tools</a>
-          <a href="../index.html#learn">Learn</a>
-          <a href="../index.html#pricing">Pricing</a>
-          <a href="../login.html">Login</a>
+          <a href="../index.html#tools" data-i18n="navTools">Tools</a>
+          <a href="../index.html#learn" data-i18n="navLearn">Learn</a>
+          <a href="../index.html#pricing" data-i18n="navPricing">Pricing</a>
+          <a href="../login.html" data-i18n="navLogin">Login</a>
         </nav>
       </div>
+      <button id="lang-toggle" class="lang-toggle" aria-label="Toggle language">
+        <span class="flag-emoji" aria-hidden="true">🇺🇸</span> EN |
+        <span class="flag-emoji" aria-hidden="true">🇪🇸</span> ES
+      </button>
     </header>
 
     <main class="container">
-      <a class="back-link" href="../index.html">← Back to tools</a>
+      <a class="back-link" href="../index.html" data-i18n="toolBack">← Back to tools</a>
       <section class="card">
-        <h1>📈 Rental Cash Flow</h1>
-        <p>Fill your income and expenses to project monthly and annual cash flow.</p>
+        <h1 data-i18n="rentalTitle">📈 Rental Cash Flow</h1>
+        <p data-i18n="rentalDesc">Fill your income and expenses to project monthly and annual cash flow.</p>
         <form id="tool-form">
           <div class="form-grid">
-            <label>Monthly Rent <input name="monthlyRent" type="number" min="0" required /></label>
-            <label>Property Taxes / month <input name="taxes" type="number" min="0" value="0" /></label>
-            <label>Insurance / month <input name="insurance" type="number" min="0" value="0" /></label>
-            <label>Maintenance / month <input name="maintenance" type="number" min="0" value="0" /></label>
-            <label>Property Management / month <input name="management" type="number" min="0" value="0" /></label>
-            <label>Vacancy Rate (%) <input name="vacancyRate" type="number" min="0" max="100" value="5" /></label>
+            <label><span data-i18n="rentalRent">Monthly Rent</span> <input name="monthlyRent" type="number" min="0" required /></label>
+            <label><span data-i18n="rentalTaxes">Property Taxes / month</span> <input name="taxes" type="number" min="0" value="0" /></label>
+            <label><span data-i18n="rentalInsurance">Insurance / month</span> <input name="insurance" type="number" min="0" value="0" /></label>
+            <label><span data-i18n="rentalMaintenance">Maintenance / month</span> <input name="maintenance" type="number" min="0" value="0" /></label>
+            <label><span data-i18n="rentalManagement">Property Management / month</span> <input name="management" type="number" min="0" value="0" /></label>
+            <label><span data-i18n="rentalVacancy">Vacancy Rate (%)</span> <input name="vacancyRate" type="number" min="0" max="100" value="5" /></label>
           </div>
-          <button type="submit">Calculate</button>
+          <button type="submit" data-i18n="calculate">Calculate</button>
         </form>
-        <div class="result" id="result">Enter your numbers and click calculate.</div>
+        <div class="result" id="result" data-i18n="resultPrompt">Enter your numbers and click calculate.</div>
       </section>
     </main>
+    <script src="../lang.js"></script>
+    <script src="../script.js"></script>
     <script src="tool-script.js"></script>
   </body>
 </html>
