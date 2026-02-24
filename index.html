@@ -13,14 +13,24 @@
   <body>
     <header class="navbar">
       <div class="logo">InvestorBlueprint</div>
-      <nav>
+      <button
+        id="menu-toggle"
+        class="menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="primary-nav"
+      >
+        ☰ Menu
+      </button>
+      <nav id="primary-nav">
         <a href="#tools" data-i18n="navTools">Tools</a>
         <a href="#learn" data-i18n="navLearn">Learn</a>
         <a href="#pricing" data-i18n="navPricing">Pricing</a>
         <a href="#" data-i18n="navLogin">Login</a>
       </nav>
       <button id="lang-toggle" class="lang-toggle" aria-label="Toggle language">
-        🇺🇸 EN | 🇪🇸 ES
+        <span class="flag-emoji" aria-hidden="true">🇺🇸</span> EN |
+        <span class="flag-emoji" aria-hidden="true">🇪🇸</span> ES
       </button>
     </header>
 
