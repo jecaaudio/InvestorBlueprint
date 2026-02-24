@@ -1,10 +1,18 @@
 (function () {
-  const toggle = document.getElementById('lang-toggle');
+  const langButtons = document.querySelectorAll('[data-lang]');
   const menuToggle = document.getElementById('menu-toggle');
   const nav = document.getElementById('primary-nav');
   const translatable = document.querySelectorAll('[data-i18n]');
 
   const getMessages = (lang) => window.translations?.[lang] || window.translations?.en || {};
+
+  const syncLanguageButtons = (lang) => {
+    langButtons.forEach((button) => {
+      const isActive = button.dataset.lang === lang;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', String(isActive));
+    });
+  };
 
   const applyLanguage = (lang) => {
     const messages = getMessages(lang);
@@ -18,10 +26,8 @@
 
     document.documentElement.lang = lang;
     localStorage.setItem('preferredLanguage', lang);
+    syncLanguageButtons(lang);
   };
-
-  const nextLanguage = () =>
-    document.documentElement.lang === 'en' ? 'es' : 'en';
 
   const browserLanguage = navigator.language?.toLowerCase().startsWith('es')
     ? 'es'
@@ -29,11 +35,12 @@
   const preferred = localStorage.getItem('preferredLanguage') || browserLanguage;
   applyLanguage(preferred === 'es' ? 'es' : 'en');
 
-  if (toggle) {
-    toggle.addEventListener('click', () => {
-      applyLanguage(nextLanguage());
+  langButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const selectedLanguage = button.dataset.lang === 'es' ? 'es' : 'en';
+      applyLanguage(selectedLanguage);
     });
-  }
+  });
 
   if (menuToggle && nav) {
     const closeMenu = () => {

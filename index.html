@@ -36,10 +36,16 @@
         <a href="#pricing" data-i18n="navPricing">Pricing</a>
         <a href="login.html" data-i18n="navLogin" data-auth-link>Login</a>
       </nav>
-      <button id="lang-toggle" class="lang-toggle" aria-label="Toggle language">
-        <span class="flag-emoji" aria-hidden="true">🇺🇸</span> EN |
-        <span class="flag-emoji" aria-hidden="true">🇪🇸</span> ES
-      </button>
+      <div class="lang-switcher" role="group" aria-label="Language selector">
+        <button type="button" class="lang-option" data-lang="en" aria-label="Switch to English">
+          <span class="flag-emoji" aria-hidden="true">🇺🇸</span>
+          EN
+        </button>
+        <button type="button" class="lang-option" data-lang="es" aria-label="Cambiar a Español">
+          <span class="flag-emoji" aria-hidden="true">🇪🇸</span>
+          ES
+        </button>
+      </div>
     </header>
 
     <main>
