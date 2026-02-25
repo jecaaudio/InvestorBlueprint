@@ -223,9 +223,10 @@
       let financingTotal = 0;
       if (isPro && values.financingType !== 'cash') {
         financedAmount = Math.max(num('loanAmount'), purchase * (num('loanPurchasePct') / 100) + rehabTotal * (num('loanRehabPct') / 100));
+        const monthlyInterestBase = values.financingType === 'hard-money' ? purchase : financedAmount;
         financingTotal =
           financedAmount * (num('pointsPct') / 100) +
-          financedAmount * (num('interestRate') / 100) * (num('holdingMonths') / 12) +
+          monthlyInterestBase * (num('interestRate') / 100) * (num('holdingMonths') / 12) +
           (num('drawFee') + num('drawInspectionFee')) * num('drawCount') +
           num('originationFees') + num('loanClosingCosts') + num('prepayPenalty');
       }

@@ -34,7 +34,9 @@
       origFees = Number(state.financing.originationFees) || 0;
       const monthlyRate = (Number(state.financing.interestApr) || 0) / 12;
       const rehabMultiplier = state.financing.useDrawInterest ? 0.5 : 1;
-      const interestBase = loanPurchase + (loanRehab * rehabMultiplier);
+      const interestBase = state.financing.type === 'hardMoney'
+        ? offerPrice
+        : loanPurchase + (loanRehab * rehabMultiplier);
       interestCost = interestBase * monthlyRate * holdMonths;
     }
 
