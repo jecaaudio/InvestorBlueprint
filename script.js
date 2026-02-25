@@ -27,6 +27,7 @@
     document.documentElement.lang = lang;
     localStorage.setItem('preferredLanguage', lang);
     syncLanguageButtons(lang);
+    document.dispatchEvent(new CustomEvent('ib:language-changed', { detail: { lang } }));
   };
 
   const browserLanguage = navigator.language?.toLowerCase().startsWith('es')
