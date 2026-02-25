@@ -13,22 +13,28 @@
       <div class="brand-menu">
         <a class="tool-logo" href="../index.html">InvestorBlueprint</a>
         <nav class="brand-dropdown" aria-label="Quick navigation">
-          <a href="../index.html">Home</a>
+          <a href="../index.html" data-i18n="navHome">Home</a>
           <a href="../index.html#tools" data-i18n="navTools">Tools</a>
           <a href="../index.html#learn" data-i18n="navLearn">Learn</a>
           <a href="../index.html#pricing" data-i18n="navPricing">Pricing</a>
           <a href="../login.html" data-i18n="navLogin">Login</a>
         </nav>
       </div>
-      <button id="lang-toggle" class="lang-toggle" aria-label="Toggle language">
-        <img class="flag-emoji" src="../assets/flags/us.svg" alt="" aria-hidden="true"> EN |
-        <img class="flag-emoji" src="../assets/flags/es.svg" alt="" aria-hidden="true"> ES
-      </button>
+      <div class="lang-switcher" role="group" aria-label="Language selector">
+        <button type="button" class="lang-option" data-lang="en" aria-label="Switch to English">
+          <img class="flag-emoji" src="../assets/flags/us.svg" alt="" aria-hidden="true">
+          EN
+        </button>
+        <button type="button" class="lang-option" data-lang="es" aria-label="Cambiar a Español">
+          <img class="flag-emoji" src="../assets/flags/es.svg" alt="" aria-hidden="true">
+          ES
+        </button>
+      </div>
     </header>
 
     <main class="container">
       <section class="card">
-        <p>Calculadora de flip intuitiva con modo Básico/Pro, escenarios, MAO y detalle total de costos.</p>
+        <p data-i18n="flipIntro">Intuitive flip calculator with Basic/Pro mode, scenarios, MAO and full cost breakdown.</p>
         <section id="flip-calculator"></section>
       </section>
     </main>
