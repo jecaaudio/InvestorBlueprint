@@ -36,11 +36,11 @@
         <p data-i18n="rentalDesc">Fill your income and expenses to project monthly and annual cash flow.</p>
         <form id="tool-form">
           <div class="form-grid">
-            <label><span data-i18n="rentalRent">Monthly Rent</span> <input name="monthlyRent" type="number" min="0" required /></label>
-            <label><span data-i18n="rentalTaxes">Property Taxes / month</span> <input name="taxes" type="number" min="0" value="0" /></label>
-            <label><span data-i18n="rentalInsurance">Insurance / month</span> <input name="insurance" type="number" min="0" value="0" /></label>
-            <label><span data-i18n="rentalMaintenance">Maintenance / month</span> <input name="maintenance" type="number" min="0" value="0" /></label>
-            <label><span data-i18n="rentalManagement">Property Management / month</span> <input name="management" type="number" min="0" value="0" /></label>
+            <label><span data-i18n="rentalRent">Monthly Rent</span> <input name="monthlyRent" type="text" data-format="currency" required /></label>
+            <label><span data-i18n="rentalTaxes">Property Taxes / month</span> <input name="taxes" type="text" data-format="currency" value="0" /></label>
+            <label><span data-i18n="rentalInsurance">Insurance / month</span> <input name="insurance" type="text" data-format="currency" value="0" /></label>
+            <label><span data-i18n="rentalMaintenance">Maintenance / month</span> <input name="maintenance" type="text" data-format="currency" value="0" /></label>
+            <label><span data-i18n="rentalManagement">Property Management / month</span> <input name="management" type="text" data-format="currency" value="0" /></label>
             <label><span data-i18n="rentalVacancy">Vacancy Rate (%)</span> <input name="vacancyRate" type="number" min="0" max="100" value="5" /></label>
           </div>
           <button type="submit" data-i18n="calculate">Calculate</button>
