@@ -8,6 +8,12 @@
 
     mount.innerHTML = window.FlipTemplates.appTemplate();
 
+    const getMessages = () => {
+      const lang = document.documentElement.lang === 'es' ? 'es' : 'en';
+      return window.translations?.[lang] || window.translations?.en || {};
+    };
+    const t = (key, fallback) => getMessages()[key] || fallback;
+
     let state = window.FlipDefaults.createFlipDefaults();
     let debounceId;
 
@@ -15,17 +21,51 @@
     const savedScenariosSelect = mount.querySelector('#saved-scenarios');
     const savedScenarioMessage = mount.querySelector('#saved-scenario-message');
 
+    const applyStaticTranslations = () => {
+      mount.querySelectorAll('[data-i18n-flip]').forEach((element) => {
+        const key = element.dataset.i18nFlip;
+        element.textContent = t(key, element.textContent);
+      });
+
+      mount.querySelectorAll('[data-i18n-flip-placeholder]').forEach((element) => {
+        const key = element.dataset.i18nFlipPlaceholder;
+        const translated = t(key, element.getAttribute('placeholder') || '');
+        element.setAttribute('placeholder', translated);
+      });
+    };
+
     const setMessage = (text) => {
       if (savedScenarioMessage) {
         savedScenarioMessage.textContent = text;
       }
     };
 
+    const translateScenarioName = (name) => {
+      if (name === 'Conservador') return t('flipScenarioConservative', 'Conservative');
+      if (name === 'Base') return t('flipScenarioBase', 'Base');
+      if (name === 'Optimista') return t('flipScenarioOptimistic', 'Optimistic');
+      return name;
+    };
+
+    const translateBreakdownLabel = (label) => {
+      const keys = {
+        'Purchase + Buy Closing + Fees': 'flipBreakdownPurchase',
+        'Rehab + Contingency': 'flipBreakdownRehab',
+        'Holding total': 'flipBreakdownHolding',
+        'Financing costs (interest + points + fees)': 'flipBreakdownFinancing',
+        'Selling costs': 'flipBreakdownSelling',
+        'Total cost': 'flipBreakdownTotalCost',
+        'Net proceeds': 'flipBreakdownNetProceeds',
+        Profit: 'flipBreakdownProfit'
+      };
+      return t(keys[label], label);
+    };
+
     const fillSavedScenarios = () => {
       if (!savedScenariosSelect) return;
 
       const scenarios = window.FlipStorage.getNamedCalculations('flip');
-      const options = ['<option value="">Selecciona un cálculo guardado</option>'];
+      const options = [`<option value="">${t('flipSelectSavedPlaceholder', 'Select a saved calculation')}</option>`];
       scenarios.forEach((item) => {
         const updated = new Date(item.updatedAt).toLocaleString();
         options.push(`<option value="${item.id}">${item.name} · ${updated}</option>`);
@@ -94,8 +134,9 @@
     };
 
     const render = () => {
+      applyStaticTranslations();
       const focusState = getFocusedField();
-      const validation = window.FlipValidation.validate(state);
+      const validation = window.FlipValidation.validate(state, t);
       const result = window.FlipEngine.compute(state);
       const scenarios = window.FlipEngine.computeScenarios(state);
 
@@ -110,72 +151,72 @@
 
       const s = result.summary;
       mount.querySelector('#flip-summary').innerHTML = `${[
-        ['MAO', s.maoAllIn],
-        ['Net Profit', s.profit],
-        ['Profit Margin', percent(s.profitMargin)],
-        ['Total Cash Needed', s.cashNeeded],
-        ['ROI', percent(s.roi)],
-        ['Break-even', s.breakEvenSale],
-        ['Deal Grade', validation.hasCritical ? '⛔' : s.dealGrade]
+        [t('flipSummaryMAO', 'MAO'), s.maoAllIn],
+        [t('flipSummaryNetProfit', 'Net Profit'), s.profit],
+        [t('flipSummaryProfitMargin', 'Profit Margin'), percent(s.profitMargin)],
+        [t('flipSummaryCashNeeded', 'Total Cash Needed'), s.cashNeeded],
+        [t('flipSummaryROI', 'ROI'), percent(s.roi)],
+        [t('flipSummaryBreakEven', 'Break-even'), s.breakEvenSale],
+        [t('flipSummaryDealGrade', 'Deal Grade'), validation.hasCritical ? '⛔' : s.dealGrade]
       ]
         .map(([k, v]) => `<div class="metric"><strong>${k}</strong><span>${typeof v === 'string' ? v : currency(v)}</span></div>`)
         .join('')}`;
 
       const basicInputs = [
-        ['ARV', 'purchase.arv', state.purchase.arv],
-        ['Offer Price', 'purchase.offerPrice', state.purchase.offerPrice],
-        ['Rehab Budget', 'rehab.rehabBudget', state.rehab.rehabBudget],
-        ['Hold Months', 'holding.holdMonths', state.holding.holdMonths, 'int'],
-        ['Interest APR %', 'financing.interestApr', state.financing.interestApr],
-        ['Points %', 'financing.pointsPct', state.financing.pointsPct],
-        ['Down Payment %', 'financing.downPaymentPct', state.financing.downPaymentPct],
-        ['Commission %', 'exit.realtorCommissionPct', state.exit.realtorCommissionPct],
-        ['Buy Closing %', 'purchase.buyClosingPct', state.purchase.buyClosingPct],
-        ['Holding Monthly $', 'holding.holdingMonthlyOverride', state.holding.holdingMonthlyOverride]
+        [t('flipInputArv', 'ARV'), 'purchase.arv', state.purchase.arv],
+        [t('flipInputOfferPrice', 'Offer Price'), 'purchase.offerPrice', state.purchase.offerPrice],
+        [t('flipInputRehabBudget', 'Rehab Budget'), 'rehab.rehabBudget', state.rehab.rehabBudget],
+        [t('flipInputHoldMonths', 'Hold Months'), 'holding.holdMonths', state.holding.holdMonths, 'int'],
+        [t('flipInputInterestApr', 'Interest APR %'), 'financing.interestApr', state.financing.interestApr],
+        [t('flipInputPoints', 'Points %'), 'financing.pointsPct', state.financing.pointsPct],
+        [t('flipInputDownPayment', 'Down Payment %'), 'financing.downPaymentPct', state.financing.downPaymentPct],
+        [t('flipInputCommission', 'Commission %'), 'exit.realtorCommissionPct', state.exit.realtorCommissionPct],
+        [t('flipInputBuyClosing', 'Buy Closing %'), 'purchase.buyClosingPct', state.purchase.buyClosingPct],
+        [t('flipInputHoldingMonthly', 'Holding Monthly $'), 'holding.holdingMonthlyOverride', state.holding.holdingMonthlyOverride]
       ];
       const proInputs = [
-        ['Buy Closing Override $', 'purchase.buyClosingOverride', state.purchase.buyClosingOverride],
-        ['Inspection/Other $', 'purchase.inspectionOther', state.purchase.inspectionOther],
-        ['Contingency %', 'rehab.contingencyPct', state.rehab.contingencyPct],
-        ['Rehab Months', 'rehab.rehabMonths', state.rehab.rehabMonths, 'int'],
-        ['Taxes/mo', 'holding.taxesPerMonth', state.holding.taxesPerMonth],
-        ['Insurance/mo', 'holding.insurancePerMonth', state.holding.insurancePerMonth],
-        ['Utilities/mo', 'holding.utilitiesPerMonth', state.holding.utilitiesPerMonth],
-        ['HOA/mo', 'holding.hoaPerMonth', state.holding.hoaPerMonth],
-        ['Lawn/mo', 'holding.lawnPerMonth', state.holding.lawnPerMonth],
-        ['Other/mo', 'holding.otherPerMonth', state.holding.otherPerMonth],
-        ['Reserves', 'holding.reserves', state.holding.reserves],
-        ['LTP %', 'financing.loanToPurchasePct', state.financing.loanToPurchasePct],
-        ['LTR %', 'financing.loanToRehabPct', state.financing.loanToRehabPct],
-        ['Origination Fees', 'financing.originationFees', state.financing.originationFees],
-        ['Sale Price', 'exit.salePrice', state.exit.salePrice],
-        ['Seller Closing %', 'exit.sellerClosingPct', state.exit.sellerClosingPct],
-        ['Concessions', 'exit.concessions', state.exit.concessions],
-        ['Staging', 'exit.staging', state.exit.staging],
-        ['MAO Rule %', 'assumptions.maoRulePct', state.assumptions.maoRulePct]
+        [t('flipInputBuyClosingOverride', 'Buy Closing Override $'), 'purchase.buyClosingOverride', state.purchase.buyClosingOverride],
+        [t('flipInputInspectionOther', 'Inspection/Other $'), 'purchase.inspectionOther', state.purchase.inspectionOther],
+        [t('flipInputContingency', 'Contingency %'), 'rehab.contingencyPct', state.rehab.contingencyPct],
+        [t('flipInputRehabMonths', 'Rehab Months'), 'rehab.rehabMonths', state.rehab.rehabMonths, 'int'],
+        [t('flipInputTaxesMonth', 'Taxes/mo'), 'holding.taxesPerMonth', state.holding.taxesPerMonth],
+        [t('flipInputInsuranceMonth', 'Insurance/mo'), 'holding.insurancePerMonth', state.holding.insurancePerMonth],
+        [t('flipInputUtilitiesMonth', 'Utilities/mo'), 'holding.utilitiesPerMonth', state.holding.utilitiesPerMonth],
+        [t('flipInputHoaMonth', 'HOA/mo'), 'holding.hoaPerMonth', state.holding.hoaPerMonth],
+        [t('flipInputLawnMonth', 'Lawn/mo'), 'holding.lawnPerMonth', state.holding.lawnPerMonth],
+        [t('flipInputOtherMonth', 'Other/mo'), 'holding.otherPerMonth', state.holding.otherPerMonth],
+        [t('flipInputReserves', 'Reserves'), 'holding.reserves', state.holding.reserves],
+        [t('flipInputLtp', 'LTP %'), 'financing.loanToPurchasePct', state.financing.loanToPurchasePct],
+        [t('flipInputLtr', 'LTR %'), 'financing.loanToRehabPct', state.financing.loanToRehabPct],
+        [t('flipInputOriginationFees', 'Origination Fees'), 'financing.originationFees', state.financing.originationFees],
+        [t('flipInputSalePrice', 'Sale Price'), 'exit.salePrice', state.exit.salePrice],
+        [t('flipInputSellerClosing', 'Seller Closing %'), 'exit.sellerClosingPct', state.exit.sellerClosingPct],
+        [t('flipInputConcessions', 'Concessions'), 'exit.concessions', state.exit.concessions],
+        [t('flipInputStaging', 'Staging'), 'exit.staging', state.exit.staging],
+        [t('flipInputMaoRule', 'MAO Rule %'), 'assumptions.maoRulePct', state.assumptions.maoRulePct]
       ];
 
       mount.querySelector('#flip-inputs').innerHTML = `
         <div class="card-block">
-          <h3>Inputs</h3>
+          <h3>${t('flipInputsTitle', 'Inputs')}</h3>
           <div class="form-grid">${basicInputs.map((x) => renderInput(...x)).join('')}</div>
           ${
             state.mode === 'pro'
               ? `<div class="form-grid">${proInputs.map((x) => renderInput(...x)).join('')}</div>
-          <label><input type="checkbox" data-path="financing.useDrawInterest" ${state.financing.useDrawInterest ? 'checked' : ''}> Pro: usar draw promedio rehab 50% para interés</label>`
+          <label><input type="checkbox" data-path="financing.useDrawInterest" ${state.financing.useDrawInterest ? 'checked' : ''}> ${t('flipUseDrawInterest', 'Pro: use 50% average rehab draw for interest')}</label>`
               : ''
           }
         </div>
       `;
 
       mount.querySelector('#flip-scenarios').innerHTML = `
-        <div class="card-block"><h3>Escenarios</h3><div class="table-wrap"><table><thead><tr><th>Escenario</th><th>Profit</th><th>Cash Needed</th><th>Break-even</th><th>ROI</th></tr></thead>
+        <div class="card-block"><h3>${t('flipScenariosTitle', 'Scenarios')}</h3><div class="table-wrap"><table><thead><tr><th>${t('flipScenarioColName', 'Scenario')}</th><th>${t('flipScenarioColProfit', 'Profit')}</th><th>${t('flipScenarioColCashNeeded', 'Cash Needed')}</th><th>${t('flipScenarioColBreakEven', 'Break-even')}</th><th>${t('flipScenarioColROI', 'ROI')}</th></tr></thead>
         <tbody>${scenarios
-          .map((sc) => `<tr><td>${sc.name}</td><td>${currency(sc.result.profit)}</td><td>${currency(sc.result.cashNeeded)}</td><td>${currency(sc.result.breakEvenSale)}</td><td>${percent(sc.result.roi)}</td></tr>`)
+          .map((sc) => `<tr><td>${translateScenarioName(sc.name)}</td><td>${currency(sc.result.profit)}</td><td>${currency(sc.result.cashNeeded)}</td><td>${currency(sc.result.breakEvenSale)}</td><td>${percent(sc.result.roi)}</td></tr>`)
           .join('')}</tbody></table></div></div>`;
 
-      mount.querySelector('#flip-breakdown').innerHTML = `<div class="card-block"><h3>Cost Breakdown</h3><div class="table-wrap"><table><tbody>${result.breakdown
-        .map((row) => `<tr><td>${row[0]}</td><td>${currency(row[1])}</td></tr>`)
+      mount.querySelector('#flip-breakdown').innerHTML = `<div class="card-block"><h3>${t('flipCostBreakdownTitle', 'Cost Breakdown')}</h3><div class="table-wrap"><table><tbody>${result.breakdown
+        .map((row) => `<tr><td>${translateBreakdownLabel(row[0])}</td><td>${currency(row[1])}</td></tr>`)
         .join('')}</tbody></table></div></div>`;
 
       mount.querySelectorAll('input[data-path]').forEach((input) => {
@@ -210,62 +251,62 @@
       if (e.target.id === 'reset-defaults') {
         state = window.FlipDefaults.createFlipDefaults();
         window.FlipStorage.clear();
-        setMessage('Se reinició el cálculo actual.');
+        setMessage(t('flipMessageReset', 'Current calculation was reset.'));
         render();
       }
       if (e.target.id === 'export-json') {
         navigator.clipboard.writeText(JSON.stringify(state, null, 2));
-        setMessage('JSON copiado al portapapeles.');
+        setMessage(t('flipMessageJsonCopied', 'JSON copied to clipboard.'));
       }
       if (e.target.id === 'copy-link') {
         const q = encodeURIComponent(btoa(JSON.stringify(state)));
         const url = `${location.origin}${location.pathname}?flip=${q}`;
         navigator.clipboard.writeText(url);
-        setMessage('Link copiado.');
+        setMessage(t('flipMessageLinkCopied', 'Link copied.'));
       }
       if (e.target.id === 'save-scenario') {
         const rawName = scenarioNameInput?.value?.trim() || '';
-        const scenarioName = rawName || `Cálculo ${new Date().toLocaleDateString()}`;
+        const scenarioName = rawName || `${t('flipScenarioDefaultPrefix', 'Calculation')} ${new Date().toLocaleDateString()}`;
         const saved = window.FlipStorage.saveNamedCalculation(scenarioName, state, 'flip');
         if (!saved) {
-          setMessage('Inicia sesión para guardar cálculos en tu perfil.');
+          setMessage(t('flipMessageLoginRequired', 'Log in to save calculations to your profile.'));
           return;
         }
         fillSavedScenarios();
         savedScenariosSelect.value = saved.id;
-        setMessage('Cálculo guardado en tu perfil.');
+        setMessage(t('flipMessageSaved', 'Calculation saved to your profile.'));
       }
       if (e.target.id === 'load-scenario') {
         const selectedId = savedScenariosSelect?.value;
         if (!selectedId) {
-          setMessage('Selecciona un cálculo para cargar.');
+          setMessage(t('flipMessageSelectToLoad', 'Select a calculation to load.'));
           return;
         }
         const found = window.FlipStorage.loadNamedCalculation(selectedId, 'flip');
         if (!found) {
-          setMessage('No encontramos ese cálculo guardado.');
+          setMessage(t('flipMessageNotFound', 'We could not find that saved calculation.'));
           return;
         }
         state = found.state;
         mergeDefaults();
         window.FlipStorage.save(state);
         scenarioNameInput.value = found.name;
-        setMessage('Cálculo cargado. Ya puedes ajustarlo.');
+        setMessage(t('flipMessageLoaded', 'Calculation loaded. You can now adjust it.'));
         render();
       }
       if (e.target.id === 'delete-scenario') {
         const selectedId = savedScenariosSelect?.value;
         if (!selectedId) {
-          setMessage('Selecciona un cálculo para eliminar.');
+          setMessage(t('flipMessageSelectToDelete', 'Select a calculation to delete.'));
           return;
         }
         const removed = window.FlipStorage.deleteNamedCalculation(selectedId, 'flip');
         if (!removed) {
-          setMessage('No se pudo eliminar el cálculo seleccionado.');
+          setMessage(t('flipMessageDeleteFailed', 'Could not delete the selected calculation.'));
           return;
         }
         fillSavedScenarios();
-        setMessage('Cálculo eliminado de tu perfil.');
+        setMessage(t('flipMessageDeleted', 'Calculation deleted from your profile.'));
       }
     });
 
@@ -283,6 +324,11 @@
         // no-op
       }
     }
+
+    document.addEventListener('ib:language-changed', () => {
+      fillSavedScenarios();
+      render();
+    });
 
     fillSavedScenarios();
     render();
