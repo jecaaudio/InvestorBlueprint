@@ -9,6 +9,7 @@
       content="Interactive bilingual platform for real estate investors with calculators, education, and scalable SaaS-ready architecture."
     />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/css/cookie-banner.css" />
   </head>
   <body>
     <header class="navbar">
@@ -57,7 +58,7 @@
           Get the exact tools and step-by-step guidance to evaluate flips, rentals, and financing with confidence.
         </p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="login.html#trial" data-i18n="heroStart">Start Free</a>
+          <a class="btn btn-primary" href="login.html#trial" data-i18n="heroStart" data-track="start_free">Start Free</a>
           <a class="btn btn-secondary" href="#tools" data-i18n="heroExplore">Explore Tools</a>
         </div>
       </section>
@@ -178,11 +179,42 @@
         <article class="price-card featured">
           <h2 data-i18n="ctaTitle">Ready to scale your investing with clarity?</h2>
           <p data-i18n="ctaDescription">Join Premium and unlock every calculator, report, and advanced framework.</p>
-          <a class="btn btn-primary" href="login.html#trial" data-i18n="ctaButton">Subscribe now</a>
+          <a class="btn btn-primary" href="login.html#trial" data-i18n="ctaButton" data-track="upgrade_premium">Subscribe now</a>
         </article>
       </section>
     </main>
 
+    <footer class="section" style="padding-top: 0; text-align: center;">
+      <a href="https://wa.me/10000000000" data-track="whatsapp_click" rel="noopener noreferrer" target="_blank">WhatsApp</a>
+    </footer>
+
+    <div id="cookie-banner" class="cookie-banner" role="dialog" aria-live="polite" aria-label="Cookie consent">
+      <p>
+        We use cookies to improve your experience. Manage consent for Analytics and Marketing cookies.
+        <a href="privacy.html">Privacy & Cookies</a>
+      </p>
+      <div class="cookie-options">
+        <label class="cookie-option" for="cookie-analytics">
+          <input id="cookie-analytics" type="checkbox" />
+          Analytics
+        </label>
+        <label class="cookie-option" for="cookie-marketing">
+          <input id="cookie-marketing" type="checkbox" />
+          Marketing
+        </label>
+      </div>
+      <div class="cookie-actions">
+        <button id="cookie-reject-all" class="cookie-btn cookie-btn-secondary" type="button">Reject all</button>
+        <button id="cookie-save-preferences" class="cookie-btn cookie-btn-secondary" type="button">Save preferences</button>
+        <button id="cookie-accept-all" class="cookie-btn cookie-btn-primary" type="button">Accept all</button>
+      </div>
+    </div>
+
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/consent.js"></script>
+    <script src="assets/js/analytics-ga4.js"></script>
+    <script src="assets/js/meta-pixel.js"></script>
+    <script src="assets/js/track-events.js"></script>
     <script src="lang.js"></script>
     <script src="script.js"></script>
     <script src="auth.js"></script>
