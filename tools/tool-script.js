@@ -16,6 +16,10 @@
     en: {
       monthlyCashFlow: 'Monthly Cash Flow',
       annualCashFlow: 'Annual Cash Flow',
+      rentSuggestedMonthly: 'Suggested Monthly Rent',
+      rentAnnualIncome: 'Projected Annual Income',
+      rentGrossYield: 'Projected Gross Yield',
+      rentNetAfterExpenses: 'Annual Net After Expenses',
       estimatedArv: 'Estimated ARV',
       maxOffer: 'Maximum Offer (70% Rule)',
       totalFinancingCost: 'Total Financing Cost',
@@ -49,6 +53,10 @@
     es: {
       monthlyCashFlow: 'Flujo de caja mensual',
       annualCashFlow: 'Flujo de caja anual',
+      rentSuggestedMonthly: 'Renta mensual sugerida',
+      rentAnnualIncome: 'Ingreso anual proyectado',
+      rentGrossYield: 'Rendimiento bruto proyectado',
+      rentNetAfterExpenses: 'Neto anual después de gastos',
       estimatedArv: 'ARV estimado',
       maxOffer: 'Oferta máxima (regla del 70%)',
       totalFinancingCost: 'Costo total del financiamiento',
@@ -247,6 +255,21 @@
     if (type === 'rental') {
       const cashFlow = num('monthlyRent') * (1 - num('vacancyRate') / 100) - num('taxes') - num('insurance') - num('maintenance') - num('management');
       output.innerHTML = `<strong>${t.monthlyCashFlow}:</strong> ${money(cashFlow)}<br><strong>${t.annualCashFlow}:</strong> ${money(cashFlow * 12)}`;
+      return;
+    }
+
+
+    if (type === 'rent') {
+      const propertyValue = num('propertyValue');
+      const annualExpenses = num('annualExpenses');
+      const targetYield = num('targetYield') / 100;
+      const occupancy = num('occupancy') / 100;
+      const suggestedMonthlyRent = propertyValue > 0 && occupancy > 0 ? (propertyValue * targetYield) / (12 * occupancy) : 0;
+      const annualIncome = suggestedMonthlyRent * 12 * occupancy;
+      const grossYield = propertyValue > 0 ? (annualIncome / propertyValue) * 100 : 0;
+      const netAfterExpenses = annualIncome - annualExpenses;
+
+      output.innerHTML = `<strong>${t.rentSuggestedMonthly}:</strong> ${money(suggestedMonthlyRent)}<br><strong>${t.rentAnnualIncome}:</strong> ${money(annualIncome)}<br><strong>${t.rentGrossYield}:</strong> ${pct(grossYield)}<br><strong>${t.rentNetAfterExpenses}:</strong> ${money(netAfterExpenses)}`;
       return;
     }
 
