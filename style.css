@@ -122,11 +122,17 @@ nav a {
   border: 0;
   background: transparent;
   color: var(--text);
-  padding: 0.45rem 0.75rem;
+  min-height: 2.25rem;
+  min-width: 4.4rem;
+  padding: 0.5rem 0.8rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
 }
@@ -141,11 +147,12 @@ nav a {
 }
 
 .flag-emoji {
-  width: 1.1rem;
-  height: 0.75rem;
-  border-radius: 0.15rem;
+  width: 1.35rem;
+  height: 0.95rem;
+  border-radius: 0.2rem;
+  flex-shrink: 0;
   object-fit: cover;
-  display: inline-block;
+  display: block;
 }
 
 main {
