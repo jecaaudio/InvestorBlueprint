@@ -8,6 +8,13 @@
 
   if (!form || !type) return;
 
+  const parseNumeric = (value) => {
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+    const clean = String(value ?? '').replace(/[^0-9.-]/g, '');
+    const parsed = Number(clean);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
   const money = (value) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value) || 0);
   const pct = (value) => `${(Number(value) || 0).toFixed(1)}%`;
@@ -91,6 +98,30 @@
 
   const getLang = () => (document.documentElement.lang === 'es' ? 'es' : 'en');
 
+  const setupCurrencyInputs = () => {
+    form.querySelectorAll('input[data-format="currency"]').forEach((input) => {
+      input.placeholder = '$0';
+      input.inputMode = 'decimal';
+
+      input.addEventListener('focus', () => {
+        const value = parseNumeric(input.value);
+        input.value = value ? String(value) : '';
+      });
+
+      input.addEventListener('blur', () => {
+        const value = parseNumeric(input.value);
+        input.value = input.value.trim() ? money(value) : '';
+      });
+
+      if (input.value) {
+        const value = parseNumeric(input.value);
+        input.value = money(value);
+      }
+    });
+  };
+
+  setupCurrencyInputs();
+
   const syncPlanMode = () => {
     if (type !== 'flip') return;
     const selected = form.querySelector('input[name="planMode"]:checked')?.value || 'free';
@@ -173,7 +204,7 @@
     const lang = getLang();
     const t = copy[lang];
     const values = Object.fromEntries(new FormData(form).entries());
-    const num = (name) => Number(values[name] || 0);
+    const num = (name) => parseNumeric(values[name]);
 
     if (type === 'flip') {
       if (!validateFlip(t)) return;

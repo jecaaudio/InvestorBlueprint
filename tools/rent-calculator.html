@@ -36,8 +36,8 @@
         <p data-i18n="rentCalcDesc">Estimate a suggested monthly rent, annual income, and gross rental yield.</p>
         <form id="tool-form">
           <div class="form-grid">
-            <label><span data-i18n="rentPropertyValue">Property Value</span> <input name="propertyValue" type="number" min="0" required /></label>
-            <label><span data-i18n="rentAnnualExpenses">Annual Expenses</span> <input name="annualExpenses" type="number" min="0" value="0" /></label>
+            <label><span data-i18n="rentPropertyValue">Property Value</span> <input name="propertyValue" type="text" data-format="currency" required /></label>
+            <label><span data-i18n="rentAnnualExpenses">Annual Expenses</span> <input name="annualExpenses" type="text" data-format="currency" value="0" /></label>
             <label><span data-i18n="rentTargetYield">Target Gross Yield (%)</span> <input name="targetYield" type="number" min="0" step="0.1" value="8" /></label>
             <label><span data-i18n="rentOccupancy">Expected Occupancy (%)</span> <input name="occupancy" type="number" min="0" max="100" step="0.1" value="95" /></label>
           </div>

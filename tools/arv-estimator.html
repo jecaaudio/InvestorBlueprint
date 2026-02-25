@@ -36,10 +36,10 @@
         <p data-i18n="arvDesc">Enter comparable sale prices and repair budget to estimate ARV and max offer.</p>
         <form id="tool-form">
           <div class="form-grid">
-            <label><span data-i18n="arvComp1">Comparable Sale #1</span> <input name="comp1" type="number" min="0" required /></label>
-            <label><span data-i18n="arvComp2">Comparable Sale #2</span> <input name="comp2" type="number" min="0" required /></label>
-            <label><span data-i18n="arvComp3">Comparable Sale #3</span> <input name="comp3" type="number" min="0" required /></label>
-            <label><span data-i18n="arvRepairs">Estimated Repairs</span> <input name="repairs" type="number" min="0" required /></label>
+            <label><span data-i18n="arvComp1">Comparable Sale #1</span> <input name="comp1" type="text" data-format="currency" required /></label>
+            <label><span data-i18n="arvComp2">Comparable Sale #2</span> <input name="comp2" type="text" data-format="currency" required /></label>
+            <label><span data-i18n="arvComp3">Comparable Sale #3</span> <input name="comp3" type="text" data-format="currency" required /></label>
+            <label><span data-i18n="arvRepairs">Estimated Repairs</span> <input name="repairs" type="text" data-format="currency" required /></label>
           </div>
           <button type="submit" data-i18n="calculate">Calculate</button>
         </form>
