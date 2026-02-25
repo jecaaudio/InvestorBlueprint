@@ -1,6 +1,6 @@
 (function () {
   const form = document.getElementById('tool-form');
-  const output = document.getElementById('result-detail');
+  const output = document.getElementById('result-detail') || document.getElementById('result');
   const cards = document.getElementById('result-cards');
   const type = document.body.dataset.tool;
   const planHint = document.getElementById('plan-hint');
@@ -21,7 +21,30 @@
       totalFinancingCost: 'Total Financing Cost',
       monthlyInterestCarry: 'Monthly Interest Carry',
       freeHint: 'Free mode: quick estimate with purchase, rehab, holding and sale costs only.',
-      proHint: 'Pro mode enabled: includes financing stack, MAO strategy checks, risk buffer and sensitivity table.'
+      proHint: 'Pro mode enabled: includes financing stack, MAO strategy checks, risk buffer and sensitivity table.',
+      requiredField: 'Required field',
+      cannotBeNegative: 'Cannot be negative',
+      profit: 'Profit',
+      mao: 'MAO',
+      cashToClose: 'Cash to Close',
+      totalCosts: 'Total Costs',
+      roi: 'ROI',
+      breakEven: 'Break-even',
+      dealScore: 'Deal Score',
+      costBreakdown: 'Cost Breakdown',
+      section: 'Section',
+      total: 'Total',
+      acquisition: 'Acquisition',
+      rehabContingency: 'Rehab + contingency',
+      holding: 'Holding',
+      selling: 'Selling',
+      financing: 'Financing',
+      sensitivityResults: 'Sensitivity Results',
+      scenario: 'Scenario',
+      low: 'Low',
+      base: 'Base',
+      high: 'High',
+      resultPrompt: 'Enter your numbers and click calculate.'
     },
     es: {
       monthlyCashFlow: 'Flujo de caja mensual',
@@ -31,7 +54,30 @@
       totalFinancingCost: 'Costo total del financiamiento',
       monthlyInterestCarry: 'Carga mensual de intereses',
       freeHint: 'Modo gratis: estimación rápida con compra, rehab, holding y costos de venta.',
-      proHint: 'Modo Pro: incluye estructura de financiamiento, MAO por objetivos, buffer de riesgo y sensibilidades.'
+      proHint: 'Modo Pro: incluye estructura de financiamiento, MAO por objetivos, buffer de riesgo y sensibilidades.',
+      requiredField: 'Campo obligatorio',
+      cannotBeNegative: 'No puede ser negativo',
+      profit: 'Ganancia',
+      mao: 'MAO',
+      cashToClose: 'Efectivo para cerrar',
+      totalCosts: 'Costos totales',
+      roi: 'ROI',
+      breakEven: 'Punto de equilibrio',
+      dealScore: 'Puntaje de operación',
+      costBreakdown: 'Desglose de costos',
+      section: 'Sección',
+      total: 'Total',
+      acquisition: 'Adquisición',
+      rehabContingency: 'Rehab + contingencia',
+      holding: 'Holding',
+      selling: 'Venta',
+      financing: 'Financiamiento',
+      sensitivityResults: 'Resultados de sensibilidad',
+      scenario: 'Escenario',
+      low: 'Bajo',
+      base: 'Base',
+      high: 'Alto',
+      resultPrompt: 'Ingresa tus datos y haz clic en calcular.'
     }
   };
 
@@ -55,17 +101,17 @@
   };
 
   const requiredFields = ['salePrice', 'purchasePrice', 'rehabCost'];
-  const validateFlip = () => {
+  const validateFlip = (t) => {
     let valid = true;
     requiredFields.forEach((field) => {
       const input = form.elements[field];
       if (!input) return;
       input.setCustomValidity('');
       if (!input.value) {
-        input.setCustomValidity('Required field');
+        input.setCustomValidity(t.requiredField);
         valid = false;
       } else if (Number(input.value) < 0) {
-        input.setCustomValidity('Cannot be negative');
+        input.setCustomValidity(t.cannotBeNegative);
         valid = false;
       }
     });
@@ -79,16 +125,17 @@
 
     form.addEventListener('reset', () => {
       setTimeout(() => {
+        const t = copy[getLang()];
         syncPlanMode();
         setCards([
-          { label: 'Profit', value: '$0' },
-          { label: 'MAO', value: '$0' },
-          { label: 'Cash to Close', value: '$0' },
-          { label: 'Total Costs', value: '$0' },
-          { label: 'ROI', value: '0.0%' },
-          { label: 'Break-even', value: '$0' }
+          { label: t.profit, value: '$0' },
+          { label: t.mao, value: '$0' },
+          { label: t.cashToClose, value: '$0' },
+          { label: t.totalCosts, value: '$0' },
+          { label: t.roi, value: '0.0%' },
+          { label: t.breakEven, value: '$0' }
         ]);
-        if (output) output.textContent = 'Enter your numbers and click calculate.';
+        if (output) output.textContent = copy[getLang()].resultPrompt || 'Enter your numbers and click calculate.';
       }, 0);
     });
 
@@ -121,7 +168,7 @@
     const num = (name) => Number(values[name] || 0);
 
     if (type === 'flip') {
-      if (!validateFlip()) return;
+      if (!validateFlip(t)) return;
 
       const purchase = num('purchasePrice');
       const sale = num('salePrice');
@@ -157,38 +204,38 @@
       const score = netProfit > 0 && roi > 15 ? 'A' : netProfit > 0 ? 'B' : 'C';
 
       setCards([
-        { label: 'Profit', value: money(netProfit) },
-        { label: 'MAO', value: money(mao70) },
-        { label: 'Cash to Close', value: money(cashToClose) },
-        { label: 'Total Costs', value: money(totalCosts) },
-        { label: 'ROI', value: pct(roi) },
-        { label: 'Break-even', value: money(breakEven) }
+        { label: t.profit, value: money(netProfit) },
+        { label: t.mao, value: money(mao70) },
+        { label: t.cashToClose, value: money(cashToClose) },
+        { label: t.totalCosts, value: money(totalCosts) },
+        { label: t.roi, value: pct(roi) },
+        { label: t.breakEven, value: money(breakEven) }
       ]);
 
       if (output) {
         output.innerHTML = `
-          <div class="badge ${netProfit > 0 ? 'green' : 'red'}">Deal Score: ${score}</div>
-          <h3>Cost Breakdown</h3>
+          <div class="badge ${netProfit > 0 ? 'green' : 'red'}">${t.dealScore}: ${score}</div>
+          <h3>${t.costBreakdown}</h3>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Section</th><th>Total</th></tr></thead>
+              <thead><tr><th>${t.section}</th><th>${t.total}</th></tr></thead>
               <tbody>
-                <tr><td>Acquisition</td><td>${money(acquisition)}</td></tr>
-                <tr><td>Rehab + contingency</td><td>${money(rehabTotal)}</td></tr>
-                <tr><td>Holding</td><td>${money(holdingTotal)}</td></tr>
-                <tr><td>Selling</td><td>${money(sellingTotal)}</td></tr>
-                <tr><td>Financing</td><td>${money(financingTotal)}</td></tr>
+                <tr><td>${t.acquisition}</td><td>${money(acquisition)}</td></tr>
+                <tr><td>${t.rehabContingency}</td><td>${money(rehabTotal)}</td></tr>
+                <tr><td>${t.holding}</td><td>${money(holdingTotal)}</td></tr>
+                <tr><td>${t.selling}</td><td>${money(sellingTotal)}</td></tr>
+                <tr><td>${t.financing}</td><td>${money(financingTotal)}</td></tr>
               </tbody>
             </table>
           </div>
-          <h3>Sensitivity Results</h3>
+          <h3>${t.sensitivityResults}</h3>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Scenario</th><th>Profit</th></tr></thead>
+              <thead><tr><th>${t.scenario}</th><th>${t.profit}</th></tr></thead>
               <tbody>
-                <tr><td>Low</td><td>${money(scenarioLow)}</td></tr>
-                <tr><td>Base</td><td>${money(scenarioBase)}</td></tr>
-                <tr><td>High</td><td>${money(scenarioHigh)}</td></tr>
+                <tr><td>${t.low}</td><td>${money(scenarioLow)}</td></tr>
+                <tr><td>${t.base}</td><td>${money(scenarioBase)}</td></tr>
+                <tr><td>${t.high}</td><td>${money(scenarioHigh)}</td></tr>
               </tbody>
             </table>
           </div>
