@@ -203,6 +203,7 @@
               <div class="fc-card">
                 <div class="fc-card-label">ROI</div>
                 <div class="fc-card-value" id="kpiRoi">0%</div>
+                <div class="fc-card-subvalue" id="kpiRoiAnnualized">Annualized: 0%</div>
               </div>
               <div class="fc-card">
                 <div class="fc-card-label">Cash Needed</div>
@@ -217,7 +218,9 @@
             <div class="fc-score" id="fcScoreBox">
               <div class="fc-score-title">Deal Score</div>
               <div class="fc-score-pill" id="dealScorePill">—</div>
+              <div class="fc-score-bar"><div class="fc-score-bar-fill"></div></div>
               <div class="fc-score-desc" id="dealScoreDesc">Calcula para ver evaluación del deal.</div>
+              <div class="fc-warnings" id="fcWarnings"></div>
             </div>
 
             <div class="fc-breakdown">
@@ -288,6 +291,14 @@
     <script src="../lang.js"></script>
     <script src="../script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-    <script src="../assets/js/flip-calculator.js"></script>
+    <script src="../assets/js/flip/config.js"></script>
+    <script src="../assets/js/flip/formatters.js"></script>
+    <script src="../assets/js/flip/validators.js"></script>
+    <script src="../assets/js/flip/core.js"></script>
+    <script src="../assets/js/flip/scoring.js"></script>
+    <script src="../assets/js/flip/sensitivity.js"></script>
+    <script src="../assets/js/flip/share_link.js"></script>
+    <script src="../assets/js/flip/export_pdf.js"></script>
+    <script src="../assets/js/flip/ui.js"></script>
   </body>
 </html>
