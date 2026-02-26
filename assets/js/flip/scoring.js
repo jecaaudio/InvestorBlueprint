@@ -1,52 +1,35 @@
 (() => {
   const getDealScore = (deal) => {
-    let score = 100;
-    const reasons = [];
-
-    const marginPctArv = deal.input.arv > 0 ? ((deal.input.arv - deal.totalCosts) / deal.input.arv) * 100 : 0;
-
-    if (deal.roi < 0.12) {
-      score -= 22;
-      reasons.push("ROI bajo para riesgo de flip.");
-    }
-    if (deal.roiAnnualized < 0.18) {
-      score -= 18;
-      reasons.push("ROI anualizado por debajo del objetivo.");
-    }
-    if (marginPctArv < 12) {
-      score -= 18;
-      reasons.push("Margen contra ARV muy ajustado.");
-    }
-    if (deal.cashNeeded > (deal.input.arv * 0.35)) {
-      score -= 12;
-      reasons.push("Capital requerido alto para el valor de salida.");
-    }
-    if (deal.input.months > 8) {
-      score -= 15;
-      reasons.push("Hold largo incrementa riesgo operativo.");
-    }
-    if (deal.profit <= 0) {
-      score -= 30;
-      reasons.push("Ganancia nula o negativa.");
-    }
-
-    score = Math.max(0, Math.min(100, score));
-
-    let label = window.FlipConfig.SCORE_LABELS.NOGO;
+    let label = "🔴 Avoid";
     let tone = "NOGO";
+    let score = 20;
 
-    if (score >= 80) {
-      label = window.FlipConfig.SCORE_LABELS.STRONG;
+    if (deal.roi > 0.4) {
+      label = "🔥 Elite Deal";
       tone = "STRONG";
-    } else if (score >= 60) {
-      label = window.FlipConfig.SCORE_LABELS.REVIEW;
+      score = 95;
+    } else if (deal.roi > 0.25) {
+      label = "🟢 Strong";
+      tone = "STRONG";
+      score = 80;
+    } else if (deal.roi > 0.15) {
+      label = "🟡 Moderate";
       tone = "REVIEW";
-    } else if (score >= 40) {
-      label = window.FlipConfig.SCORE_LABELS.RISKY;
+      score = 62;
+    } else if (deal.roi > 0.05) {
+      label = "🟠 Risky";
       tone = "RISKY";
+      score = 45;
     }
 
-    return { score, label, tone, reasons: reasons.slice(0, 3) };
+    if (deal.profit < 0) score = Math.min(score, 25);
+    if (deal.input.months > deal.input.loanTermMonths) score = Math.max(0, score - 10);
+
+    const maoDelta = deal.input.purchase - deal.mao70;
+    const maoLabel = maoDelta <= 0 ? "✔ Within 70% rule" : maoDelta <= (deal.input.purchase * 0.05) ? "⚠ Slightly above 70%" : "❌ Overpriced vs 70%";
+    const recommendation = score >= 80 ? "Go / Pursue aggressively" : score >= 60 ? "Go with tight execution" : score >= 40 ? "Proceed only with better terms" : "Pass unless repriced";
+
+    return { score, label, tone, reasons: [recommendation], maoLabel, recommendation };
   };
 
   window.FlipScoring = { getDealScore };

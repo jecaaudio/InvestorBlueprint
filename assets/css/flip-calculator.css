@@ -321,3 +321,17 @@
   .fc-grid { grid-template-columns: 1fr; }
   .fc-results { border:none; background:#fff; color:#111; }
 }
+
+
+.fc-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.fc-actions .fc-input {
+  min-width: 180px;
+  max-width: 240px;
+}
