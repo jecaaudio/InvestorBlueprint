@@ -34,7 +34,7 @@
     wrap.innerHTML = STEPS.map((step, index) => `<span class="fc-step-pill ${index === currentStep ? "is-active" : ""}">${index + 1}. ${step}</span>`).join("");
     document.querySelectorAll("#fcSingleForm .fc-section").forEach((section) => {
       const step = Number(section.dataset.step || 0);
-      section.classList.toggle("fc-hidden", step !== currentStep && step < 5);
+      section.classList.toggle("fc-hidden", step !== currentStep);
     });
   };
 
