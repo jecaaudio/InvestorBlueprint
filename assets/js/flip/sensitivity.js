@@ -1,19 +1,16 @@
 (() => {
-  const getSensitivityRows = (baseInput, settings = {}) => {
-    const arvShift = Number(settings.arvShift || 10);
-    const rehabShift = Number(settings.rehabShift || 10);
-    const holdShift = Number(settings.holdShift || 2);
+  const getSensitivityRows = (baseInput, toggles = {}) => {
+    const scenarios = [{ label: "Base", arvFactor: 1, rehabFactor: 1, holdDelta: 0 }];
 
-    const scenarios = [
-      { label: "Base", arvFactor: 1, rehabFactor: 1, holdDelta: 0 },
-      { label: `Best (+${arvShift}% ARV / -${rehabShift}% Rehab / -${holdShift}m)`, arvFactor: 1 + (arvShift / 100), rehabFactor: 1 - (rehabShift / 100), holdDelta: -holdShift },
-      { label: `Worst (-${arvShift}% ARV / +${rehabShift}% Rehab / +${holdShift}m)`, arvFactor: 1 - (arvShift / 100), rehabFactor: 1 + (rehabShift / 100), holdDelta: holdShift }
-    ];
+    if (toggles.arvDown) scenarios.push({ label: "ARV -5%", arvFactor: 0.95, rehabFactor: 1, holdDelta: 0 });
+    if (toggles.rehabUp) scenarios.push({ label: "Rehab +10%", arvFactor: 1, rehabFactor: 1.1, holdDelta: 0 });
+    if (toggles.holdUp) scenarios.push({ label: "Hold +2 months", arvFactor: 1, rehabFactor: 1, holdDelta: 2 });
 
     return scenarios.map((scenario) => {
       const variant = {
         ...baseInput,
         arv: baseInput.arv * scenario.arvFactor,
+        expectedSellingPrice: baseInput.expectedSellingPrice * scenario.arvFactor,
         rehab: baseInput.rehab * scenario.rehabFactor,
         months: Math.max(0, baseInput.months + scenario.holdDelta)
       };

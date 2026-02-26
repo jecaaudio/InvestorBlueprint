@@ -25,14 +25,21 @@
     const input = {
       model: rawInput.model === "hardMoney" ? "hardMoney" : "standard",
       arv: Math.max(0, rawInput.arv || 0),
+      expectedSellingPrice: Math.max(0, rawInput.expectedSellingPrice || rawInput.arv || 0),
       purchase: Math.max(0, rawInput.purchase || 0),
       rehab: Math.max(0, rawInput.rehab || 0),
       loanPct: clamp(rawInput.loanPct || 0, 0, 100),
+      rehabFinancingPct: clamp((rawInput.rehabFinancingPct ?? rawInput.loanPct ?? 0), 0, 100),
       downPct: clamp(rawInput.downPct || 0, 0, 100),
       pointsPct: clamp(rawInput.pointsPct || 0, 0, 20),
       interestApr: clamp(rawInput.interestApr || 0, 0, 50),
+      loanTermMonths: clamp(rawInput.loanTermMonths || rawInput.months || 0, 0, 60),
       months: clamp(rawInput.months || 0, 0, 60),
       holdingMonthly: Math.max(0, rawInput.holdingMonthly || 0),
+      propertyTaxesMonthly: Math.max(0, rawInput.propertyTaxesMonthly || 0),
+      insuranceMonthly: Math.max(0, rawInput.insuranceMonthly || 0),
+      utilitiesMonthly: Math.max(0, rawInput.utilitiesMonthly || 0),
+      hoaMonthly: Math.max(0, rawInput.hoaMonthly || 0),
       agentPct: clamp(rawInput.agentPct || 0, 0, 20),
       closingPct: clamp(rawInput.closingPct || 0, 0, 20),
       contingencyPct: clamp(rawInput.contingencyPct || 0, 0, 50),
@@ -46,6 +53,7 @@
 
     const pct = {
       loan: input.loanPct / 100,
+      rehabFinancing: input.rehabFinancingPct / 100,
       down: input.downPct / 100,
       points: input.pointsPct / 100,
       interest: input.interestApr / 100,
@@ -59,7 +67,7 @@
     const rehabWithContingency = input.rehab * (1 + pct.contingency);
     const acquisitionClosing = input.purchase * pct.buyClosing;
     const loanPurchase = input.purchase * pct.loan;
-    const loanRehab = input.rehabFinanced ? rehabWithContingency * pct.loan : 0;
+    const loanRehab = input.rehabFinanced ? rehabWithContingency * pct.rehabFinancing : 0;
     const loanTotal = loanPurchase + loanRehab;
 
     const pointsCost = loanTotal * pct.points;
@@ -73,8 +81,9 @@
     const interestRehab = rehabInterestBase * pct.interest * (input.months / 12);
     const interestCost = interestPurchase + interestRehab;
 
-    const holdingCost = input.holdingMonthly * input.months;
-    const sellingCost = input.arv * (pct.agent + pct.closing);
+    const monthlyOperatingCosts = input.holdingMonthly + input.propertyTaxesMonthly + input.insuranceMonthly + input.utilitiesMonthly + input.hoaMonthly;
+    const holdingCost = monthlyOperatingCosts * input.months;
+    const sellingCost = input.expectedSellingPrice * (pct.agent + pct.closing);
 
     const financingCost = pointsCost + interestCost + input.lenderFees;
 
@@ -87,7 +96,8 @@
     };
 
     const totalCosts = Object.values(phaseCosts).reduce((sum, value) => sum + value, 0);
-    const profit = input.arv - totalCosts;
+    const netSaleProceeds = input.expectedSellingPrice - sellingCost;
+    const profit = netSaleProceeds - totalCosts;
 
     const purchaseDownPayment = input.purchase * pct.down;
     const uncoveredPurchase = Math.max(0, input.purchase - loanPurchase - purchaseDownPayment);
@@ -101,7 +111,8 @@
     const maoAdjustedBase = input.arv - (rehabWithContingency + sellingCost + holdingCost + financingCost + input.desiredProfit + acquisitionClosing);
     const maoAdjusted = Math.max(0, maoAdjustedBase * (1 - pct.maoSafety));
 
-    const breakEvenArv = totalCosts;
+    const breakEvenPrice = totalCosts / Math.max(0.0001, 1 - (pct.agent + pct.closing));
+    const safetyMargin = input.arv > 0 ? (input.arv - breakEvenPrice) / input.arv : 0;
 
     return {
       input,
@@ -113,8 +124,10 @@
       pointsCost,
       interestCost,
       holdingCost,
+      monthlyOperatingCosts,
       sellingCost,
       financingCost,
+      netSaleProceeds,
       phaseCosts,
       totalCosts,
       profit,
@@ -124,7 +137,9 @@
       mao: maoAdjusted,
       mao70,
       maoAdjusted,
-      breakEvenArv
+      breakEvenArv: breakEvenPrice,
+      breakEvenPrice,
+      safetyMargin
     };
   };
 
