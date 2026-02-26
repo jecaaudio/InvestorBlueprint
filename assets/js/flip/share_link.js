@@ -2,14 +2,15 @@
   const buildShareLink = (state) => {
     const encoded = window.FlipFormatters.encodeState(state);
     const url = new URL(window.location.href);
-    url.hash = `deal=${encoded}`;
+    url.searchParams.set("deal", encoded);
     return url.toString();
   };
 
   const readStateFromHash = () => {
-    const hash = window.location.hash || "";
-    if (!hash.startsWith("#deal=")) return null;
-    return window.FlipFormatters.decodeState(hash.replace("#deal=", ""));
+    const url = new URL(window.location.href);
+    const deal = url.searchParams.get("deal");
+    if (!deal) return null;
+    return window.FlipFormatters.decodeState(deal);
   };
 
   window.FlipShareLink = { buildShareLink, readStateFromHash };

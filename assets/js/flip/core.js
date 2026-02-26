@@ -1,8 +1,29 @@
 (() => {
   const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
 
+  const normalizeDraws = (draws = []) => {
+    const clean = (Array.isArray(draws) && draws.length ? draws : [0, 25, 50, 75, 100])
+      .map((n) => clamp(Number(n) || 0, 0, 100))
+      .sort((a, b) => a - b);
+    if (clean[0] !== 0) clean.unshift(0);
+    if (clean[clean.length - 1] !== 100) clean.push(100);
+    return clean;
+  };
+
+  const averageFundedPct = (drawSchedule) => {
+    const draws = normalizeDraws(drawSchedule);
+    let area = 0;
+    for (let i = 1; i < draws.length; i += 1) {
+      const prev = draws[i - 1] / 100;
+      const curr = draws[i] / 100;
+      area += ((prev + curr) / 2) * (1 / (draws.length - 1));
+    }
+    return clamp(area, 0, 1);
+  };
+
   const computeDeal = (rawInput) => {
     const input = {
+      model: rawInput.model === "hardMoney" ? "hardMoney" : "standard",
       arv: Math.max(0, rawInput.arv || 0),
       purchase: Math.max(0, rawInput.purchase || 0),
       rehab: Math.max(0, rawInput.rehab || 0),
@@ -15,7 +36,12 @@
       agentPct: clamp(rawInput.agentPct || 0, 0, 20),
       closingPct: clamp(rawInput.closingPct || 0, 0, 20),
       contingencyPct: clamp(rawInput.contingencyPct || 0, 0, 50),
-      desiredProfit: Math.max(0, rawInput.desiredProfit || 0)
+      desiredProfit: Math.max(0, rawInput.desiredProfit || 0),
+      buyClosingPct: clamp(rawInput.buyClosingPct || 0, 0, 20),
+      lenderFees: Math.max(0, rawInput.lenderFees || 0),
+      rehabFinanced: Boolean(rawInput.rehabFinanced ?? true),
+      drawSchedule: normalizeDraws(rawInput.drawSchedule),
+      maoSafetyPct: clamp(rawInput.maoSafetyPct || 0, 0, 40)
     };
 
     const pct = {
@@ -25,41 +51,62 @@
       interest: input.interestApr / 100,
       agent: input.agentPct / 100,
       closing: input.closingPct / 100,
-      contingency: input.contingencyPct / 100
+      contingency: input.contingencyPct / 100,
+      buyClosing: input.buyClosingPct / 100,
+      maoSafety: input.maoSafetyPct / 100
     };
 
     const rehabWithContingency = input.rehab * (1 + pct.contingency);
+    const acquisitionClosing = input.purchase * pct.buyClosing;
     const loanPurchase = input.purchase * pct.loan;
-    const loanRehab = rehabWithContingency * pct.loan;
+    const loanRehab = input.rehabFinanced ? rehabWithContingency * pct.loan : 0;
     const loanTotal = loanPurchase + loanRehab;
 
     const pointsCost = loanTotal * pct.points;
+
+    let rehabInterestBase = loanRehab * 0.5;
+    if (input.model === "hardMoney") {
+      rehabInterestBase = loanRehab * averageFundedPct(input.drawSchedule);
+    }
+
     const interestPurchase = loanPurchase * pct.interest * (input.months / 12);
-    const avgDrawnRehabLoan = loanRehab * 0.5;
-    const interestRehab = avgDrawnRehabLoan * pct.interest * (input.months / 12);
+    const interestRehab = rehabInterestBase * pct.interest * (input.months / 12);
     const interestCost = interestPurchase + interestRehab;
 
     const holdingCost = input.holdingMonthly * input.months;
     const sellingCost = input.arv * (pct.agent + pct.closing);
 
-    const totalCosts = input.purchase + rehabWithContingency + pointsCost + interestCost + holdingCost + sellingCost;
+    const financingCost = pointsCost + interestCost + input.lenderFees;
+
+    const phaseCosts = {
+      acquisition: input.purchase + acquisitionClosing,
+      rehab: rehabWithContingency,
+      holding: holdingCost,
+      sale: sellingCost,
+      financing: financingCost
+    };
+
+    const totalCosts = Object.values(phaseCosts).reduce((sum, value) => sum + value, 0);
     const profit = input.arv - totalCosts;
 
     const purchaseDownPayment = input.purchase * pct.down;
     const uncoveredPurchase = Math.max(0, input.purchase - loanPurchase - purchaseDownPayment);
     const uncoveredRehab = Math.max(0, rehabWithContingency - loanRehab);
-    const cashNeeded = Math.max(0, purchaseDownPayment + uncoveredPurchase + uncoveredRehab + pointsCost + interestCost + holdingCost);
+    const cashNeeded = Math.max(0, purchaseDownPayment + uncoveredPurchase + uncoveredRehab + acquisitionClosing + financingCost + holdingCost);
 
     const roi = cashNeeded > 0 ? profit / cashNeeded : 0;
     const roiAnnualized = input.months > 0 ? roi * (12 / input.months) : 0;
 
-    const mao = Math.max(0, input.arv - (rehabWithContingency + sellingCost + holdingCost + pointsCost + interestCost + input.desiredProfit));
+    const mao70 = Math.max(0, (input.arv * 0.7) - rehabWithContingency);
+    const maoAdjustedBase = input.arv - (rehabWithContingency + sellingCost + holdingCost + financingCost + input.desiredProfit + acquisitionClosing);
+    const maoAdjusted = Math.max(0, maoAdjustedBase * (1 - pct.maoSafety));
 
-    const financingCost = pointsCost + interestCost;
+    const breakEvenArv = totalCosts;
 
     return {
       input,
       rehabWithContingency,
+      acquisitionClosing,
       loanPurchase,
       loanRehab,
       loanTotal,
@@ -68,14 +115,18 @@
       holdingCost,
       sellingCost,
       financingCost,
+      phaseCosts,
       totalCosts,
       profit,
       cashNeeded,
       roi,
       roiAnnualized,
-      mao
+      mao: maoAdjusted,
+      mao70,
+      maoAdjusted,
+      breakEvenArv
     };
   };
 
-  window.FlipCore = { computeDeal };
+  window.FlipCore = { computeDeal, averageFundedPct };
 })();
