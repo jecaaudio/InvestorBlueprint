@@ -335,3 +335,42 @@
   min-width: 180px;
   max-width: 240px;
 }
+
+@media (max-width: 768px) {
+  .fc-wrap {
+    padding: 14px;
+  }
+
+  .fc-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fc-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .fc-header-actions .fc-btn {
+    flex: 1 1 100%;
+  }
+
+  .fc-actions {
+    flex-direction: column;
+  }
+
+  .fc-actions .fc-btn,
+  .fc-actions .fc-input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .fc-breakdown-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fc-card-value,
+  .fc-mini strong {
+    overflow-wrap: anywhere;
+  }
+}
