@@ -97,7 +97,8 @@
 
     const totalCosts = Object.values(phaseCosts).reduce((sum, value) => sum + value, 0);
     const netSaleProceeds = input.expectedSellingPrice - sellingCost;
-    const profit = netSaleProceeds - totalCosts;
+    // totalCosts already contains sale costs, so profit should only subtract them once.
+    const profit = input.expectedSellingPrice - totalCosts;
 
     const purchaseDownPayment = input.purchase * pct.down;
     const uncoveredPurchase = Math.max(0, input.purchase - loanPurchase - purchaseDownPayment);
