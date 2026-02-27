@@ -39,12 +39,12 @@
       en: 'Account created. Your 30-day free trial is active.'
     },
     accountCreatedNoTrial: {
-      es: 'Cuenta creada correctamente. Ya puedes activar tu prueba gratis.',
-      en: 'Account created successfully. You can now activate your free trial.'
+      es: 'Solicitud enviada. Te avisaremos cuando tu acceso esté listo.',
+      en: 'Request submitted. We will notify you when your access is ready.'
     },
     invalidCredentials: {
-      es: 'Correo o contraseña inválidos.',
-      en: 'Invalid email or password.'
+      es: 'Correo no encontrado. Solicita acceso primero.',
+      en: 'Email not found. Please request access first.'
     },
     trialActivated: {
       es: 'Prueba gratis activada por 30 días.',
@@ -62,9 +62,9 @@
       es: 'Primero inicia sesión.',
       en: 'Please sign in first.'
     },
-    paidActivated: {
-      es: 'Suscripción de pago activada correctamente.',
-      en: 'Paid subscription activated successfully.'
+    invalidEmail: {
+      es: 'Ingresa un correo válido.',
+      en: 'Enter a valid email address.'
     }
   };
 
@@ -112,16 +112,6 @@
   };
 
   const tAuth = (key) => authMessages[key]?.[getCurrentLang()] || authMessages[key]?.es || '';
-
-  const getPaymentMethodLabel = (paymentMethod, lang = 'es') => {
-    const labels = {
-      card: { es: 'Tarjeta de crédito/débito', en: 'Credit/Debit card' },
-      transfer: { es: 'Transferencia bancaria', en: 'Bank transfer' },
-      paypal: { es: 'PayPal', en: 'PayPal' }
-    };
-
-    return labels[paymentMethod]?.[lang] || (lang === 'es' ? 'No definido' : 'Not set');
-  };
 
   const getSubscriptionStatus = (user) => {
     if (!user) {
@@ -176,24 +166,6 @@
     return true;
   };
 
-  const activatePaidPlan = (email) => {
-    const users = getUsers();
-    const idx = users.findIndex((u) => u.email === email);
-
-    if (idx === -1) {
-      return false;
-    }
-
-    users[idx] = {
-      ...users[idx],
-      subscriptionPlan: 'paid',
-      paidActivatedAt: new Date().toISOString()
-    };
-
-    saveUsers(users);
-    return true;
-  };
-
   const updateLoginLinks = () => {
     const loginLinks = document.querySelectorAll('[data-auth-link]');
     const user = getSession();
@@ -226,24 +198,34 @@
   const registerForm = document.getElementById('register-form');
   const loginForm = document.getElementById('login-form');
   const logoutBtn = document.getElementById('logout-btn');
-  const activatePaidBtn = document.getElementById('activate-paid-btn');
   const authMessage = document.getElementById('auth-message');
   const accountPanel = document.getElementById('account-panel');
   const accountEmail = document.getElementById('account-email');
   const subscriptionStatus = document.getElementById('subscription-status');
   const subscriptionDetail = document.getElementById('subscription-detail');
-  const accountPaymentMethod = document.getElementById('account-payment-method');
-  const enrollmentPaymentStatus = document.getElementById('enrollment-payment-status');
   const savedCalculationsList = document.getElementById('saved-calculations-list');
+  const registerEmailField = document.getElementById('register-email');
+  const registerEmailError = document.getElementById('register-email-error');
 
   if (registerForm) {
     registerForm.addEventListener('submit', (event) => {
       event.preventDefault();
       const data = new FormData(registerForm);
-      const name = String(data.get('name') || '').trim();
       const email = String(data.get('email') || '').trim().toLowerCase();
-      const password = String(data.get('password') || '').trim();
-      const paymentMethod = String(data.get('paymentMethod') || '').trim();
+
+      if (!email || !registerEmailField?.checkValidity()) {
+        if (registerEmailError) {
+          registerEmailError.hidden = false;
+          registerEmailError.textContent = tAuth('invalidEmail');
+        }
+        registerEmailField?.focus();
+        return;
+      }
+
+      if (registerEmailError) {
+        registerEmailError.hidden = true;
+        registerEmailError.textContent = '';
+      }
 
       const users = getUsers();
       if (users.some((u) => u.email === email)) {
@@ -252,11 +234,8 @@
       }
 
       users.push({
-        name,
         email,
-        password,
-        paymentMethod,
-        enrollmentPaidAt: new Date().toISOString(),
+        accessRequestedAt: new Date().toISOString(),
         subscriptionPlan: 'none'
       });
       saveUsers(users);
@@ -281,9 +260,8 @@
       event.preventDefault();
       const data = new FormData(loginForm);
       const email = String(data.get('email') || '').trim().toLowerCase();
-      const password = String(data.get('password') || '').trim();
 
-      const user = getUsers().find((u) => u.email === email && u.password === password);
+      const user = getUsers().find((u) => u.email === email);
       if (!user) {
         authMessage.textContent = tAuth('invalidCredentials');
         return;
@@ -307,20 +285,6 @@
     });
   }
 
-  if (activatePaidBtn) {
-    activatePaidBtn.addEventListener('click', () => {
-      const current = getSession();
-      if (!current) {
-        authMessage.textContent = tAuth('loginFirst');
-        return;
-      }
-
-      activatePaidPlan(current);
-      authMessage.textContent = tAuth('paidActivated');
-      window.location.reload();
-    });
-  }
-
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       clearSession();
@@ -338,17 +302,6 @@
       const status = getSubscriptionStatus(user);
       accountPanel.hidden = false;
       accountEmail.textContent = current;
-
-      if (accountPaymentMethod && enrollmentPaymentStatus) {
-        accountPaymentMethod.textContent = getPaymentMethodLabel(user?.paymentMethod, currentLang);
-        enrollmentPaymentStatus.textContent = user?.enrollmentPaidAt
-          ? currentLang === 'es'
-            ? `Pagada el ${formatDate(user.enrollmentPaidAt)}`
-            : `Paid on ${formatDate(user.enrollmentPaidAt, 'en-US')}`
-          : currentLang === 'es'
-            ? 'Pendiente'
-            : 'Pending';
-      }
 
       if (savedCalculationsList) {
         const savedCalculations = Array.isArray(user?.savedCalculations)
@@ -386,10 +339,6 @@
           subscriptionStatus.textContent = accountPlanText.none.status[currentLang];
           subscriptionDetail.textContent = accountPlanText.none.detail[currentLang];
         }
-      }
-
-      if (activatePaidBtn) {
-        activatePaidBtn.hidden = status === 'paid';
       }
     } else {
       accountPanel.hidden = true;

@@ -38,38 +38,23 @@
     <main>
       <section class="section auth-layout">
         <article class="card auth-card">
-          <h2 data-i18n="registerTitle">Create account</h2>
-          <p data-i18n="registerDesc">Sign up to activate your 30-day free trial.</p>
-          <form id="register-form" class="auth-form">
-            <label><span data-i18n="registerName">Name</span>
-              <input type="text" name="name" required />
-            </label>
-            <label><span data-i18n="labelEmail">Email</span>
-              <input type="email" name="email" required />
-            </label>
-            <label><span data-i18n="labelPassword">Password</span>
-              <input type="password" name="password" minlength="4" required />
-            </label>
-            <label><span data-i18n="registerPaymentMethod">Payment method for enrollment</span>
-              <select name="paymentMethod" required>
-                <option value="card" data-i18n="paymentOptionCard">Credit/Debit card</option>
-                <option value="transfer" data-i18n="paymentOptionTransfer">Bank transfer</option>
-                <option value="paypal" data-i18n="paymentOptionPaypal">PayPal</option>
-              </select>
-            </label>
-            <button class="btn btn-primary" type="submit" data-i18n="registerBtn">Create account</button>
+          <h2 data-i18n="registerTitle">Request access</h2>
+          <p data-i18n="registerDesc">Share your email to request access and activate your 30-day free trial.</p>
+          <form id="register-form" class="auth-form" novalidate>
+            <label for="register-email"><span data-i18n="labelEmail">Email</span></label>
+            <input id="register-email" type="email" name="email" required aria-describedby="register-email-error" />
+            <div id="register-email-error" role="alert" hidden></div>
+            <p class="auth-note" data-i18n="registerNoSensitiveData">We do not request passwords or payment methods at this stage.</p>
+            <button class="btn btn-primary" type="submit" data-i18n="registerBtn">Request access</button>
           </form>
         </article>
 
         <article class="card auth-card">
           <h2 data-i18n="loginTitle">Sign in</h2>
-          <p data-i18n="loginDesc">If you come from “Start Free”, your 1-month trial is activated.</p>
+          <p data-i18n="loginDesc">Sign in with your email to continue your trial and saved calculations.</p>
           <form id="login-form" class="auth-form">
             <label><span data-i18n="labelEmail">Email</span>
               <input type="email" name="email" required />
-            </label>
-            <label><span data-i18n="labelPassword">Password</span>
-              <input type="password" name="password" required />
             </label>
             <button class="btn btn-secondary" type="submit" data-i18n="loginBtn">Sign in</button>
           </form>
@@ -80,14 +65,11 @@
         <article class="card" id="account-panel" hidden>
           <h2 data-i18n="accountTitle">My account</h2>
           <p><span data-i18n="accountActiveSession">Active session with:</span> <strong id="account-email"></strong></p>
-          <p><span data-i18n="accountPaymentMethod">Enrollment payment method:</span> <strong id="account-payment-method"></strong></p>
-          <p><span data-i18n="accountEnrollmentStatus">Enrollment payment status:</span> <strong id="enrollment-payment-status"></strong></p>
           <p><strong id="subscription-status"></strong></p>
           <p id="subscription-detail"></p>
           <h3 data-i18n="savedCalculationsTitle">Saved calculations</h3>
           <ul id="saved-calculations-list" class="saved-calculations-list"></ul>
           <div class="hero-actions">
-            <button id="activate-paid-btn" class="btn btn-primary" type="button" data-i18n="activatePaidBtn">Activate paid subscription</button>
             <button id="logout-btn" class="card-btn" type="button" data-i18n="logoutBtn">Log out</button>
           </div>
         </article>
