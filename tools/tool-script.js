@@ -8,6 +8,10 @@
 
   if (!form || !type) return;
 
+  if (window.IBAnalytics && typeof window.IBAnalytics.trackToolOpen === 'function') {
+    window.IBAnalytics.trackToolOpen(type);
+  }
+
   const parseNumeric = (value) => {
     if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
     const clean = String(value ?? '').replace(/[^0-9.-]/g, '');
@@ -309,6 +313,10 @@
     const lang = getLang();
     const t = copy[lang];
     clearValidationError();
+
+    if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcRun === 'function') {
+      window.IBAnalytics.trackCalcRun(type);
+    }
     const values = Object.fromEntries(new FormData(form).entries());
     const num = (name) => parseNumeric(values[name]);
 
@@ -387,6 +395,10 @@
           </div>
         `;
       }
+
+      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+        window.IBAnalytics.trackCalcSuccess(type, { result: netProfit > 0 ? 'profit' : 'loss' });
+      }
       return;
     }
 
@@ -411,6 +423,9 @@
         { label: 'Vacancy Rate', value: pct(vacancyRate) }
       ]);
       output.textContent = 'Cash flow calculated.';
+      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+        window.IBAnalytics.trackCalcSuccess(type, { result: 'cash_flow' });
+      }
       return;
     }
 
@@ -440,6 +455,9 @@
         { label: t.rentNetAfterExpenses, value: money(netAfterExpenses) }
       ]);
       output.textContent = 'Rent projection calculated.';
+      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+        window.IBAnalytics.trackCalcSuccess(type, { result: 'rent_projection' });
+      }
       return;
     }
 
@@ -458,6 +476,9 @@
         { label: t.maxOffer, value: money(maxOffer) }
       ]);
       output.textContent = 'ARV estimate calculated.';
+      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+        window.IBAnalytics.trackCalcSuccess(type, { result: 'arv_estimate' });
+      }
       return;
     }
 
@@ -477,6 +498,9 @@
         { label: t.monthlyInterestCarry, value: money(interestCost / Math.max(num('months'), 1)) }
       ]);
       output.textContent = 'Financing estimate calculated.';
+      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+        window.IBAnalytics.trackCalcSuccess(type, { result: 'financing_estimate' });
+      }
     }
   });
 })();
