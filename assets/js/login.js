@@ -2,12 +2,29 @@
   const ACCESS_CODE = 'INVESTOR_TEAM_2026';
   const ACCESS_KEY = 'ib_role';
   const ACCESS_VALUE = 'TEAM_ACCESS';
+  const FALLBACK_PATH = 'index.html';
 
   const form = document.getElementById('access-form');
   const codeInput = document.getElementById('access-code');
   const error = document.getElementById('access-code-error');
 
   if (!form || !codeInput || !error) {
+    return;
+  }
+
+  const resolveNextPath = () => {
+    const url = new URL(window.location.href);
+    const returnTo = url.searchParams.get('returnTo');
+
+    if (!returnTo || !returnTo.startsWith('/')) {
+      return FALLBACK_PATH;
+    }
+
+    return returnTo;
+  };
+
+  if (localStorage.getItem(ACCESS_KEY) === ACCESS_VALUE) {
+    window.location.replace(resolveNextPath());
     return;
   }
 
@@ -37,6 +54,6 @@
 
     clearError();
     localStorage.setItem(ACCESS_KEY, ACCESS_VALUE);
-    window.location.href = 'index.html';
+    window.location.href = resolveNextPath();
   });
 })();
