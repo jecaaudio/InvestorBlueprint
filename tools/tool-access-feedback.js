@@ -46,14 +46,15 @@
   const createFeedbackWidget = () => {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = `
-      <button type="button" class="feedback-fab" id="feedback-open-btn" aria-haspopup="dialog" aria-controls="feedback-modal">
+      <button type="button" class="feedback-fab" id="feedbackOpen" aria-haspopup="dialog" aria-controls="feedbackModal">
         Send Feedback
       </button>
-      <div class="feedback-modal" id="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title" hidden>
-        <div class="feedback-modal-panel">
+      <div id="feedbackBackdrop" hidden></div>
+      <div class="feedback-modal" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title" hidden>
+        <div class="feedback-modal-panel" id="feedbackPanel">
           <div class="feedback-modal-header">
             <h2 id="feedback-modal-title">Send Feedback</h2>
-            <button type="button" class="feedback-close" id="feedback-close-btn" aria-label="Close feedback modal">×</button>
+            <button type="button" class="feedback-close" id="feedbackClose" aria-label="Close feedback modal">×</button>
           </div>
           <form id="feedback-form" class="feedback-form">
             <label for="feedback-tool">Tool</label>
@@ -73,15 +74,16 @@
 
     document.body.appendChild(wrapper);
 
-    const openButton = document.getElementById('feedback-open-btn');
-    const closeButton = document.getElementById('feedback-close-btn');
-    const modal = document.getElementById('feedback-modal');
+    const openButton = document.getElementById('feedbackOpen');
+    const closeButton = document.getElementById('feedbackClose');
+    const backdrop = document.getElementById('feedbackBackdrop');
+    const modal = document.getElementById('feedbackModal');
     const form = document.getElementById('feedback-form');
     const status = document.getElementById('feedback-status');
     const toolSelect = document.getElementById('feedback-tool');
     const messageInput = document.getElementById('feedback-message');
 
-    if (!openButton || !closeButton || !modal || !form || !status || !toolSelect || !messageInput) {
+    if (!openButton || !closeButton || !backdrop || !modal || !form || !status || !toolSelect || !messageInput) {
       return;
     }
 
@@ -90,28 +92,29 @@
       toolSelect.value = currentTool;
     }
 
-    const openModal = () => {
+    const openFeedback = () => {
+      backdrop.hidden = false;
       modal.hidden = false;
+      document.body.style.overflow = 'hidden';
       messageInput.focus();
     };
 
-    const closeModal = () => {
+    const closeFeedback = () => {
+      backdrop.hidden = true;
       modal.hidden = true;
+      document.body.style.overflow = '';
       openButton.focus();
     };
 
-    openButton.addEventListener('click', openModal);
-    closeButton.addEventListener('click', closeModal);
+    openButton.addEventListener('click', openFeedback);
+    closeButton.addEventListener('click', closeFeedback);
 
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) {
-        closeModal();
-      }
-    });
+    backdrop.addEventListener('click', closeFeedback);
+    modal.addEventListener('click', (event) => event.stopPropagation());
 
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && !modal.hidden) {
-        closeModal();
+        closeFeedback();
       }
     });
 
@@ -135,7 +138,7 @@
       status.textContent = 'Opening your email client to send feedback.';
       form.reset();
       toolSelect.value = selectedTool;
-      setTimeout(closeModal, 300);
+      setTimeout(closeFeedback, 300);
     });
   };
 
