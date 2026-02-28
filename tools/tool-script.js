@@ -35,6 +35,7 @@
       proHint: 'Pro mode enabled: includes financing stack, MAO strategy checks, risk buffer and sensitivity table.',
       requiredField: 'Required field',
       cannotBeNegative: 'Cannot be negative',
+      outOfRange: 'Value out of allowed range',
       profit: 'Profit',
       mao: 'MAO',
       cashToClose: 'Cash to Close',
@@ -72,6 +73,7 @@
       proHint: 'Modo Pro: incluye estructura de financiamiento, MAO por objetivos, buffer de riesgo y sensibilidades.',
       requiredField: 'Campo obligatorio',
       cannotBeNegative: 'No puede ser negativo',
+      outOfRange: 'Valor fuera del rango permitido',
       profit: 'Ganancia',
       mao: 'MAO',
       cashToClose: 'Efectivo para cerrar',
@@ -139,6 +141,23 @@
       .join('');
   };
 
+
+  const validationFeedback = document.getElementById('tool-validation');
+
+  const showValidationError = (message) => {
+    if (!validationFeedback) return;
+    validationFeedback.hidden = false;
+    validationFeedback.textContent = message;
+  };
+
+  const clearValidationError = () => {
+    if (!validationFeedback) return;
+    validationFeedback.hidden = true;
+    validationFeedback.textContent = '';
+  };
+
+  const validateRange = (value, min, max) => Number.isFinite(value) && value >= min && value <= max;
+
   const requiredFields = ['salePrice', 'purchasePrice', 'rehabCost'];
   const validateFlip = (t) => {
     let valid = true;
@@ -203,6 +222,7 @@
     event.preventDefault();
     const lang = getLang();
     const t = copy[lang];
+    clearValidationError();
     const values = Object.fromEntries(new FormData(form).entries());
     const num = (name) => parseNumeric(values[name]);
 
@@ -285,7 +305,16 @@
     }
 
     if (type === 'rental') {
-      const cashFlow = num('monthlyRent') * (1 - num('vacancyRate') / 100) - num('taxes') - num('insurance') - num('maintenance') - num('management');
+      const monthlyRent = num('monthlyRent');
+      const vacancyRate = num('vacancyRate');
+      const expenses = ['taxes', 'insurance', 'maintenance', 'management'].map(num);
+
+      if (monthlyRent <= 0 || expenses.some((value) => value < 0) || !validateRange(vacancyRate, 0, 100)) {
+        showValidationError(t.outOfRange);
+        return;
+      }
+
+      const cashFlow = monthlyRent * (1 - vacancyRate / 100) - expenses.reduce((sum, value) => sum + value, 0);
       output.innerHTML = `<strong>${t.monthlyCashFlow}:</strong> ${money(cashFlow)}<br><strong>${t.annualCashFlow}:</strong> ${money(cashFlow * 12)}`;
       return;
     }
@@ -296,6 +325,11 @@
       const annualExpenses = num('annualExpenses');
       const targetYield = num('targetYield') / 100;
       const occupancy = num('occupancy') / 100;
+      if (propertyValue <= 0 || annualExpenses < 0 || targetYield < 0 || !validateRange(occupancy * 100, 0, 100)) {
+        showValidationError(t.outOfRange);
+        return;
+      }
+
       const suggestedMonthlyRent = propertyValue > 0 && occupancy > 0 ? (propertyValue * targetYield) / (12 * occupancy) : 0;
       const annualIncome = suggestedMonthlyRent * 12 * occupancy;
       const grossYield = propertyValue > 0 ? (annualIncome / propertyValue) * 100 : 0;

@@ -27,6 +27,9 @@
     },
     whatsapp_click: function () {
       trackMetaEvent('Contact');
+    },
+    calculator_submit: function () {
+      trackGaEvent('calculator_submit', { source: 'tool_form' });
     }
   };
 

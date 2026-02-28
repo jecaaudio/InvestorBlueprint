@@ -27,3 +27,20 @@ python3 -m http.server 4173
 Luego abre:
 
 - `http://localhost:4173`
+
+## Quality gates (CI)
+
+El workflow `.github/workflows/quality-gates.yml` ejecuta:
+
+- Pruebas de accesibilidad con `axe` en páginas clave.
+- Auditoría de Lighthouse con mínimos de performance, accesibilidad, best-practices y SEO.
+
+Para ejecutarlos localmente:
+
+```bash
+npm install
+npx playwright install --with-deps chromium
+python3 -m http.server 4173 &
+npm run qa:axe
+npm run qa:lighthouse
+```

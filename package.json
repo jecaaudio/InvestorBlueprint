@@ -1,0 +1,14 @@
+{
+  "name": "investor-blueprint-qa",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "qa:axe": "node scripts/axe-check.mjs",
+    "qa:lighthouse": "lhci autorun --config=./lighthouserc.json"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@lhci/cli": "^0.14.0",
+    "playwright": "^1.51.1"
+  }
+}
