@@ -374,3 +374,52 @@
     overflow-wrap: anywhere;
   }
 }
+
+.info-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:18px;
+  height:18px;
+  margin-left:6px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.06);
+  color:inherit;
+  font-weight:700;
+  font-size:12px;
+  line-height:1;
+  cursor:pointer;
+  position:relative;
+  top:-1px;
+}
+
+.info-icon:focus{
+  outline:2px solid rgba(255,255,255,.35);
+  outline-offset:2px;
+}
+
+.tooltip-bubble{
+  position:fixed;
+  z-index:9999;
+  max-width:min(320px, calc(100vw - 24px));
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(10,10,10,.92);
+  color:#fff;
+  font-size:13px;
+  line-height:1.35;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+  pointer-events:none;
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity .12s ease, transform .12s ease;
+}
+
+.tooltip-bubble.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+#outDecision[data-state="ok"] { color: #00d084; }
+#outDecision[data-state="bad"] { color: #ff6b6b; }
