@@ -389,14 +389,29 @@ button:focus-visible {
   box-shadow: 0 10px 30px rgba(2, 6, 23, 0.5);
 }
 
-.feedback-modal {
+#feedbackBackdrop[hidden],
+#feedbackModal[hidden] {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+#feedbackBackdrop {
   position: fixed;
   inset: 0;
-  z-index: 250;
-  background: rgba(2, 6, 23, 0.65);
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.feedback-modal,
+#feedbackModal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
   display: grid;
   place-items: center;
-  padding: 1rem;
+  width: calc(100% - 24px);
+  max-width: 520px;
+  margin: auto;
 }
 
 .feedback-modal-panel {
