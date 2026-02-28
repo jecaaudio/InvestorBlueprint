@@ -2,7 +2,13 @@ import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
 
 const baseUrl = process.env.AXE_BASE_URL || 'http://127.0.0.1:4173';
-const pages = ['/', '/tools/rental-cash-flow.html', '/tools/rent-calculator.html'];
+const pages = [
+  '/InvestorBlueprint/index.html',
+  '/InvestorBlueprint/pricing.html',
+  '/InvestorBlueprint/tools/rental-cash-flow.html',
+  '/InvestorBlueprint/tools/rent-calculator.html',
+  '/InvestorBlueprint/tools/flip-calculator.html'
+];
 
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext();

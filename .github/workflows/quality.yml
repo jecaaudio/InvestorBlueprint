@@ -1,12 +1,14 @@
-name: Quality Gates
+name: Quality
 
 on:
+  push:
   pull_request:
   workflow_dispatch:
 
 jobs:
-  qa:
+  quality-gates:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,17 +20,17 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
       - name: Run axe accessibility checks
         run: |
-          python3 -m http.server 4173 &
+          npx http-server .. -p 4173 --silent &
           SERVER_PID=$!
           trap "kill $SERVER_PID" EXIT
           npm run qa:axe
 
-      - name: Run Lighthouse assertions
+      - name: Run Lighthouse CI assertions
         run: npm run qa:lighthouse
