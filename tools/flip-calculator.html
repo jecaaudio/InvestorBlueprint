@@ -110,12 +110,38 @@
       </section>
     </main>
 
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/consent.js"></script>
+    <script src="../assets/js/analytics-ga4.js"></script>
+    <script src="../assets/js/meta-pixel.js"></script>
+    <script src="../assets/js/analytics.js"></script>
     <script src="../lang.js"></script><script src="../script.js"></script>
     <script src="../assets/js/flip/config.js"></script><script src="../assets/js/flip/formatters.js"></script><script src="../assets/js/flip/validators.js"></script>
     <script src="../assets/js/flip/core.js"></script><script src="../assets/js/flip/scoring.js"></script><script src="../assets/js/flip/sensitivity.js"></script>
     <script src="../assets/js/flip/share_link.js"></script><script src="../assets/js/flip/export_pdf.js"></script><script src="../assets/js/flip/ui.js"></script>
     <script>
       (() => {
+        if (window.IBAnalytics && typeof window.IBAnalytics.trackToolOpen === 'function') {
+          window.IBAnalytics.trackToolOpen('flip');
+        }
+
+        const calcBtn = document.getElementById('fcCalcBtn');
+        if (calcBtn && window.IBAnalytics) {
+          calcBtn.addEventListener('click', () => {
+            if (typeof window.IBAnalytics.trackCalcRun === 'function') {
+              window.IBAnalytics.trackCalcRun('flip');
+            }
+            if (typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+              setTimeout(() => {
+                const score = document.getElementById('dealScorePill')?.textContent?.trim();
+                if (score && score !== '—') {
+                  window.IBAnalytics.trackCalcSuccess('flip', { deal_score: score });
+                }
+              }, 0);
+            }
+          });
+        }
+
         const useExampleBtn = document.getElementById('fcUseExampleBtn');
         if (!useExampleBtn) return;
         useExampleBtn.addEventListener('click', () => {
