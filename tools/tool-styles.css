@@ -250,6 +250,31 @@ td {
 .badge.yellow { background: rgba(234, 179, 8, 0.2); color: #fde68a; }
 .badge.red { background: rgba(220, 38, 38, 0.2); color: #fca5a5; }
 
+.badge.free { background: #1d4ed8; color: #dbeafe; }
+.badge.pro { background: #7c3aed; color: #ede9fe; }
+
+.pro-tool-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-upgrade-overlay {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(124, 58, 237, 0.8);
+  border-radius: 0.65rem;
+  padding: 0.45rem 0.55rem;
+}
+
+.tool-upgrade-overlay .card-btn {
+  margin-top: 0;
+}
+
 .plan-toggle {
   display: flex;
   gap: 0.8rem;
