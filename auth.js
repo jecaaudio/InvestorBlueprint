@@ -138,6 +138,24 @@
     return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString(locale);
   };
 
+  const escapeHtml = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+  const encodeStateToBase64 = (state) => {
+    try {
+      const json = JSON.stringify(state);
+      const bytes = new TextEncoder().encode(json);
+      const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
+      return btoa(binary);
+    } catch {
+      return null;
+    }
+  };
+
   const startTrial = (email) => {
     const users = getUsers();
     const idx = users.findIndex((u) => u.email === email);
@@ -316,10 +334,11 @@
           savedCalculationsList.innerHTML = savedCalculations
             .map((item) => {
               const updated = formatDate(item.updatedAt, currentLang === 'es' ? 'es-ES' : 'en-US');
+              const encodedState = encodeStateToBase64(item.state);
               const toolUrl = item.tool === 'flip'
-                ? `tools/flip-calculator.html?flip=${encodeURIComponent(btoa(JSON.stringify(item.state)))}`
+                ? (encodedState ? `tools/flip-calculator.html?flip=${encodeURIComponent(encodedState)}` : '#')
                 : '#';
-              return `<li><a href="${toolUrl}">${item.name}</a> · ${updated}</li>`;
+              return `<li><a href="${toolUrl}">${escapeHtml(item.name)}</a> · ${updated}</li>`;
             })
             .join('');
         }
