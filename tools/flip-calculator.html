@@ -79,6 +79,7 @@
             </div>
 
             <div class="fc-actions">
+              <button class="fc-btn fc-btn-ghost" id="fcUseExampleBtn" type="button">Use Example</button>
               <button class="fc-btn" id="fcCalcBtn" type="button">Calculate Deal</button>
               <button class="fc-btn fc-btn-ghost" id="fcResetBtn" type="button">Reset Defaults</button>
               <select id="fcHistorySelect" class="fc-input"><option value="">Load saved...</option></select>
@@ -113,5 +114,38 @@
     <script src="../assets/js/flip/config.js"></script><script src="../assets/js/flip/formatters.js"></script><script src="../assets/js/flip/validators.js"></script>
     <script src="../assets/js/flip/core.js"></script><script src="../assets/js/flip/scoring.js"></script><script src="../assets/js/flip/sensitivity.js"></script>
     <script src="../assets/js/flip/share_link.js"></script><script src="../assets/js/flip/export_pdf.js"></script><script src="../assets/js/flip/ui.js"></script>
+    <script>
+      (() => {
+        const useExampleBtn = document.getElementById('fcUseExampleBtn');
+        if (!useExampleBtn) return;
+        useExampleBtn.addEventListener('click', () => {
+          const sample = {
+            purchasePrice: 180000,
+            arv: 320000,
+            expectedSellingPrice: 315000,
+            rehab: 50000,
+            months: 6,
+            loanPct: 85,
+            rehabFinancingPct: 100,
+            downPct: 15,
+            pointsPct: 2,
+            interestApr: 12,
+            loanTermMonths: 12,
+            buyClosingPct: 2,
+            sellingCostsPct: 8,
+            holdingMonthly: 450,
+            propertyTaxesMonthly: 260,
+            insuranceMonthly: 140,
+            utilitiesMonthly: 220,
+            hoaMonthly: 0
+          };
+          Object.entries(sample).forEach(([id, value]) => {
+            const input = document.getElementById(id);
+            if (input) input.value = value;
+          });
+          document.getElementById('fcCalcBtn')?.click();
+        });
+      })();
+    </script>
   </body>
 </html>

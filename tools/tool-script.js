@@ -156,6 +156,63 @@
     validationFeedback.textContent = '';
   };
 
+  const clearFieldErrors = () => {
+    form.querySelectorAll('.field-error').forEach((node) => {
+      node.hidden = true;
+      node.textContent = '';
+    });
+    form.querySelectorAll('input, select').forEach((input) => input.removeAttribute('aria-invalid'));
+  };
+
+  const setFieldError = (name, message) => {
+    const input = form.elements[name];
+    const errorNode = document.getElementById(`${name}-error`);
+    if (!input || !errorNode) return;
+    input.setAttribute('aria-invalid', 'true');
+    errorNode.hidden = false;
+    errorNode.textContent = message;
+  };
+
+  const validateFields = (rules, t) => {
+    clearFieldErrors();
+    const invalid = [];
+    rules.forEach((rule) => {
+      const value = parseNumeric(form.elements[rule.name]?.value);
+      const isBlank = String(form.elements[rule.name]?.value || '').trim() === '';
+      if (rule.required && isBlank) {
+        setFieldError(rule.name, t.requiredField);
+        invalid.push(rule.name);
+        return;
+      }
+      if (!Number.isFinite(value)) {
+        setFieldError(rule.name, t.outOfRange);
+        invalid.push(rule.name);
+        return;
+      }
+      if (!rule.allowNegative && value < 0) {
+        setFieldError(rule.name, t.cannotBeNegative);
+        invalid.push(rule.name);
+        return;
+      }
+      if (rule.min !== undefined && value < rule.min) {
+        setFieldError(rule.name, t.outOfRange);
+        invalid.push(rule.name);
+        return;
+      }
+      if (rule.max !== undefined && value > rule.max) {
+        setFieldError(rule.name, t.outOfRange);
+        invalid.push(rule.name);
+      }
+    });
+
+    if (invalid.length) {
+      showValidationError(t.outOfRange);
+      form.elements[invalid[0]]?.focus();
+      return false;
+    }
+    return true;
+  };
+
   const validateRange = (value, min, max) => Number.isFinite(value) && value >= min && value <= max;
 
   const requiredFields = ['salePrice', 'purchasePrice', 'rehabCost'];
@@ -214,6 +271,35 @@
         });
         form.elements.planMode.value = 'pro';
         syncPlanMode();
+      });
+    }
+  }
+
+  const sampleData = {
+    rental: { monthlyRent: 2400, taxes: 220, insurance: 120, maintenance: 180, management: 190, vacancyRate: 5 },
+    rent: { propertyValue: 320000, annualExpenses: 9600, targetYield: 8.5, occupancy: 95 },
+    arv: { comp1: 305000, comp2: 315000, comp3: 322000, repairs: 38000 },
+    'hard-money': { loanAmount: 210000, interestRate: 11.5, points: 2, months: 9 }
+  };
+
+  if (type !== 'flip') {
+    form.addEventListener('reset', () => {
+      setTimeout(() => {
+        clearValidationError();
+        clearFieldErrors();
+        setCards([]);
+        if (output) output.textContent = copy[getLang()].resultPrompt;
+      }, 0);
+    });
+
+    if (sampleBtn) {
+      sampleBtn.addEventListener('click', () => {
+        const sample = sampleData[type];
+        if (!sample) return;
+        Object.entries(sample).forEach(([name, value]) => {
+          if (form.elements[name]) form.elements[name].value = value;
+        });
+        form.requestSubmit();
       });
     }
   }
@@ -305,51 +391,92 @@
     }
 
     if (type === 'rental') {
+      if (!validateFields([
+        { name: 'monthlyRent', required: true, min: 0.01 },
+        { name: 'taxes', min: 0 },
+        { name: 'insurance', min: 0 },
+        { name: 'maintenance', min: 0 },
+        { name: 'management', min: 0 },
+        { name: 'vacancyRate', required: true, min: 0, max: 100 }
+      ], t)) return;
+
       const monthlyRent = num('monthlyRent');
       const vacancyRate = num('vacancyRate');
       const expenses = ['taxes', 'insurance', 'maintenance', 'management'].map(num);
 
-      if (monthlyRent <= 0 || expenses.some((value) => value < 0) || !validateRange(vacancyRate, 0, 100)) {
-        showValidationError(t.outOfRange);
-        return;
-      }
-
       const cashFlow = monthlyRent * (1 - vacancyRate / 100) - expenses.reduce((sum, value) => sum + value, 0);
-      output.innerHTML = `<strong>${t.monthlyCashFlow}:</strong> ${money(cashFlow)}<br><strong>${t.annualCashFlow}:</strong> ${money(cashFlow * 12)}`;
+      setCards([
+        { label: t.monthlyCashFlow, value: money(cashFlow) },
+        { label: t.annualCashFlow, value: money(cashFlow * 12) },
+        { label: 'Vacancy Rate', value: pct(vacancyRate) }
+      ]);
+      output.textContent = 'Cash flow calculated.';
       return;
     }
 
 
     if (type === 'rent') {
+      if (!validateFields([
+        { name: 'propertyValue', required: true, min: 0.01 },
+        { name: 'annualExpenses', min: 0 },
+        { name: 'targetYield', required: true, min: 0, max: 100 },
+        { name: 'occupancy', required: true, min: 0, max: 100 }
+      ], t)) return;
+
       const propertyValue = num('propertyValue');
       const annualExpenses = num('annualExpenses');
       const targetYield = num('targetYield') / 100;
       const occupancy = num('occupancy') / 100;
-      if (propertyValue <= 0 || annualExpenses < 0 || targetYield < 0 || !validateRange(occupancy * 100, 0, 100)) {
-        showValidationError(t.outOfRange);
-        return;
-      }
 
       const suggestedMonthlyRent = propertyValue > 0 && occupancy > 0 ? (propertyValue * targetYield) / (12 * occupancy) : 0;
       const annualIncome = suggestedMonthlyRent * 12 * occupancy;
       const grossYield = propertyValue > 0 ? (annualIncome / propertyValue) * 100 : 0;
       const netAfterExpenses = annualIncome - annualExpenses;
 
-      output.innerHTML = `<strong>${t.rentSuggestedMonthly}:</strong> ${money(suggestedMonthlyRent)}<br><strong>${t.rentAnnualIncome}:</strong> ${money(annualIncome)}<br><strong>${t.rentGrossYield}:</strong> ${pct(grossYield)}<br><strong>${t.rentNetAfterExpenses}:</strong> ${money(netAfterExpenses)}`;
+      setCards([
+        { label: t.rentSuggestedMonthly, value: money(suggestedMonthlyRent) },
+        { label: t.rentAnnualIncome, value: money(annualIncome) },
+        { label: t.rentGrossYield, value: pct(grossYield) },
+        { label: t.rentNetAfterExpenses, value: money(netAfterExpenses) }
+      ]);
+      output.textContent = 'Rent projection calculated.';
       return;
     }
 
     if (type === 'arv') {
+      if (!validateFields([
+        { name: 'comp1', required: true, min: 0.01 },
+        { name: 'comp2', required: true, min: 0.01 },
+        { name: 'comp3', required: true, min: 0.01 },
+        { name: 'repairs', required: true, min: 0 }
+      ], t)) return;
+
       const average = (num('comp1') + num('comp2') + num('comp3')) / 3;
-      output.innerHTML = `<strong>${t.estimatedArv}:</strong> ${money(average)}<br><strong>${t.maxOffer}:</strong> ${money(average * 0.7 - num('repairs'))}`;
+      const maxOffer = average * 0.7 - num('repairs');
+      setCards([
+        { label: t.estimatedArv, value: money(average) },
+        { label: t.maxOffer, value: money(maxOffer) }
+      ]);
+      output.textContent = 'ARV estimate calculated.';
       return;
     }
 
     if (type === 'hard-money') {
+      if (!validateFields([
+        { name: 'loanAmount', required: true, min: 0.01 },
+        { name: 'interestRate', required: true, min: 0, max: 100 },
+        { name: 'points', required: true, min: 0, max: 20 },
+        { name: 'months', required: true, min: 1 }
+      ], t)) return;
+
       const loan = num('loanAmount');
       const interestCost = loan * (num('interestRate') / 100) * (num('months') / 12);
       const totalCost = loan * (num('points') / 100) + interestCost;
-      output.innerHTML = `<strong>${t.totalFinancingCost}:</strong> ${money(totalCost)}<br><strong>${t.monthlyInterestCarry}:</strong> ${money(interestCost / Math.max(num('months'), 1))}`;
+      setCards([
+        { label: t.totalFinancingCost, value: money(totalCost) },
+        { label: t.monthlyInterestCarry, value: money(interestCost / Math.max(num('months'), 1)) }
+      ]);
+      output.textContent = 'Financing estimate calculated.';
     }
   });
 })();
