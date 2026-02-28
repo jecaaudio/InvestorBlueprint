@@ -1,0 +1,143 @@
+(function () {
+  const ACCESS_KEY = 'ib_role';
+  const REQUIRED_ROLE = 'TEAM_ACCESS';
+
+  const getLoginPath = () => (window.location.pathname.includes('/tools/arv/') ? '../../login.html' : '../login.html');
+
+  if (localStorage.getItem(ACCESS_KEY) !== REQUIRED_ROLE) {
+    window.location.replace(getLoginPath());
+    return;
+  }
+
+  const TOOL_NAMES = [
+    { value: 'arv-estimator', label: 'ARV Estimator' },
+    { value: 'flip-calculator', label: 'Flip Calculator' },
+    { value: 'hard-money-analyzer', label: 'Hard Money Analyzer' },
+    { value: 'rent-calculator', label: 'Rent Calculator' },
+    { value: 'rental-cash-flow', label: 'Rental Cash Flow' },
+    { value: 'automated-arv-tool', label: 'Automated ARV Tool' }
+  ];
+
+  const detectTool = () => {
+    const bodyTool = document.body?.dataset?.tool;
+    if (bodyTool) {
+      return bodyTool;
+    }
+
+    const path = window.location.pathname;
+    if (path.includes('/tools/arv/')) {
+      return 'automated-arv-tool';
+    }
+
+    return 'unknown';
+  };
+
+  const resolveToolFromValue = (value) => {
+    const match = TOOL_NAMES.find((tool) => tool.value === value);
+    return match ? match.label : value;
+  };
+
+  const encode = (text) => encodeURIComponent(text);
+
+  const createFeedbackWidget = () => {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `
+      <button type="button" class="feedback-fab" id="feedback-open-btn" aria-haspopup="dialog" aria-controls="feedback-modal">
+        Send Feedback
+      </button>
+      <div class="feedback-modal" id="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title" hidden>
+        <div class="feedback-modal-panel">
+          <div class="feedback-modal-header">
+            <h2 id="feedback-modal-title">Send Feedback</h2>
+            <button type="button" class="feedback-close" id="feedback-close-btn" aria-label="Close feedback modal">×</button>
+          </div>
+          <form id="feedback-form" class="feedback-form">
+            <label for="feedback-tool">Tool</label>
+            <select id="feedback-tool" name="tool" required>
+              ${TOOL_NAMES.map((tool) => `<option value="${tool.value}">${tool.label}</option>`).join('')}
+            </select>
+
+            <label for="feedback-message">Your feedback</label>
+            <textarea id="feedback-message" name="message" rows="5" required placeholder="Tell us what is working and what we should improve."></textarea>
+
+            <p class="feedback-status" id="feedback-status" role="status" aria-live="polite"></p>
+            <button type="submit" class="feedback-submit">Send</button>
+          </form>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(wrapper);
+
+    const openButton = document.getElementById('feedback-open-btn');
+    const closeButton = document.getElementById('feedback-close-btn');
+    const modal = document.getElementById('feedback-modal');
+    const form = document.getElementById('feedback-form');
+    const status = document.getElementById('feedback-status');
+    const toolSelect = document.getElementById('feedback-tool');
+    const messageInput = document.getElementById('feedback-message');
+
+    if (!openButton || !closeButton || !modal || !form || !status || !toolSelect || !messageInput) {
+      return;
+    }
+
+    const currentTool = detectTool();
+    if (TOOL_NAMES.some((tool) => tool.value === currentTool)) {
+      toolSelect.value = currentTool;
+    }
+
+    const openModal = () => {
+      modal.hidden = false;
+      messageInput.focus();
+    };
+
+    const closeModal = () => {
+      modal.hidden = true;
+      openButton.focus();
+    };
+
+    openButton.addEventListener('click', openModal);
+    closeButton.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !modal.hidden) {
+        closeModal();
+      }
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const selectedTool = toolSelect.value;
+      const message = messageInput.value.trim();
+
+      if (!message) {
+        status.textContent = 'Please write your feedback before sending.';
+        return;
+      }
+
+      const toolLabel = resolveToolFromValue(selectedTool);
+      const mailtoHref = `mailto:feedback@investorblueprint.local?subject=${encode(`InvestorBlueprint Feedback - ${toolLabel}`)}&body=${encode(
+        `Tool: ${toolLabel}\nURL: ${window.location.href}\n\nFeedback:\n${message}`
+      )}`;
+
+      window.location.href = mailtoHref;
+      status.textContent = 'Opening your email client to send feedback.';
+      form.reset();
+      toolSelect.value = selectedTool;
+      setTimeout(closeModal, 300);
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', createFeedbackWidget, { once: true });
+  } else {
+    createFeedbackWidget();
+  }
+})();

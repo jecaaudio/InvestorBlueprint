@@ -379,3 +379,71 @@ button:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+.feedback-fab {
+  position: fixed;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  z-index: 220;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.5);
+}
+
+.feedback-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: rgba(2, 6, 23, 0.65);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.feedback-modal-panel {
+  width: min(520px, 95vw);
+  background: #0f172a;
+  border: 1px solid var(--border);
+  border-radius: 0.95rem;
+  padding: 1rem;
+}
+
+.feedback-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.feedback-modal-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.feedback-close {
+  margin: 0;
+  background: transparent;
+  font-size: 1.2rem;
+  color: var(--text);
+  padding: 0.2rem 0.5rem;
+}
+
+.feedback-form {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.feedback-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.feedback-status {
+  min-height: 1.2rem;
+  margin: 0;
+  color: var(--muted);
+}
+
+.feedback-submit {
+  justify-self: start;
+  margin-top: 0.15rem;
+}

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Request Access | InvestorBlueprint</title>
+    <title>Access Login | InvestorBlueprint</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -38,23 +38,22 @@
     <main>
       <section class="section auth-layout auth-layout-single">
         <article class="card auth-card">
-          <h2>Request Access</h2>
-          <p>Demo: no solicitamos contraseña ni pagos en esta etapa.</p>
-          <form id="request-access-form" class="auth-form" novalidate>
-            <label for="waitlist-email">Email</label>
+          <h2>Team Access</h2>
+          <p>Enter your internal access code to unlock all tools.</p>
+          <form id="access-form" class="auth-form" novalidate>
+            <label for="access-code">Access Code</label>
             <input
-              id="waitlist-email"
-              type="email"
-              name="email"
+              id="access-code"
+              type="text"
+              name="accessCode"
               required
-              autocomplete="email"
-              aria-describedby="waitlist-email-error"
+              autocomplete="off"
+              aria-describedby="access-code-error"
             />
-            <div id="waitlist-email-error" role="alert" hidden></div>
-            <button class="btn btn-primary" type="submit">Request Access</button>
+            <div id="access-code-error" role="alert" hidden></div>
+            <button class="btn btn-primary" type="submit">Enter</button>
           </form>
           <p class="auth-note">By continuing, you agree to our <a href="privacy.html">Privacy Policy</a>.</p>
-          <p id="request-access-message" class="auth-success" aria-live="polite"></p>
         </article>
       </section>
     </main>

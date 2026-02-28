@@ -44,3 +44,19 @@ python3 -m http.server 4173 &
 npm run qa:axe
 npm run qa:lighthouse
 ```
+
+## Acceso interno por código (sin backend)
+
+El acceso a las tools se controla en frontend con `localStorage`:
+
+- Código actual: `INVESTOR_TEAM_2026`
+- Clave usada en `localStorage`: `ib_role`
+- Valor válido: `TEAM_ACCESS`
+
+### Cómo cambiar el código de acceso
+
+1. Abre `assets/js/login.js`.
+2. Cambia la constante `ACCESS_CODE` por el nuevo código interno.
+3. Guarda y publica.
+
+> Nota: esto es un control interno de conveniencia en frontend, no un sistema de seguridad robusto.

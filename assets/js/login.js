@@ -1,45 +1,42 @@
 (function () {
-  const WAITLIST_KEY = 'ib_waitlist_email';
-  const form = document.getElementById('request-access-form');
-  const emailInput = document.getElementById('waitlist-email');
-  const error = document.getElementById('waitlist-email-error');
-  const message = document.getElementById('request-access-message');
+  const ACCESS_CODE = 'INVESTOR_TEAM_2026';
+  const ACCESS_KEY = 'ib_role';
+  const ACCESS_VALUE = 'TEAM_ACCESS';
 
-  if (!form || !emailInput || !error) {
+  const form = document.getElementById('access-form');
+  const codeInput = document.getElementById('access-code');
+  const error = document.getElementById('access-code-error');
+
+  if (!form || !codeInput || !error) {
     return;
   }
 
-  const showError = (text) => {
+  const showError = (message) => {
     error.hidden = false;
-    error.textContent = text;
-    emailInput.setAttribute('aria-invalid', 'true');
-    emailInput.focus();
+    error.textContent = message;
+    codeInput.setAttribute('aria-invalid', 'true');
+    codeInput.focus();
   };
 
   const clearError = () => {
     error.hidden = true;
     error.textContent = '';
-    emailInput.removeAttribute('aria-invalid');
+    codeInput.removeAttribute('aria-invalid');
   };
 
-  emailInput.addEventListener('input', clearError);
+  codeInput.addEventListener('input', clearError);
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const email = emailInput.value.trim().toLowerCase();
+    const accessCode = codeInput.value.trim();
 
-    if (!email || !emailInput.checkValidity()) {
-      showError('Please enter a valid email address.');
+    if (accessCode !== ACCESS_CODE) {
+      showError('Invalid access code. Please try again.');
       return;
     }
 
     clearError();
-    localStorage.setItem(WAITLIST_KEY, email);
-
-    if (message) {
-      message.textContent = 'Request received. We will contact you soon.';
-    }
-
-    form.reset();
+    localStorage.setItem(ACCESS_KEY, ACCESS_VALUE);
+    window.location.href = 'index.html';
   });
 })();
