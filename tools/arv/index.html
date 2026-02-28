@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="arv.css" />
       <script src="../tool-access-feedback.js"></script>
   </head>
-  <body>
+  <body data-tool-id="automated-arv">
     <header class="tool-navbar">
       <div class="brand-menu">
         <a class="tool-logo" href="../../index.html">InvestorBlueprint</a>
@@ -24,12 +24,12 @@
 
     <main class="container">
       <section class="card arv-shell pro-tool-card">
-        <span class="badge pro">PRO</span>
+        <span class="badge pro" data-tool-plan-badge>PRO</span>
         <div class="tool-upgrade-overlay" role="note">
-          <strong>Upgrade required for full access.</strong>
-          <a class="card-btn" href="../../pricing.html">Upgrade</a>
+          <strong>Pilot access required for full access.</strong>
+          <a class="card-btn" href="../../pricing.html">Request Access</a>
         </div>
-        <h1>🏠 Automated ARV Tool</h1>
+        <h1 data-tool-title>🏠 Automated ARV Tool</h1>
         <p>Enter an address to get subject details, sold comps, and an ARV estimate.</p>
 
         <form id="arv-form" class="arv-form">
@@ -37,7 +37,7 @@
             Address
             <input id="address" name="address" type="text" placeholder="123 Main St, Miami, FL" required />
           </label>
-          <button type="submit" id="calculate-btn">Calcular ARV</button>
+          <button type="submit" id="calculate-btn">Calculate ARV</button>
         </form>
 
         <div id="status" class="status" aria-live="polite">Ready.</div>
@@ -56,7 +56,7 @@
         </section>
 
         <div class="action-row" id="action-row" hidden>
-          <button type="button" id="copy-btn">Copiar reporte</button>
+          <button type="button" id="copy-btn">Copy report</button>
           <button type="button" id="export-btn">Export JSON</button>
         </div>
 
@@ -81,6 +81,7 @@
       </section>
     </main>
 
+    <script src="../../assets/js/tools-config.js"></script>
     <script src="arv.js"></script>
   </body>
 </html>
