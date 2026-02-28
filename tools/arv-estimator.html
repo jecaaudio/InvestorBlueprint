@@ -39,16 +39,44 @@
         </div>
         <h1 data-i18n="arvTitle">🏠 ARV Estimator</h1>
         <p data-i18n="arvDesc">Enter comparable sale prices and repair budget to estimate ARV and max offer.</p>
-        <form id="tool-form">
-          <div class="form-grid">
-            <label><span data-i18n="arvComp1">Comparable Sale #1</span> <input name="comp1" type="text" data-format="currency" required /></label>
-            <label><span data-i18n="arvComp2">Comparable Sale #2</span> <input name="comp2" type="text" data-format="currency" required /></label>
-            <label><span data-i18n="arvComp3">Comparable Sale #3</span> <input name="comp3" type="text" data-format="currency" required /></label>
-            <label><span data-i18n="arvRepairs">Estimated Repairs</span> <input name="repairs" type="text" data-format="currency" required /></label>
+        <form id="tool-form" novalidate>
+          <fieldset>
+            <legend>Comparable sales</legend>
+            <div class="form-grid">
+              <label for="comp1"><span data-i18n="arvComp1">Comparable Sale #1</span></label>
+              <div class="input-control"><input id="comp1" name="comp1" type="number" inputmode="decimal" min="0" step="0.01" required aria-describedby="comp1-error" /><span class="input-suffix">USD</span></div>
+              <p id="comp1-error" class="field-error" role="alert" hidden></p>
+
+              <label for="comp2"><span data-i18n="arvComp2">Comparable Sale #2</span></label>
+              <div class="input-control"><input id="comp2" name="comp2" type="number" inputmode="decimal" min="0" step="0.01" required aria-describedby="comp2-error" /><span class="input-suffix">USD</span></div>
+              <p id="comp2-error" class="field-error" role="alert" hidden></p>
+
+              <label for="comp3"><span data-i18n="arvComp3">Comparable Sale #3</span></label>
+              <div class="input-control"><input id="comp3" name="comp3" type="number" inputmode="decimal" min="0" step="0.01" required aria-describedby="comp3-help comp3-error" /><span class="input-suffix">USD</span></div>
+              <small id="comp3-help" class="help-text">Use sold comps from the last 3–6 months nearby.</small>
+              <p id="comp3-error" class="field-error" role="alert" hidden></p>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Deal assumptions</legend>
+            <div class="form-grid">
+              <label for="repairs"><span data-i18n="arvRepairs">Estimated Repairs</span></label>
+              <div class="input-control"><input id="repairs" name="repairs" type="number" inputmode="decimal" min="0" step="0.01" required aria-describedby="repairs-error" /><span class="input-suffix">USD</span></div>
+              <p id="repairs-error" class="field-error" role="alert" hidden></p>
+            </div>
+          </fieldset>
+          <p id="tool-validation" class="form-feedback" role="alert" hidden></p>
+          <div class="tool-actions">
+            <button type="submit" data-i18n="calculate">Calculate</button>
+            <button type="button" id="load-sample" class="secondary">Use example</button>
+            <button type="reset" class="secondary">Reset</button>
           </div>
-          <button type="submit" data-i18n="calculate">Calculate</button>
         </form>
-        <div class="result" id="result" data-i18n="resultPrompt">Enter your numbers and click calculate.</div>
+        <aside class="result result-panel" role="status" aria-live="polite">
+          <div class="result-grid" id="result-cards"></div>
+          <div id="result" data-i18n="resultPrompt">Enter your numbers and click calculate.</div>
+        </aside>
       </section>
     </main>
     <script src="../lang.js"></script>

@@ -38,18 +38,57 @@
         <h1 data-i18n="rentalTitle">📈 Rental Cash Flow</h1>
         <p data-i18n="rentalDesc">Fill your income and expenses to project monthly and annual cash flow.</p>
         <form id="tool-form" novalidate>
-          <div class="form-grid">
-            <label><span data-i18n="rentalRent">Monthly Rent</span> <input name="monthlyRent" type="text" data-format="currency" required /></label>
-            <label><span data-i18n="rentalTaxes">Property Taxes / month</span> <input name="taxes" type="text" data-format="currency" value="0" /></label>
-            <label><span data-i18n="rentalInsurance">Insurance / month</span> <input name="insurance" type="text" data-format="currency" value="0" /></label>
-            <label><span data-i18n="rentalMaintenance">Maintenance / month</span> <input name="maintenance" type="text" data-format="currency" value="0" /></label>
-            <label><span data-i18n="rentalManagement">Property Management / month</span> <input name="management" type="text" data-format="currency" value="0" /></label>
-            <label><span data-i18n="rentalVacancy">Vacancy Rate (%)</span> <input name="vacancyRate" type="number" min="0" max="100" value="5" required /></label>
-          </div>
+          <fieldset>
+            <legend>Income</legend>
+            <div class="form-grid">
+              <label for="monthlyRent"><span data-i18n="rentalRent">Monthly Rent</span></label>
+              <div class="input-control">
+                <input id="monthlyRent" name="monthlyRent" type="number" inputmode="decimal" min="0" step="0.01" required aria-describedby="monthlyRent-help monthlyRent-error" />
+                <span class="input-suffix">USD</span>
+              </div>
+              <small id="monthlyRent-help" class="help-text">Use signed lease rent before expenses.</small>
+              <p id="monthlyRent-error" class="field-error" role="alert" hidden></p>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Expenses &amp; assumptions</legend>
+            <div class="form-grid">
+              <label for="taxes"><span data-i18n="rentalTaxes">Property Taxes / month</span></label>
+              <div class="input-control"><input id="taxes" name="taxes" type="number" inputmode="decimal" min="0" step="0.01" value="0" aria-describedby="taxes-error" /><span class="input-suffix">USD</span></div>
+              <p id="taxes-error" class="field-error" role="alert" hidden></p>
+
+              <label for="insurance"><span data-i18n="rentalInsurance">Insurance / month</span></label>
+              <div class="input-control"><input id="insurance" name="insurance" type="number" inputmode="decimal" min="0" step="0.01" value="0" aria-describedby="insurance-error" /><span class="input-suffix">USD</span></div>
+              <p id="insurance-error" class="field-error" role="alert" hidden></p>
+
+              <label for="maintenance"><span data-i18n="rentalMaintenance">Maintenance / month</span></label>
+              <div class="input-control"><input id="maintenance" name="maintenance" type="number" inputmode="decimal" min="0" step="0.01" value="0" aria-describedby="maintenance-help maintenance-error" /><span class="input-suffix">USD</span></div>
+              <small id="maintenance-help" class="help-text">Reserve 5–10% of monthly rent for repairs.</small>
+              <p id="maintenance-error" class="field-error" role="alert" hidden></p>
+
+              <label for="management"><span data-i18n="rentalManagement">Property Management / month</span></label>
+              <div class="input-control"><input id="management" name="management" type="number" inputmode="decimal" min="0" step="0.01" value="0" aria-describedby="management-error" /><span class="input-suffix">USD</span></div>
+              <p id="management-error" class="field-error" role="alert" hidden></p>
+
+              <label for="vacancyRate"><span data-i18n="rentalVacancy">Vacancy Rate</span></label>
+              <div class="input-control"><input id="vacancyRate" name="vacancyRate" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="5" required aria-describedby="vacancyRate-help vacancyRate-error" /><span class="input-suffix">%</span></div>
+              <small id="vacancyRate-help" class="help-text">Typical stabilized vacancy is 3%–8%.</small>
+              <p id="vacancyRate-error" class="field-error" role="alert" hidden></p>
+            </div>
+          </fieldset>
+
           <p id="tool-validation" class="form-feedback" role="alert" hidden></p>
-          <button type="submit" data-track="calculator_submit" data-i18n="calculate">Calculate</button>
+          <div class="tool-actions">
+            <button type="submit" data-track="calculator_submit" data-i18n="calculate">Calculate</button>
+            <button type="button" id="load-sample" class="secondary">Use example</button>
+            <button type="reset" class="secondary">Reset</button>
+          </div>
         </form>
-        <div class="result" id="result" role="status" aria-live="polite" data-i18n="resultPrompt">Enter your numbers and click calculate.</div>
+        <aside class="result result-panel" role="status" aria-live="polite">
+          <div class="result-grid" id="result-cards"></div>
+          <div id="result" data-i18n="resultPrompt">Enter your numbers and click calculate.</div>
+        </aside>
       </section>
     </main>
     <script src="../assets/js/config.js"></script>
