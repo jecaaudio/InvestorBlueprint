@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="tool-styles.css" />
       <script src="tool-access-feedback.js"></script>
   </head>
-  <body data-tool="arv">
+  <body data-tool-id="arv" data-tool="arv">
     <header class="tool-navbar">
       <div class="brand-menu">
         <a class="tool-logo" href="../index.html">InvestorBlueprint</a>
@@ -33,12 +33,12 @@
 
     <main class="container">
       <section class="card pro-tool-card">
-        <span class="badge pro">PRO</span>
+        <span class="badge pro" data-tool-plan-badge>PRO</span>
         <div class="tool-upgrade-overlay" role="note">
-          <strong>Upgrade required for full access.</strong>
-          <a class="card-btn" href="../pricing.html">Upgrade</a>
+          <strong>Pilot access required for full access.</strong>
+          <a class="card-btn" href="../pricing.html">Request Access</a>
         </div>
-        <h1 data-i18n="arvTitle">🏠 ARV Estimator</h1>
+        <h1 data-tool-title data-i18n="arvTitle">🏠 ARV Estimator</h1>
         <p data-i18n="arvDesc">Enter comparable sale prices and repair budget to estimate ARV and max offer.</p>
         <form id="tool-form" novalidate>
           <fieldset>
@@ -86,6 +86,7 @@
     <script src="../assets/js/meta-pixel.js"></script>
     <script src="../assets/js/analytics.js"></script>
     <script src="../lang.js"></script>
+    <script src="../assets/js/tools-config.js"></script>
     <script src="../script.js"></script>
     <script src="tool-script.js"></script>
   </body>

@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="tool-styles.css" />
       <script src="tool-access-feedback.js"></script>
   </head>
-  <body data-tool="rent">
+  <body data-tool-id="rent" data-tool="rent">
     <header class="tool-navbar">
       <div class="brand-menu">
         <a class="tool-logo" href="../index.html">InvestorBlueprint</a>
@@ -35,8 +35,8 @@
 
     <main class="container">
       <section class="card">
-        <span class="badge free">FREE</span>
-        <h1 data-i18n="rentCalcTitle">🏘️ Rent Calculator</h1>
+        <span class="badge free" data-tool-plan-badge>FREE</span>
+        <h1 data-tool-title data-i18n="rentCalcTitle">🏘️ Rent Calculator</h1>
         <p data-i18n="rentCalcDesc">Estimate a suggested monthly rent, annual income, and gross rental yield.</p>
         <form id="tool-form" novalidate>
           <fieldset>
@@ -87,6 +87,7 @@
     <script src="../assets/js/analytics.js"></script>
     <script src="../assets/js/track-events.js"></script>
     <script src="../lang.js"></script>
+    <script src="../assets/js/tools-config.js"></script>
     <script src="../script.js"></script>
     <script src="tool-script.js"></script>
   </body>

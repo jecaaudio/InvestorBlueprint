@@ -1,27 +1,30 @@
 (function () {
-  const ACCESS_CODE = 'INVESTOR_TEAM_2026';
   const ACCESS_KEY = 'ib_role';
   const ACCESS_VALUE = 'TEAM_ACCESS';
-  const FALLBACK_PATH = 'index.html';
+  const WAITLIST_KEY = 'ib_waitlist_email';
+  const FALLBACK_PATH = '/InvestorBlueprint/index.html';
+  const TEAM_DOMAIN = '@tudominio.com';
+  const TEAM_ALLOWLIST = ['team@investorblueprint.local', 'admin@investorblueprint.local'];
 
   const form = document.getElementById('access-form');
-  const codeInput = document.getElementById('access-code');
-  const error = document.getElementById('access-code-error');
+  const emailInput = document.getElementById('access-email');
+  const error = document.getElementById('access-email-error');
 
-  if (!form || !codeInput || !error) {
+  if (!form || !emailInput || !error) {
     return;
   }
 
   const resolveNextPath = () => {
     const url = new URL(window.location.href);
     const returnTo = url.searchParams.get('returnTo');
-
-    if (!returnTo || !returnTo.startsWith('/')) {
-      return FALLBACK_PATH;
+    if (returnTo && returnTo.startsWith('/')) {
+      return returnTo;
     }
 
-    return returnTo;
+    return FALLBACK_PATH;
   };
+
+  const hasInternalAccess = (email) => email.endsWith(TEAM_DOMAIN) || TEAM_ALLOWLIST.includes(email);
 
   if (localStorage.getItem(ACCESS_KEY) === ACCESS_VALUE) {
     window.location.replace(resolveNextPath());
@@ -31,29 +34,36 @@
   const showError = (message) => {
     error.hidden = false;
     error.textContent = message;
-    codeInput.setAttribute('aria-invalid', 'true');
-    codeInput.focus();
+    emailInput.setAttribute('aria-invalid', 'true');
+    emailInput.focus();
   };
 
   const clearError = () => {
     error.hidden = true;
     error.textContent = '';
-    codeInput.removeAttribute('aria-invalid');
+    emailInput.removeAttribute('aria-invalid');
   };
 
-  codeInput.addEventListener('input', clearError);
+  emailInput.addEventListener('input', clearError);
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const accessCode = codeInput.value.trim();
+    const email = emailInput.value.trim().toLowerCase();
 
-    if (accessCode !== ACCESS_CODE) {
-      showError('Invalid access code. Please try again.');
+    if (!email || !emailInput.checkValidity()) {
+      showError('Please enter a valid email address.');
       return;
     }
 
     clearError();
-    localStorage.setItem(ACCESS_KEY, ACCESS_VALUE);
-    window.location.href = resolveNextPath();
+    localStorage.setItem(WAITLIST_KEY, email);
+
+    if (hasInternalAccess(email)) {
+      localStorage.setItem(ACCESS_KEY, ACCESS_VALUE);
+      window.location.href = resolveNextPath();
+      return;
+    }
+
+    window.alert('Access requested. We have saved your email and will contact you for pilot access.');
   });
 })();

@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../assets/css/flip-calculator.css" />
     <script src="tool-access-feedback.js"></script>
   </head>
-  <body data-tool="flip">
+  <body data-tool-id="flip" data-tool="flip">
     <header class="tool-navbar">
       <div class="brand-menu">
         <a class="tool-logo" href="../index.html">InvestorBlueprint</a>
@@ -27,10 +27,10 @@
 
     <main class="container">
       <section class="fc-wrap pro-tool-card" id="flip-calculator">
-        <span class="badge pro">PRO</span>
+        <span class="badge pro" data-tool-plan-badge>PRO</span>
         <header class="fc-header">
           <div>
-            <h2 class="fc-title">Flip Calculator PRO</h2>
+            <h2 class="fc-title" data-tool-title>Flip Calculator — PRO</h2>
             <p class="fc-subtitle">Financial diagnostics with live updates and resilient validation.</p>
           </div>
         </header>
@@ -38,18 +38,18 @@
         <div class="fc-grid">
           <div class="fc-panel">
             <div class="fc-section"><h3>Inputs</h3>
-              <div class="fc-row"><label for="arv">ARV <button type="button" class="info-icon" aria-label="¿Qué es ARV?" data-tooltip="Valor estimado después de reparaciones basado en comps recientes.">!</button></label><input class="fc-input money" id="arv" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="purchasePrice">Purchase Price <button type="button" class="info-icon" aria-label="¿Qué es Purchase Price?" data-tooltip="Precio de compra acordado (sin incluir cierres).">!</button></label><input class="fc-input money" id="purchasePrice" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="rehab">Rehab Costs <button type="button" class="info-icon" aria-label="¿Qué es Rehab Costs?" data-tooltip="Costo total de reparación/remodelación (material + labor + permisos).">!</button></label><input class="fc-input money" id="rehab" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="holdingMonths">Holding Months <button type="button" class="info-icon" aria-label="¿Qué es Holding Months?" data-tooltip="Meses estimados desde compra hasta venta.">!</button></label><input class="fc-input" id="holdingMonths" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="holdingMonthlyCost">Holding Monthly Cost <button type="button" class="info-icon" aria-label="¿Qué es Holding Monthly Cost?" data-tooltip="Gastos mensuales: impuestos, seguro, utilidades, lawn care, etc.">!</button></label><input class="fc-input money" id="holdingMonthlyCost" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="buyClosingCosts">Buy Closing Costs <button type="button" class="info-icon" aria-label="¿Qué es Buy Closing Costs?" data-tooltip="Costos de cierre al comprar: title, lender fees, recording, etc.">!</button></label><input class="fc-input money" id="buyClosingCosts" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="sellClosingCosts">Sell Closing Costs <button type="button" class="info-icon" aria-label="¿Qué es Sell Closing Costs?" data-tooltip="Costos de cierre al vender (sin incluir comisión del agente).">!</button></label><input class="fc-input money" id="sellClosingCosts" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="agentCommissionPct">Agent Commission % <button type="button" class="info-icon" aria-label="¿Qué es Agent Commission?" data-tooltip="Porcentaje total de comisión (listing + buyer agent).">!</button></label><input class="fc-input percent" id="agentCommissionPct" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="loanAmount">Loan Amount <button type="button" class="info-icon" aria-label="¿Qué es Loan Amount?" data-tooltip="Monto prestado (hard money / loan).">!</button></label><input class="fc-input money" id="loanAmount" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="interestRatePct">Interest Rate % <button type="button" class="info-icon" aria-label="¿Qué es Interest Rate?" data-tooltip="Interés anual del préstamo.">!</button></label><input class="fc-input percent" id="interestRatePct" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="pointsPct">Points % <button type="button" class="info-icon" aria-label="¿Qué es Points?" data-tooltip="Puntos del préstamo (fee inicial). 1 punto = 1% del loan.">!</button></label><input class="fc-input percent" id="pointsPct" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="downPayment">Down Payment <button type="button" class="info-icon" aria-label="¿Qué es Down Payment?" data-tooltip="Dinero que pones tú al cierre (si aplica).">!</button></label><input class="fc-input money" id="downPayment" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="arv">ARV <button type="button" class="info-icon" aria-label="What is ARV?" data-tooltip="Estimated value after repairs based on recent comparable sales.">!</button></label><input class="fc-input money" id="arv" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="purchasePrice">Purchase Price <button type="button" class="info-icon" aria-label="What is Purchase Price?" data-tooltip="Agreed purchase price (excluding closing costs).">!</button></label><input class="fc-input money" id="purchasePrice" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="rehab">Rehab Costs <button type="button" class="info-icon" aria-label="What are Rehab Costs?" data-tooltip="Total renovation cost (materials, labor, and permits).">!</button></label><input class="fc-input money" id="rehab" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="holdingMonths">Holding Months <button type="button" class="info-icon" aria-label="What are Holding Months?" data-tooltip="Estimated months from purchase to sale.">!</button></label><input class="fc-input" id="holdingMonths" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="holdingMonthlyCost">Holding Monthly Cost <button type="button" class="info-icon" aria-label="What is Holding Monthly Cost?" data-tooltip="Monthly carrying costs: taxes, insurance, utilities, lawn care, etc.">!</button></label><input class="fc-input money" id="holdingMonthlyCost" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="buyClosingCosts">Buy Closing Costs <button type="button" class="info-icon" aria-label="What are Buy Closing Costs?" data-tooltip="Closing costs when buying: title, lender fees, recording, etc.">!</button></label><input class="fc-input money" id="buyClosingCosts" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="sellClosingCosts">Sell Closing Costs <button type="button" class="info-icon" aria-label="What are Sell Closing Costs?" data-tooltip="Closing costs when selling (excluding agent commission).">!</button></label><input class="fc-input money" id="sellClosingCosts" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="agentCommissionPct">Agent Commission % <button type="button" class="info-icon" aria-label="What is Agent Commission?" data-tooltip="Total commission percentage (listing + buyer agent).">!</button></label><input class="fc-input percent" id="agentCommissionPct" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="loanAmount">Loan Amount <button type="button" class="info-icon" aria-label="What is Loan Amount?" data-tooltip="Borrowed amount (hard money/loan).">!</button></label><input class="fc-input money" id="loanAmount" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="interestRatePct">Interest Rate % <button type="button" class="info-icon" aria-label="What is Interest Rate?" data-tooltip="Annual loan interest rate.">!</button></label><input class="fc-input percent" id="interestRatePct" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="pointsPct">Points % <button type="button" class="info-icon" aria-label="What are Points?" data-tooltip="Loan points (upfront fee). 1 point = 1% of the loan amount.">!</button></label><input class="fc-input percent" id="pointsPct" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="downPayment">Down Payment <button type="button" class="info-icon" aria-label="What is Down Payment?" data-tooltip="Cash you bring to closing (if applicable).">!</button></label><input class="fc-input money" id="downPayment" type="text" inputmode="decimal" autocomplete="off" /></div>
             </div>
           </div>
 
@@ -73,6 +73,7 @@
     <script src="../assets/js/meta-pixel.js"></script>
     <script src="../assets/js/analytics.js"></script>
     <script src="../lang.js"></script>
+    <script src="../assets/js/tools-config.js"></script>
     <script src="../script.js"></script>
     <script src="../assets/js/flip-calculator.js"></script>
   </body>

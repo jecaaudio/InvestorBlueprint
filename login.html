@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Access Login | InvestorBlueprint</title>
+    <title>Request Access | InvestorBlueprint</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -13,47 +13,39 @@
         <div class="brand-dropdown" role="menu" aria-label="Quick navigation">
           <a href="index.html#tools" data-i18n="navTools">Tools</a>
           <a href="index.html#learn" data-i18n="navLearn">Learn</a>
-          <a href="index.html#pricing" data-i18n="navPricing" data-cta-click="Pricing">Pricing</a>
+          <a href="pricing.html" data-i18n="navPricing" data-cta-click="Pricing">Pricing</a>
           <a href="login.html" data-i18n="navLogin" data-auth-link>Login</a>
         </div>
       </div>
       <nav id="primary-nav" class="is-open">
         <a href="index.html#tools" data-i18n="navTools">Tools</a>
         <a href="index.html#learn" data-i18n="navLearn">Learn</a>
-        <a href="index.html#pricing" data-i18n="navPricing" data-cta-click="Pricing">Pricing</a>
+        <a href="pricing.html" data-i18n="navPricing" data-cta-click="Pricing">Pricing</a>
         <a href="login.html" data-i18n="navLogin" data-auth-link>Login</a>
       </nav>
-      <div class="lang-switcher" role="group" aria-label="Language selector">
-        <button type="button" class="lang-option" data-lang="en" aria-label="Switch to English">
-          <img class="flag-emoji" src="assets/flags/us.svg" alt="" aria-hidden="true">
-          EN
-        </button>
-        <button type="button" class="lang-option" data-lang="es" aria-label="Cambiar a Español">
-          <img class="flag-emoji" src="assets/flags/es.svg" alt="" aria-hidden="true">
-          ES
-        </button>
-      </div>
     </header>
 
     <main>
       <section class="section auth-layout auth-layout-single">
         <article class="card auth-card">
-          <h2>Team Access</h2>
-          <p>Enter your internal access code to unlock all tools.</p>
+          <h2>Request Access</h2>
+          <p>Demo: no pedimos contraseñas ni pagos. Solo registramos tu email para darte acceso.</p>
           <form id="access-form" class="auth-form" novalidate>
-            <label for="access-code">Access Code</label>
+            <label for="access-email">Email</label>
             <input
-              id="access-code"
-              type="text"
-              name="accessCode"
+              id="access-email"
+              type="email"
+              name="email"
               required
-              autocomplete="off"
-              aria-describedby="access-code-error"
+              autocomplete="email"
+              aria-describedby="access-email-error"
             />
-            <div id="access-code-error" role="alert" hidden></div>
-            <button class="btn btn-primary" type="submit">Enter</button>
+            <div id="access-email-error" role="alert" hidden></div>
+            <button class="btn btn-primary" type="submit">Request Access</button>
           </form>
-          <p class="auth-note">By continuing, you agree to our <a href="privacy.html">Privacy Policy</a>.</p>
+          <p class="auth-note">
+            By continuing, you agree to our <a href="privacy.html">Privacy Policy</a>.
+          </p>
         </article>
       </section>
     </main>

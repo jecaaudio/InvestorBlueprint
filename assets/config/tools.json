@@ -1,0 +1,8 @@
+[
+  { "id": "flip", "name": "Flip Calculator", "url": "/InvestorBlueprint/tools/flip-calculator.html", "plan": "pro" },
+  { "id": "rental", "name": "Rental Cash Flow", "url": "/InvestorBlueprint/tools/rental-cash-flow.html", "plan": "free" },
+  { "id": "rent", "name": "Rent Calculator", "url": "/InvestorBlueprint/tools/rent-calculator.html", "plan": "free" },
+  { "id": "arv", "name": "ARV Estimator", "url": "/InvestorBlueprint/tools/arv-estimator.html", "plan": "pro" },
+  { "id": "automated-arv", "name": "Automated ARV Tool", "url": "/InvestorBlueprint/tools/arv/", "plan": "pro" },
+  { "id": "hard-money", "name": "Hard Money Analyzer", "url": "/InvestorBlueprint/tools/hard-money-analyzer.html", "plan": "pro" }
+]

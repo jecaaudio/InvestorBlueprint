@@ -65,44 +65,21 @@
     });
   }
 
-  const getUsers = () => {
-    try {
-      return JSON.parse(localStorage.getItem('ibUsers') || '[]');
-    } catch {
-      return [];
-    }
-  };
-
-  const currentSession = localStorage.getItem('ibCurrentUser');
-  const currentUser = getUsers().find((user) => user.email === currentSession);
-
-  const hasActiveAccess = () => {
-    if (!currentUser) {
-      return false;
-    }
-
-    if (currentUser.subscriptionPlan === 'paid') {
-      return true;
-    }
-
-    if (!currentUser.trialEndsAt) {
-      return false;
-    }
-
-    return new Date(currentUser.trialEndsAt).getTime() > Date.now();
-  };
+  const hasTeamAccess = () => localStorage.getItem('ib_role') === 'TEAM_ACCESS';
 
   document.querySelectorAll('[data-pro-tool="true"]').forEach((link) => {
     link.addEventListener('click', (event) => {
-      if (hasActiveAccess()) {
+      if (hasTeamAccess()) {
         return;
       }
 
       event.preventDefault();
       const lang = document.documentElement.lang === 'es' ? 'es' : 'en';
-      const messages = getMessages(lang);
-      alert(messages.proRequiredAlert || 'This Pro module requires an active trial or paid subscription. Start from “Start Free”.');
-      window.location.href = 'login.html#trial';
+      const message = lang === 'es'
+        ? 'Esta herramienta está en acceso piloto. Solicita acceso para continuar.'
+        : 'This tool is in pilot access. Request access to continue.';
+      alert(message);
+      window.location.href = 'login.html';
     });
   });
 })();
