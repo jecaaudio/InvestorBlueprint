@@ -4,10 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flip Calculator | InvestorBlueprint</title>
-    <meta name="description" content="Analyze fix-and-flip deals with MAO, profit, ROI, cost breakdowns, and sensitivity scenarios." />
+    <meta name="description" content="Analyze fix-and-flip deals with robust math, validation, and fast decision support." />
     <link rel="stylesheet" href="tool-styles.css" />
     <link rel="stylesheet" href="../assets/css/flip-calculator.css" />
-      <script src="tool-access-feedback.js"></script>
+    <script src="tool-access-feedback.js"></script>
   </head>
   <body data-tool="flip">
     <header class="tool-navbar">
@@ -28,84 +28,40 @@
     <main class="container">
       <section class="fc-wrap pro-tool-card" id="flip-calculator">
         <span class="badge pro">PRO</span>
-        <div class="tool-upgrade-overlay" role="note">
-          <strong>Upgrade required for full access.</strong>
-          <a class="card-btn" href="../pricing.html">Upgrade</a>
-        </div>
         <header class="fc-header">
           <div>
             <h2 class="fc-title">Flip Calculator PRO</h2>
-            <p class="fc-subtitle">Diagnóstico financiero completo en menos de 60 segundos.</p>
-          </div>
-          <div class="fc-header-actions">
-            <button class="fc-btn fc-btn-ghost" id="fcDuplicateBtn" type="button">Save Snapshot</button>
-            <button class="fc-btn fc-btn-ghost" id="fcExportPdfBtn" type="button">📄 Export to PDF</button>
-            <button class="fc-btn fc-btn-ghost" id="fcExportExcelBtn" type="button">📊 Export to Excel</button>
+            <p class="fc-subtitle">Financial diagnostics with live updates and resilient validation.</p>
           </div>
         </header>
 
         <div class="fc-grid">
           <div class="fc-panel">
-            <div class="fc-section"><h3>1) Property Data</h3>
-              <div class="fc-row"><label>Purchase Price</label><input class="fc-input money" id="purchasePrice" inputmode="numeric" /></div>
-              <div class="fc-row"><label>ARV</label><input class="fc-input money" id="arv" inputmode="numeric" /></div>
-              <div class="fc-row"><label>Expected Selling Price</label><input class="fc-input money" id="expectedSellingPrice" inputmode="numeric" /></div>
-              <div class="fc-row"><label>Rehab Budget</label><input class="fc-input money" id="rehab" inputmode="numeric" /></div>
-              <div class="fc-row"><label>Estimated Hold Time (months)</label><input class="fc-input" id="months" inputmode="numeric" /></div>
-            </div>
-
-            <div class="fc-section"><h3>2) Financing Structure</h3>
-              <div class="fc-row"><label>Loan-to-Value % (Purchase)</label><input class="fc-input percent" id="loanPct" inputmode="decimal" /></div>
-              <div class="fc-row"><label>Rehab Financing %</label><input class="fc-input percent" id="rehabFinancingPct" inputmode="decimal" /></div>
-              <div class="fc-row"><label>Down Payment %</label><input class="fc-input percent" id="downPct" inputmode="decimal" /></div>
-              <div class="fc-row"><label>Points %</label><input class="fc-input percent" id="pointsPct" inputmode="decimal" /></div>
-              <div class="fc-row"><label>Interest Rate APR %</label><input class="fc-input percent" id="interestApr" inputmode="decimal" /></div>
-              <div class="fc-row"><label>Loan Term (months)</label><input class="fc-input" id="loanTermMonths" inputmode="numeric" /></div>
-            </div>
-
-            <div class="fc-section"><h3>3) Holding & Operating Costs</h3>
-              <div class="fc-row"><label>Closing Costs % (buy side)</label><input class="fc-input percent" id="buyClosingPct" inputmode="decimal" /></div>
-              <div class="fc-row"><label>Selling Costs %</label><input class="fc-input percent" id="sellingCostsPct" inputmode="decimal" /></div>
-              <div class="fc-row"><label>Monthly Holding Cost</label><input class="fc-input money" id="holdingMonthly" inputmode="numeric" /></div>
-              <div class="fc-row"><label>Property Taxes (monthly)</label><input class="fc-input money" id="propertyTaxesMonthly" inputmode="numeric" /></div>
-              <div class="fc-row"><label>Insurance (monthly)</label><input class="fc-input money" id="insuranceMonthly" inputmode="numeric" /></div>
-              <div class="fc-row"><label>Utilities (monthly)</label><input class="fc-input money" id="utilitiesMonthly" inputmode="numeric" /></div>
-              <div class="fc-row"><label>HOA (monthly)</label><input class="fc-input money" id="hoaMonthly" inputmode="numeric" /></div>
-            </div>
-
-            <div class="fc-section"><h3>6) Sensitivity Simulation</h3>
-              <label class="fc-check"><input type="checkbox" id="sensArvDown"> ARV -5%</label>
-              <label class="fc-check"><input type="checkbox" id="sensRehabUp"> Rehab +10%</label>
-              <label class="fc-check"><input type="checkbox" id="sensHoldUp"> Hold +2 months</label>
-            </div>
-
-            <div class="fc-actions">
-              <button class="fc-btn fc-btn-ghost" id="fcUseExampleBtn" type="button">Use Example</button>
-              <button class="fc-btn" id="fcCalcBtn" type="button">Calculate Deal</button>
-              <button class="fc-btn fc-btn-ghost" id="fcResetBtn" type="button">Reset Defaults</button>
-              <select id="fcHistorySelect" class="fc-input"><option value="">Load saved...</option></select>
+            <div class="fc-section"><h3>Inputs</h3>
+              <div class="fc-row"><label for="arv">ARV <button type="button" class="info-icon" aria-label="¿Qué es ARV?" data-tooltip="Valor estimado después de reparaciones basado en comps recientes.">!</button></label><input class="fc-input money" id="arv" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="purchasePrice">Purchase Price <button type="button" class="info-icon" aria-label="¿Qué es Purchase Price?" data-tooltip="Precio de compra acordado (sin incluir cierres).">!</button></label><input class="fc-input money" id="purchasePrice" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="rehab">Rehab Costs <button type="button" class="info-icon" aria-label="¿Qué es Rehab Costs?" data-tooltip="Costo total de reparación/remodelación (material + labor + permisos).">!</button></label><input class="fc-input money" id="rehab" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="holdingMonths">Holding Months <button type="button" class="info-icon" aria-label="¿Qué es Holding Months?" data-tooltip="Meses estimados desde compra hasta venta.">!</button></label><input class="fc-input" id="holdingMonths" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="holdingMonthlyCost">Holding Monthly Cost <button type="button" class="info-icon" aria-label="¿Qué es Holding Monthly Cost?" data-tooltip="Gastos mensuales: impuestos, seguro, utilidades, lawn care, etc.">!</button></label><input class="fc-input money" id="holdingMonthlyCost" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="buyClosingCosts">Buy Closing Costs <button type="button" class="info-icon" aria-label="¿Qué es Buy Closing Costs?" data-tooltip="Costos de cierre al comprar: title, lender fees, recording, etc.">!</button></label><input class="fc-input money" id="buyClosingCosts" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="sellClosingCosts">Sell Closing Costs <button type="button" class="info-icon" aria-label="¿Qué es Sell Closing Costs?" data-tooltip="Costos de cierre al vender (sin incluir comisión del agente).">!</button></label><input class="fc-input money" id="sellClosingCosts" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="agentCommissionPct">Agent Commission % <button type="button" class="info-icon" aria-label="¿Qué es Agent Commission?" data-tooltip="Porcentaje total de comisión (listing + buyer agent).">!</button></label><input class="fc-input percent" id="agentCommissionPct" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="loanAmount">Loan Amount <button type="button" class="info-icon" aria-label="¿Qué es Loan Amount?" data-tooltip="Monto prestado (hard money / loan).">!</button></label><input class="fc-input money" id="loanAmount" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="interestRatePct">Interest Rate % <button type="button" class="info-icon" aria-label="¿Qué es Interest Rate?" data-tooltip="Interés anual del préstamo.">!</button></label><input class="fc-input percent" id="interestRatePct" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="pointsPct">Points % <button type="button" class="info-icon" aria-label="¿Qué es Points?" data-tooltip="Puntos del préstamo (fee inicial). 1 punto = 1% del loan.">!</button></label><input class="fc-input percent" id="pointsPct" type="text" inputmode="decimal" autocomplete="off" /></div>
+              <div class="fc-row"><label for="downPayment">Down Payment <button type="button" class="info-icon" aria-label="¿Qué es Down Payment?" data-tooltip="Dinero que pones tú al cierre (si aplica).">!</button></label><input class="fc-input money" id="downPayment" type="text" inputmode="decimal" autocomplete="off" /></div>
             </div>
           </div>
 
           <div class="fc-results" id="fcReportArea">
-            <div class="fc-kpis" id="fcKpis">
-              <div class="fc-card"><div class="fc-card-label">Net Profit</div><div class="fc-card-value" id="kpiProfit">$0</div></div>
-              <div class="fc-card"><div class="fc-card-label">ROI on Cash</div><div class="fc-card-value" id="kpiRoi">0%</div></div>
-              <div class="fc-card"><div class="fc-card-label">Annualized ROI</div><div class="fc-card-value" id="kpiRoiAnnualized">0%</div></div>
-              <div class="fc-card"><div class="fc-card-label">Cash Required</div><div class="fc-card-value" id="kpiCash">$0</div></div>
+            <div class="fc-kpis">
+              <div class="fc-card"><div class="fc-card-label">Net Profit</div><div class="fc-card-value" id="outNetProfit">$0</div></div>
+              <div class="fc-card"><div class="fc-card-label">ROI</div><div class="fc-card-value" id="outROI">0%</div></div>
+              <div class="fc-card"><div class="fc-card-label">Total Costs</div><div class="fc-card-value" id="outTotalCosts">$0</div></div>
+              <div class="fc-card"><div class="fc-card-label">Break-even Sale Price</div><div class="fc-card-value" id="outBreakEven">$0</div></div>
+              <div class="fc-card"><div class="fc-card-label">Max Offer (70% Rule)</div><div class="fc-card-value" id="outMaxOffer70">$0</div></div>
+              <div class="fc-card"><div class="fc-card-label">Decision</div><div class="fc-card-value" id="outDecision" data-state="bad">NO GO</div></div>
             </div>
-            <div class="fc-score" id="fcScoreBox"><div class="fc-score-title">Deal Score</div><div class="fc-score-pill" id="dealScorePill">—</div><div class="fc-score-bar"><div class="fc-score-bar-fill"></div></div><div class="fc-score-desc" id="dealScoreDesc">Calculate to see score rationale.</div></div>
-            <div class="fc-breakdown"><h3>Deal Diagnostics</h3><div class="fc-breakdown-grid">
-              <div class="fc-mini"><span>Loan Amount</span><strong id="diagLoanAmount">$0</strong></div>
-              <div class="fc-mini"><span>Points Cost</span><strong id="diagPointsCost">$0</strong></div>
-              <div class="fc-mini"><span>Total Interest</span><strong id="diagInterest">$0</strong></div>
-              <div class="fc-mini"><span>Total Project Cost</span><strong id="diagTotalProject">$0</strong></div>
-              <div class="fc-mini"><span>70% Rule Status</span><strong id="diagMaoStatus">—</strong></div>
-              <div class="fc-mini"><span>Safety Margin</span><strong id="diagSafety">0%</strong></div>
-            </div></div>
-            <div class="fc-sensitivity"><h3>Sensitivity</h3><div class="fc-table-wrap"><table class="fc-table" id="fcSensitivityTable"><thead><tr><th>Scenario</th><th>Profit</th><th>ROI</th><th>Cash</th></tr></thead><tbody><tr><td colspan="4" class="fc-muted">Calculate to see table.</td></tr></tbody></table></div></div>
-            <div class="fc-method"><h3>Investor Snapshot</h3><p id="investorSnapshot">Run calculation to generate recommendation.</p></div>
-            <div class="fc-errors" id="fcErrors"></div>
           </div>
         </div>
       </section>
@@ -116,63 +72,8 @@
     <script src="../assets/js/analytics-ga4.js"></script>
     <script src="../assets/js/meta-pixel.js"></script>
     <script src="../assets/js/analytics.js"></script>
-    <script src="../lang.js"></script><script src="../script.js"></script>
-    <script src="../assets/js/flip/config.js"></script><script src="../assets/js/flip/formatters.js"></script><script src="../assets/js/flip/validators.js"></script>
-    <script src="../assets/js/flip/core.js"></script><script src="../assets/js/flip/scoring.js"></script><script src="../assets/js/flip/sensitivity.js"></script>
-    <script src="../assets/js/flip/share_link.js"></script><script src="../assets/js/flip/export_pdf.js"></script><script src="../assets/js/flip/ui.js"></script>
-    <script>
-      (() => {
-        if (window.IBAnalytics && typeof window.IBAnalytics.trackToolOpen === 'function') {
-          window.IBAnalytics.trackToolOpen('flip');
-        }
-
-        const calcBtn = document.getElementById('fcCalcBtn');
-        if (calcBtn && window.IBAnalytics) {
-          calcBtn.addEventListener('click', () => {
-            if (typeof window.IBAnalytics.trackCalcRun === 'function') {
-              window.IBAnalytics.trackCalcRun('flip');
-            }
-            if (typeof window.IBAnalytics.trackCalcSuccess === 'function') {
-              setTimeout(() => {
-                const score = document.getElementById('dealScorePill')?.textContent?.trim();
-                if (score && score !== '—') {
-                  window.IBAnalytics.trackCalcSuccess('flip', { deal_score: score });
-                }
-              }, 0);
-            }
-          });
-        }
-
-        const useExampleBtn = document.getElementById('fcUseExampleBtn');
-        if (!useExampleBtn) return;
-        useExampleBtn.addEventListener('click', () => {
-          const sample = {
-            purchasePrice: 180000,
-            arv: 320000,
-            expectedSellingPrice: 315000,
-            rehab: 50000,
-            months: 6,
-            loanPct: 85,
-            rehabFinancingPct: 100,
-            downPct: 15,
-            pointsPct: 2,
-            interestApr: 12,
-            loanTermMonths: 12,
-            buyClosingPct: 2,
-            sellingCostsPct: 8,
-            holdingMonthly: 450,
-            propertyTaxesMonthly: 260,
-            insuranceMonthly: 140,
-            utilitiesMonthly: 220,
-            hoaMonthly: 0
-          };
-          Object.entries(sample).forEach(([id, value]) => {
-            const input = document.getElementById(id);
-            if (input) input.value = value;
-          });
-          document.getElementById('fcCalcBtn')?.click();
-        });
-      })();
-    </script>
+    <script src="../lang.js"></script>
+    <script src="../script.js"></script>
+    <script src="../assets/js/flip-calculator.js"></script>
   </body>
 </html>
