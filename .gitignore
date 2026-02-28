@@ -1,1 +1,3 @@
+node_modules/
 workers/arv-worker/node_modules/
+.lighthouseci/
