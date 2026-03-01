@@ -1,18 +1,4 @@
 (function () {
-  const ACCESS_KEY = 'ib_role';
-  const REQUIRED_ROLE = 'TEAM_ACCESS';
-
-  const getLoginPath = () => {
-    const baseLoginPath = window.location.pathname.includes('/tools/arv/') ? '../../login.html' : '../login.html';
-    const returnTo = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-    return `${baseLoginPath}?returnTo=${encodeURIComponent(returnTo)}`;
-  };
-
-  if (localStorage.getItem(ACCESS_KEY) !== REQUIRED_ROLE) {
-    window.location.replace(getLoginPath());
-    return;
-  }
-
   const TOOL_NAMES = [
     { value: 'arv-estimator', label: 'ARV Estimator' },
     { value: 'flip-calculator', label: 'Flip Calculator' },
