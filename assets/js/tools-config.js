@@ -7,10 +7,19 @@
   ];
 
   const STATUS_CONFIG = {
-    beta_free: { label: 'BETA FREE', className: 'free', isPro: false }
+    beta_free: { label: 'BETA (free)', className: 'free', isPro: false }
   };
 
   const getCurrentLanguage = () => (localStorage.getItem('preferredLanguage') === 'es' ? 'es' : 'en');
+
+  const TOOL_DESCRIPTION_KEYS = {
+    flip: 'toolFlipDesc',
+    rental_cash_flow: 'toolRentalDesc',
+    rent: 'toolRentDesc',
+    arv_estimator: 'toolArvDesc',
+    automated_arv: 'automatedArvDesc',
+    hard_money: 'toolHardMoneyDesc'
+  };
 
   const getMessages = () => {
     const lang = getCurrentLanguage();
@@ -61,7 +70,8 @@
     title.textContent = tool.name;
 
     const description = document.createElement('p');
-    description.textContent = messages[tool.descriptionKey] || '';
+    const descriptionKey = tool.descriptionKey || TOOL_DESCRIPTION_KEYS[tool.id];
+    description.textContent = messages[descriptionKey] || '';
 
     const link = document.createElement('a');
     link.className = 'card-btn';
