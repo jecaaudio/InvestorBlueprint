@@ -1,8 +1,44 @@
 [
-  { "id": "flip", "name": "Flip Calculator", "url": "/InvestorBlueprint/tools/flip-calculator.html", "plan": "pro" },
-  { "id": "rental", "name": "Rental Cash Flow", "url": "/InvestorBlueprint/tools/rental-cash-flow.html", "plan": "free" },
-  { "id": "rent", "name": "Rent Calculator", "url": "/InvestorBlueprint/tools/rent-calculator.html", "plan": "free" },
-  { "id": "arv", "name": "ARV Estimator", "url": "/InvestorBlueprint/tools/arv-estimator.html", "plan": "pro" },
-  { "id": "automated-arv", "name": "Automated ARV Tool", "url": "/InvestorBlueprint/tools/arv/", "plan": "pro" },
-  { "id": "hard-money", "name": "Hard Money Analyzer", "url": "/InvestorBlueprint/tools/hard-money-analyzer.html", "plan": "pro" }
+  {
+    "id": "flip",
+    "name": "🧮 Flip Calculator",
+    "url": "/InvestorBlueprint/tools/flip-calculator.html",
+    "status": "beta_free",
+    "descriptionKey": "toolFlipDesc"
+  },
+  {
+    "id": "rental",
+    "name": "📈 Rental Cash Flow",
+    "url": "/InvestorBlueprint/tools/rental-cash-flow.html",
+    "status": "beta_free",
+    "descriptionKey": "toolRentalDesc"
+  },
+  {
+    "id": "rent",
+    "name": "🏘️ Rent Calculator",
+    "url": "/InvestorBlueprint/tools/rent-calculator.html",
+    "status": "beta_free",
+    "descriptionKey": "toolRentDesc"
+  },
+  {
+    "id": "arv",
+    "name": "🏠 ARV Estimator",
+    "url": "/InvestorBlueprint/tools/arv-estimator.html",
+    "status": "beta_free",
+    "descriptionKey": "toolArvDesc"
+  },
+  {
+    "id": "automated-arv",
+    "name": "🤖 Automated ARV Tool",
+    "url": "/InvestorBlueprint/tools/arv/",
+    "status": "beta_free",
+    "descriptionKey": "automatedArvDesc"
+  },
+  {
+    "id": "hard-money",
+    "name": "💰 Hard Money Analyzer",
+    "url": "/InvestorBlueprint/tools/hard-money-analyzer.html",
+    "status": "beta_free",
+    "descriptionKey": "toolHardMoneyDesc"
+  }
 ]

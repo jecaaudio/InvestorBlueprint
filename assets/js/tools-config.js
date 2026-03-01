@@ -1,5 +1,21 @@
 (function () {
-  const TOOL_CONFIG_PATHS = ['/InvestorBlueprint/assets/config/tools.json', 'assets/config/tools.json', '../assets/config/tools.json', '../../assets/config/tools.json'];
+  const TOOL_CONFIG_PATHS = [
+    '/InvestorBlueprint/assets/config/tools.json',
+    'assets/config/tools.json',
+    '../assets/config/tools.json',
+    '../../assets/config/tools.json'
+  ];
+
+  const STATUS_CONFIG = {
+    beta_free: { label: 'BETA FREE', className: 'free', isPro: false }
+  };
+
+  const getCurrentLanguage = () => (localStorage.getItem('preferredLanguage') === 'es' ? 'es' : 'en');
+
+  const getMessages = () => {
+    const lang = getCurrentLanguage();
+    return window.translations?.[lang] || window.translations?.en || {};
+  };
 
   const fetchToolsConfig = async () => {
     for (const path of TOOL_CONFIG_PATHS) {
@@ -16,42 +32,63 @@
     return [];
   };
 
-  const normalizePlan = (plan) => (String(plan || '').toLowerCase() === 'free' ? 'free' : 'pro');
+  const getStatusMeta = (status) => STATUS_CONFIG[String(status || '').toLowerCase()] || STATUS_CONFIG.beta_free;
 
-  const applyBadge = (badgeNode, plan) => {
+  const applyBadge = (badgeNode, status) => {
     if (!badgeNode) {
       return;
     }
 
-    const normalizedPlan = normalizePlan(plan);
-    badgeNode.textContent = normalizedPlan.toUpperCase();
+    const statusMeta = getStatusMeta(status);
+    badgeNode.textContent = statusMeta.label;
     badgeNode.classList.remove('free', 'pro');
-    badgeNode.classList.add(normalizedPlan);
+    badgeNode.classList.add(statusMeta.className);
   };
 
-  const applyHomeCards = (toolsById) => {
-    document.querySelectorAll('[data-tool-id]').forEach((card) => {
-      const toolId = card.dataset.toolId;
-      const tool = toolsById.get(toolId);
-      if (!tool) {
-        return;
-      }
+  const createHomeCard = (tool, messages) => {
+    const article = document.createElement('article');
+    article.className = 'card';
+    article.dataset.toolId = tool.id;
 
-      const plan = normalizePlan(tool.plan);
-      applyBadge(card.querySelector('[data-tool-plan-badge]'), plan);
+    const statusMeta = getStatusMeta(tool.status);
 
-      const link = card.querySelector('a.card-btn');
-      if (link) {
-        const isPro = plan === 'pro';
-        if (isPro) {
-          link.setAttribute('data-pro-tool', 'true');
-        } else {
-          link.removeAttribute('data-pro-tool');
-        }
-      }
+    const badge = document.createElement('span');
+    badge.className = `badge ${statusMeta.className}`;
+    badge.dataset.toolPlanBadge = '';
+    badge.textContent = statusMeta.label;
+
+    const title = document.createElement('h3');
+    title.textContent = tool.name;
+
+    const description = document.createElement('p');
+    description.textContent = messages[tool.descriptionKey] || '';
+
+    const link = document.createElement('a');
+    link.className = 'card-btn';
+    link.href = tool.url;
+    link.textContent = messages.tryTool || 'Open Tool';
+    if (statusMeta.isPro) {
+      link.setAttribute('data-pro-tool', 'true');
+    }
+
+    article.append(badge, title, description, link);
+    return article;
+  };
+
+  const applyHomeCards = (tools) => {
+    const toolGrid = document.querySelector('.tool-grid');
+    if (!toolGrid) {
+      return;
+    }
+
+    const messages = getMessages();
+    toolGrid.innerHTML = '';
+
+    tools.forEach((tool) => {
+      toolGrid.append(createHomeCard(tool, messages));
     });
 
-    const freeCount = Array.from(toolsById.values()).filter((tool) => normalizePlan(tool.plan) === 'free').length;
+    const freeCount = tools.filter((tool) => !getStatusMeta(tool.status).isPro).length;
     const freeFeature = document.getElementById('free-feature-count');
     if (freeFeature) {
       freeFeature.textContent = `${freeCount} tools`;
@@ -69,13 +106,13 @@
       return;
     }
 
-    const plan = normalizePlan(tool.plan);
-    applyBadge(document.querySelector('[data-tool-plan-badge]'), plan);
+    const statusMeta = getStatusMeta(tool.status);
+    applyBadge(document.querySelector('[data-tool-plan-badge]'), tool.status);
 
     const title = document.querySelector('[data-tool-title]');
     if (title) {
       const cleanName = tool.name || title.textContent;
-      title.textContent = `${cleanName} — ${plan.toUpperCase()}`;
+      title.textContent = `${cleanName} — ${statusMeta.label}`;
     }
   };
 
@@ -86,8 +123,14 @@
     }
 
     const toolsById = new Map(tools.map((tool) => [tool.id, tool]));
-    applyHomeCards(toolsById);
-    applyToolPage(toolsById);
+
+    const render = () => {
+      applyHomeCards(tools);
+      applyToolPage(toolsById);
+    };
+
+    render();
+    document.addEventListener('ib:language-changed', render);
   };
 
   init();
