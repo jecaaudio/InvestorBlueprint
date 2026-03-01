@@ -92,11 +92,18 @@
       openButton.focus();
     };
 
+    // Keep closed by default and fully non-interactive until opened.
+    closeFeedback();
+
     openButton.addEventListener('click', openFeedback);
     closeButton.addEventListener('click', closeFeedback);
 
     backdrop.addEventListener('click', closeFeedback);
-    modal.addEventListener('click', (event) => event.stopPropagation());
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        closeFeedback();
+      }
+    });
 
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && !modal.hidden) {

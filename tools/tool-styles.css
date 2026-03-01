@@ -7,6 +7,11 @@
   --border: #334155;
 }
 
+[hidden] {
+  display: none !important;
+  pointer-events: none !important;
+}
+
 * { box-sizing: border-box; }
 
 body {
@@ -387,12 +392,6 @@ button:focus-visible {
   z-index: 220;
   border-radius: 999px;
   box-shadow: 0 10px 30px rgba(2, 6, 23, 0.5);
-}
-
-#feedbackBackdrop[hidden],
-#feedbackModal[hidden] {
-  display: none !important;
-  pointer-events: none !important;
 }
 
 #feedbackBackdrop {
