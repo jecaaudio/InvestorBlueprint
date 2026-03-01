@@ -95,3 +95,32 @@
     grid-template-columns: 1fr;
   }
 }
+
+.worker-config {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.85rem;
+  background: rgba(2, 6, 23, 0.4);
+}
+
+.worker-config h2 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+}
+
+.worker-config-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.worker-config-row label {
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .worker-config-row {
+    grid-template-columns: 1fr;
+  }
+}

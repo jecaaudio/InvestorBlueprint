@@ -1,5 +1,6 @@
 const DEFAULT_WORKER_URL = "https://YOUR-WORKER.workers.dev";
-const WORKER_URL = localStorage.getItem("arvWorkerUrl") || DEFAULT_WORKER_URL;
+const WORKER_URL_STORAGE_KEY = "arvWorkerUrl";
+const DEMO_DATA_PATH = "./fixtures/demo-report.json";
 
 const form = document.getElementById("arv-form");
 const statusEl = document.getElementById("status");
@@ -12,12 +13,28 @@ const compsBody = document.getElementById("comps-body");
 const actionRow = document.getElementById("action-row");
 const copyBtn = document.getElementById("copy-btn");
 const exportBtn = document.getElementById("export-btn");
+const workerUrlInput = document.getElementById("worker-url");
+const saveWorkerBtn = document.getElementById("save-worker-url-btn");
+const demoBtn = document.getElementById("run-demo-btn");
 
 let latestReport = null;
+
+function getWorkerUrl() {
+  return localStorage.getItem(WORKER_URL_STORAGE_KEY) || DEFAULT_WORKER_URL;
+}
+
+function isWorkerUrlConfigured(url = getWorkerUrl()) {
+  return Boolean(url) && !url.includes("YOUR-WORKER");
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   if (window.IBAnalytics && typeof window.IBAnalytics.trackToolOpen === "function") {
     window.IBAnalytics.trackToolOpen("arv");
+  }
+
+  workerUrlInput.value = getWorkerUrl();
+  if (!isWorkerUrlConfigured()) {
+    setStatus("Set a Worker URL and click Save, or use Run with demo data.");
   }
 }, { once: true });
 
@@ -39,46 +56,77 @@ function setError(message) {
   errorEl.textContent = message || "";
 }
 
-function row(label, value) {
-  return `<div class="kv-row"><span>${label}</span><strong>${value}</strong></div>`;
+function createKvRow(label, value) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "kv-row";
+
+  const labelEl = document.createElement("span");
+  labelEl.textContent = label;
+
+  const valueEl = document.createElement("strong");
+  valueEl.textContent = value;
+
+  wrapper.append(labelEl, valueEl);
+  return wrapper;
+}
+
+function renderKeyValueRows(container, rows) {
+  container.textContent = "";
+  rows.forEach(({ label, value }) => {
+    container.append(createKvRow(label, value));
+  });
+}
+
+function createCompCell(value) {
+  const td = document.createElement("td");
+  td.textContent = value;
+  return td;
+}
+
+function renderComps(comps) {
+  compsBody.textContent = "";
+
+  comps.forEach((comp) => {
+    const tr = document.createElement("tr");
+    tr.append(
+      createCompCell(comp.address || "N/A"),
+      createCompCell(number(comp.distanceMiles, 2)),
+      createCompCell(comp.soldDate || "N/A"),
+      createCompCell(money(comp.soldPrice)),
+      createCompCell(number(comp.beds, 1)),
+      createCompCell(number(comp.baths, 1)),
+      createCompCell(number(comp.sqft)),
+      createCompCell(money(comp.pricePerSqft)),
+      createCompCell(number(comp.score, 3))
+    );
+    compsBody.append(tr);
+  });
 }
 
 function render(payload) {
   latestReport = payload;
   const { subject, comps, arv, meta } = payload;
 
-  subjectFields.innerHTML = [
-    row("Address", subject.address || "N/A"),
-    row("Beds", number(subject.beds, 1)),
-    row("Baths", number(subject.baths, 1)),
-    row("Sqft", number(subject.sqft)),
-    row("Type", subject.propertyType || "N/A"),
-    row("Year", subject.yearBuilt || "N/A"),
-    row("Lot", `${number(subject.lotSqft)} sqft`)
-  ].join("");
+  renderKeyValueRows(subjectFields, [
+    { label: "Address", value: subject.address || "N/A" },
+    { label: "Beds", value: number(subject.beds, 1) },
+    { label: "Baths", value: number(subject.baths, 1) },
+    { label: "Sqft", value: number(subject.sqft) },
+    { label: "Type", value: subject.propertyType || "N/A" },
+    { label: "Year", value: String(subject.yearBuilt || "N/A") },
+    { label: "Lot", value: `${number(subject.lotSqft)} sqft` }
+  ]);
 
-  arvFields.innerHTML = [
-    row("Estimate", money(arv.estimate)),
-    row("Low", money(arv.low)),
-    row("High", money(arv.high)),
-    row("Confidence", `${arv.confidence}%`),
-    row("Method", arv.method),
-    row("PPSF Weighted", money(arv.ppsfWeighted))
-  ].join("");
+  renderKeyValueRows(arvFields, [
+    { label: "Estimate", value: money(arv.estimate) },
+    { label: "Low", value: money(arv.low) },
+    { label: "High", value: money(arv.high) },
+    { label: "Confidence", value: `${arv.confidence}%` },
+    { label: "Method", value: arv.method },
+    { label: "PPSF Weighted", value: money(arv.ppsfWeighted) }
+  ]);
 
-  compsBody.innerHTML = comps.map((comp) => `
-    <tr>
-      <td>${comp.address || "N/A"}</td>
-      <td>${number(comp.distanceMiles, 2)}</td>
-      <td>${comp.soldDate || "N/A"}</td>
-      <td>${money(comp.soldPrice)}</td>
-      <td>${number(comp.beds, 1)}</td>
-      <td>${number(comp.baths, 1)}</td>
-      <td>${number(comp.sqft)}</td>
-      <td>${money(comp.pricePerSqft)}</td>
-      <td>${number(comp.score, 3)}</td>
-    </tr>
-  `).join("");
+  renderComps(comps);
 
   if (meta?.warnings?.length) {
     setStatus(`Done with warnings: ${meta.warnings.join(" | ")}`);
@@ -114,7 +162,12 @@ function reportText(payload) {
 }
 
 async function fetchArv(address) {
-  const response = await fetch(`${WORKER_URL}/api/arv`, {
+  const workerUrl = getWorkerUrl();
+  if (!isWorkerUrlConfigured(workerUrl)) {
+    throw new Error("Worker URL is not configured. Add it below and click Save, or use Run with demo data.");
+  }
+
+  const response = await fetch(`${workerUrl}/api/arv`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ address, options: { maxComps: 8 } })
@@ -134,6 +187,44 @@ async function fetchArv(address) {
 
   return json;
 }
+
+async function loadDemoReport() {
+  const response = await fetch(DEMO_DATA_PATH);
+  if (!response.ok) {
+    throw new Error("Unable to load demo data.");
+  }
+
+  return response.json();
+}
+
+saveWorkerBtn.addEventListener("click", () => {
+  const value = workerUrlInput.value.trim();
+  localStorage.setItem(WORKER_URL_STORAGE_KEY, value || DEFAULT_WORKER_URL);
+
+  if (isWorkerUrlConfigured(value)) {
+    setStatus("Worker URL saved. You can now calculate ARV.");
+    setError("");
+    return;
+  }
+
+  setStatus("Worker URL saved as placeholder. Add a real URL or run demo data.");
+});
+
+demoBtn.addEventListener("click", async () => {
+  setError("");
+  setStatus("Loading demo data...", true);
+
+  try {
+    const payload = await loadDemoReport();
+    render(payload);
+    setStatus("Demo data loaded.");
+  } catch (error) {
+    setStatus("Failed.");
+    setError(error.message);
+  } finally {
+    statusEl.classList.remove("loader");
+  }
+});
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -161,7 +252,7 @@ form.addEventListener("submit", async (event) => {
     }
   } catch (error) {
     setStatus("Failed.");
-    setError(`${error.message} Configure WORKER_URL in tools/arv/arv.js or localStorage.arvWorkerUrl.`);
+    setError(error.message);
   } finally {
     statusEl.classList.remove("loader");
   }
