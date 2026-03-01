@@ -1,4 +1,13 @@
 (function () {
+  const onDomReady = (callback) => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', callback, { once: true });
+      return;
+    }
+    callback();
+  };
+
+  onDomReady(() => {
   const form = document.getElementById('tool-form');
   const output = document.getElementById('result-detail') || document.getElementById('result');
   const cards = document.getElementById('result-cards');
@@ -502,5 +511,6 @@
         window.IBAnalytics.trackCalcSuccess(type, { result: 'financing_estimate' });
       }
     }
+  });
   });
 })();

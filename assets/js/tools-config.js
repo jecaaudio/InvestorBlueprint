@@ -67,6 +67,7 @@
     link.className = 'card-btn';
     link.href = tool.url;
     link.textContent = messages.tryTool || 'Open Tool';
+    link.setAttribute('data-cta-click', 'Open Tool');
     if (statusMeta.isPro) {
       link.setAttribute('data-pro-tool', 'true');
     }
