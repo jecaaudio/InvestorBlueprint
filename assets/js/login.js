@@ -3,14 +3,16 @@
   const ACCESS_VALUE = 'TEAM_ACCESS';
   const WAITLIST_KEY = 'ib_waitlist_email';
   const FALLBACK_PATH = '/InvestorBlueprint/index.html';
+  const TEAM_ACCESS_CODE = 'INVESTOR_TEAM_2026';
   const TEAM_DOMAIN = '@tudominio.com';
   const TEAM_ALLOWLIST = ['team@investorblueprint.local', 'admin@investorblueprint.local'];
 
   const form = document.getElementById('access-form');
   const emailInput = document.getElementById('access-email');
+  const teamCodeInput = document.getElementById('access-team-code');
   const error = document.getElementById('access-email-error');
 
-  if (!form || !emailInput || !error) {
+  if (!form || !emailInput || !teamCodeInput || !error) {
     return;
   }
 
@@ -49,6 +51,7 @@
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     const email = emailInput.value.trim().toLowerCase();
+    const teamCode = teamCodeInput.value.trim();
 
     if (!email || !emailInput.checkValidity()) {
       showError('Please enter a valid email address.');
@@ -58,7 +61,7 @@
     clearError();
     localStorage.setItem(WAITLIST_KEY, email);
 
-    if (hasInternalAccess(email)) {
+    if (teamCode === TEAM_ACCESS_CODE || hasInternalAccess(email)) {
       localStorage.setItem(ACCESS_KEY, ACCESS_VALUE);
       window.location.href = resolveNextPath();
       return;
