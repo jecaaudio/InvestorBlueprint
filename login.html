@@ -43,6 +43,15 @@
               autocomplete="email"
               aria-describedby="access-email-error"
             />
+            <label for="access-team-code">Team access code (optional)</label>
+            <input
+              id="access-team-code"
+              type="text"
+              name="teamCode"
+              autocomplete="one-time-code"
+              inputmode="text"
+              spellcheck="false"
+            />
             <div id="access-email-error" role="alert" hidden></div>
             <button class="btn btn-primary" type="submit" data-cta-click="Request Access">Request Access</button>
           </form>
