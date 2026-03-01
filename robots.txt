@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jecaaudio.github.io/InvestorBlueprint/sitemap.xml
