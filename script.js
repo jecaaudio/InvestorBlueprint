@@ -65,21 +65,4 @@
     });
   }
 
-  const hasTeamAccess = () => localStorage.getItem('ib_role') === 'TEAM_ACCESS';
-
-  document.querySelectorAll('[data-pro-tool="true"]').forEach((link) => {
-    link.addEventListener('click', (event) => {
-      if (hasTeamAccess()) {
-        return;
-      }
-
-      event.preventDefault();
-      const lang = document.documentElement.lang === 'es' ? 'es' : 'en';
-      const message = lang === 'es'
-        ? 'Esta herramienta está en acceso piloto. Solicita acceso para continuar.'
-        : 'This tool is in pilot access. Request access to continue.';
-      alert(message);
-      window.location.href = 'login.html';
-    });
-  });
 })();
