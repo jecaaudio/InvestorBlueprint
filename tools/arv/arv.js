@@ -23,6 +23,10 @@ function getWorkerUrl() {
   return localStorage.getItem(WORKER_URL_STORAGE_KEY) || DEFAULT_WORKER_URL;
 }
 
+function workerSetupMessage() {
+  return "Worker URL not configured. 1) Paste your Worker URL, 2) click Save, or 3) use Run with demo data.";
+}
+
 function isWorkerUrlConfigured(url = getWorkerUrl()) {
   return Boolean(url) && !url.includes("YOUR-WORKER");
 }
@@ -34,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   workerUrlInput.value = getWorkerUrl();
   if (!isWorkerUrlConfigured()) {
-    setStatus("Set a Worker URL and click Save, or use Run with demo data.");
+    setStatus(workerSetupMessage());
   }
 }, { once: true });
 
@@ -164,7 +168,7 @@ function reportText(payload) {
 async function fetchArv(address) {
   const workerUrl = getWorkerUrl();
   if (!isWorkerUrlConfigured(workerUrl)) {
-    throw new Error("Worker URL is not configured. Add it below and click Save, or use Run with demo data.");
+    throw new Error(workerSetupMessage());
   }
 
   const response = await fetch(`${workerUrl}/api/arv`, {
@@ -207,7 +211,7 @@ saveWorkerBtn.addEventListener("click", () => {
     return;
   }
 
-  setStatus("Worker URL saved as placeholder. Add a real URL or run demo data.");
+  setStatus(workerSetupMessage());
 });
 
 demoBtn.addEventListener("click", async () => {
@@ -235,6 +239,12 @@ form.addEventListener("submit", async (event) => {
 
   if (!address) {
     setError("Please add an address.");
+    return;
+  }
+
+  if (!isWorkerUrlConfigured()) {
+    setStatus(workerSetupMessage());
+    setError(workerSetupMessage());
     return;
   }
 
