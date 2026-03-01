@@ -16,6 +16,7 @@ const exportBtn = document.getElementById("export-btn");
 const workerUrlInput = document.getElementById("worker-url");
 const saveWorkerBtn = document.getElementById("save-worker-url-btn");
 const demoBtn = document.getElementById("run-demo-btn");
+const calculateBtn = document.getElementById("calculate-btn");
 
 let latestReport = null;
 
@@ -24,11 +25,21 @@ function getWorkerUrl() {
 }
 
 function workerSetupMessage() {
-  return "Worker URL not configured. 1) Paste your Worker URL, 2) click Save, or 3) use Run with demo data.";
+  return `Worker URL missing. Save it in localStorage key "${WORKER_URL_STORAGE_KEY}" (via Save button) or use "Run with demo data".`;
 }
 
 function isWorkerUrlConfigured(url = getWorkerUrl()) {
   return Boolean(url) && !url.includes("YOUR-WORKER");
+}
+
+function updateWorkerStateUi(url = getWorkerUrl()) {
+  const configured = isWorkerUrlConfigured(url);
+  calculateBtn.disabled = !configured;
+  calculateBtn.title = configured ? "" : "Configure Worker URL first, or use Run with demo data";
+
+  if (!configured) {
+    setStatus(workerSetupMessage());
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -37,10 +48,33 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   workerUrlInput.value = getWorkerUrl();
-  if (!isWorkerUrlConfigured()) {
-    setStatus(workerSetupMessage());
-  }
+  updateWorkerStateUi();
 }, { once: true });
+
+function trackCalcError(reason, extra = {}) {
+  if (window.IBAnalytics && typeof window.IBAnalytics.track === "function") {
+    window.IBAnalytics.track("calc_error", {
+      tool_name: "arv",
+      page_path: window.location.pathname,
+      reason,
+      ...extra
+    });
+  }
+}
+
+function mapWorkerError(error, workerUrl) {
+  const message = (error?.message || "").trim();
+
+  if (message.includes("FORBIDDEN_ORIGIN")) {
+    return `Worker rejected this origin (FORBIDDEN_ORIGIN). Align Worker env ALLOWED_ORIGIN with this site origin: ${window.location.origin}.`;
+  }
+
+  if (message === "Failed to fetch") {
+    return `Request failed before receiving a response from ${workerUrl}. Check Worker URL, CORS, and network access.`;
+  }
+
+  return message || "Unable to calculate ARV.";
+}
 
 function money(value) {
   return Number(value || 0).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -208,10 +242,11 @@ saveWorkerBtn.addEventListener("click", () => {
   if (isWorkerUrlConfigured(value)) {
     setStatus("Worker URL saved. You can now calculate ARV.");
     setError("");
+    updateWorkerStateUi(value);
     return;
   }
 
-  setStatus(workerSetupMessage());
+  updateWorkerStateUi(value);
 });
 
 demoBtn.addEventListener("click", async () => {
@@ -225,6 +260,7 @@ demoBtn.addEventListener("click", async () => {
   } catch (error) {
     setStatus("Failed.");
     setError(error.message);
+    trackCalcError("demo_load_failed", { message: error.message });
   } finally {
     statusEl.classList.remove("loader");
   }
@@ -243,8 +279,11 @@ form.addEventListener("submit", async (event) => {
   }
 
   if (!isWorkerUrlConfigured()) {
-    setStatus(workerSetupMessage());
-    setError(workerSetupMessage());
+    const message = workerSetupMessage();
+    setStatus(message);
+    setError(`${message} Recommended: click "Run with demo data".`);
+    demoBtn.focus();
+    trackCalcError("worker_url_missing", { storage_key: WORKER_URL_STORAGE_KEY });
     return;
   }
 
@@ -261,8 +300,11 @@ form.addEventListener("submit", async (event) => {
       window.IBAnalytics.trackCalcSuccess("arv", { result: "arv_estimate" });
     }
   } catch (error) {
+    const workerUrl = getWorkerUrl();
+    const errorMessage = mapWorkerError(error, workerUrl);
     setStatus("Failed.");
-    setError(error.message);
+    setError(errorMessage);
+    trackCalcError("calc_failed", { message: errorMessage, worker_url: workerUrl });
   } finally {
     statusEl.classList.remove("loader");
   }
