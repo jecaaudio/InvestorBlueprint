@@ -15,6 +15,12 @@ const exportBtn = document.getElementById("export-btn");
 
 let latestReport = null;
 
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.IBAnalytics && typeof window.IBAnalytics.trackToolOpen === "function") {
+    window.IBAnalytics.trackToolOpen("arv");
+  }
+}, { once: true });
+
 function money(value) {
   return Number(value || 0).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 }
@@ -131,6 +137,9 @@ async function fetchArv(address) {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcRun === "function") {
+    window.IBAnalytics.trackCalcRun("arv");
+  }
   const address = (new FormData(form).get("address") || "").toString().trim();
 
   if (!address) {
@@ -147,6 +156,9 @@ form.addEventListener("submit", async (event) => {
   try {
     const payload = await fetchArv(address);
     render(payload);
+    if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === "function") {
+      window.IBAnalytics.trackCalcSuccess("arv", { result: "arv_estimate" });
+    }
   } catch (error) {
     setStatus("Failed.");
     setError(`${error.message} Configure WORKER_URL in tools/arv/arv.js or localStorage.arvWorkerUrl.`);
