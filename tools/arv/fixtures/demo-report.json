@@ -1,0 +1,61 @@
+{
+  "subject": {
+    "address": "123 Main St, Miami, FL",
+    "beds": 3,
+    "baths": 2,
+    "sqft": 1580,
+    "propertyType": "Single Family",
+    "yearBuilt": 1997,
+    "lotSqft": 5200
+  },
+  "comps": [
+    {
+      "address": "110 Oak Ave, Miami, FL",
+      "distanceMiles": 0.24,
+      "soldDate": "2026-01-18",
+      "soldPrice": 515000,
+      "beds": 3,
+      "baths": 2,
+      "sqft": 1540,
+      "pricePerSqft": 334,
+      "score": 0.941
+    },
+    {
+      "address": "78 Pine Rd, Miami, FL",
+      "distanceMiles": 0.37,
+      "soldDate": "2025-12-05",
+      "soldPrice": 528000,
+      "beds": 3,
+      "baths": 2,
+      "sqft": 1625,
+      "pricePerSqft": 325,
+      "score": 0.913
+    },
+    {
+      "address": "250 Palm Ct, Miami, FL",
+      "distanceMiles": 0.51,
+      "soldDate": "2025-11-21",
+      "soldPrice": 499000,
+      "beds": 3,
+      "baths": 2,
+      "sqft": 1498,
+      "pricePerSqft": 333,
+      "score": 0.894
+    }
+  ],
+  "arv": {
+    "estimate": 522000,
+    "low": 506000,
+    "high": 538000,
+    "confidence": 82,
+    "method": "weighted-comps",
+    "ppsfWeighted": 331
+  },
+  "meta": {
+    "generatedAt": "2026-02-15T14:25:00.000Z",
+    "provider": "demo-fixture",
+    "warnings": [
+      "Demo data only"
+    ]
+  }
+}

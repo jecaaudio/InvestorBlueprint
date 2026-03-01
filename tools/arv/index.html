@@ -39,6 +39,18 @@
           <button type="submit" id="calculate-btn">Calculate ARV</button>
         </form>
 
+        <section class="worker-config" aria-label="Worker configuration">
+          <h2>Worker Configuration</h2>
+          <div class="worker-config-row">
+            <label>
+              Worker URL
+              <input id="worker-url" type="url" placeholder="https://your-worker.workers.dev" />
+            </label>
+            <button type="button" id="save-worker-url-btn">Save</button>
+            <button type="button" id="run-demo-btn">Run with demo data</button>
+          </div>
+        </section>
+
         <div id="status" class="status" aria-live="polite">Ready.</div>
         <div id="error" class="error" role="alert" hidden></div>
 
