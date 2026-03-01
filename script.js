@@ -1,4 +1,5 @@
 (function () {
+  const BETA_FREE_MODE = true;
   const langButtons = document.querySelectorAll('[data-lang]');
   const menuToggle = document.getElementById('menu-toggle');
   const nav = document.getElementById('primary-nav');
@@ -62,6 +63,13 @@
       if (window.innerWidth > 840) {
         closeMenu();
       }
+    });
+  }
+
+  // Beta free mode keeps every tool link open without premium/pilot gating redirects.
+  if (BETA_FREE_MODE) {
+    document.querySelectorAll('[data-pro-tool="true"]').forEach((link) => {
+      link.removeAttribute('data-pro-tool');
     });
   }
 
