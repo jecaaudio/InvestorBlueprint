@@ -37,3 +37,7 @@ La UI muestra mensajes claros cuando:
 - Falta dirección
 - El worker no responde
 - Hay error de CORS/configuración
+
+## Beta troubleshooting
+
+- If your Worker returns `FORBIDDEN_ORIGIN`, align Worker env `ALLOWED_ORIGIN` with your site origin.
