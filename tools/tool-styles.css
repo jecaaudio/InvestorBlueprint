@@ -394,6 +394,12 @@ button:focus-visible {
   box-shadow: 0 10px 30px rgba(2, 6, 23, 0.5);
 }
 
+#feedbackBackdrop[hidden],
+#feedbackModal[hidden] {
+  display: none !important;
+  pointer-events: none !important;
+}
+
 #feedbackBackdrop {
   position: fixed;
   inset: 0;
