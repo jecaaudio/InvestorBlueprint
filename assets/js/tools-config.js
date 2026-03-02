@@ -7,15 +7,12 @@
   ];
 
   const STATUS_CONFIG = {
-    beta_free: { label: 'BETA (FREE)', className: 'free', isPro: false }
+    beta_free: { className: 'free', isPro: false }
   };
 
-  const getCurrentLanguage = () => (localStorage.getItem('preferredLanguage') === 'es' ? 'es' : 'en');
+  const getCurrentLanguage = () => (localStorage.getItem('preferredLanguage') === 'en' ? 'en' : 'es');
 
-  const getMessages = () => {
-    const lang = getCurrentLanguage();
-    return window.translations?.[lang] || window.translations?.en || {};
-  };
+  const getMessages = () => window.IBI18n?.getCurrentMessages?.() || {};
 
   const getLocalizedDescription = (tool) => {
     const lang = getCurrentLanguage();
@@ -49,7 +46,8 @@
     }
 
     const statusMeta = getStatusMeta(status);
-    badgeNode.textContent = statusMeta.label;
+    const messages = getMessages();
+    badgeNode.textContent = messages.betaFreeLabel || 'BETA (FREE)';
     badgeNode.classList.remove('free', 'pro');
     badgeNode.classList.add(statusMeta.className);
   };
@@ -64,7 +62,7 @@
     const badge = document.createElement('span');
     badge.className = `badge ${statusMeta.className}`;
     badge.dataset.toolPlanBadge = '';
-    badge.textContent = statusMeta.label;
+    badge.textContent = messages.betaFreeLabel || 'BETA (FREE)';
 
     const title = document.createElement('h3');
     title.textContent = tool.name;
@@ -101,7 +99,7 @@
     const freeCount = tools.filter((tool) => !getStatusMeta(tool.status).isPro).length;
     const freeFeature = document.getElementById('free-feature-count');
     if (freeFeature) {
-      freeFeature.textContent = `${freeCount} tools`;
+      freeFeature.textContent = `${freeCount} ${messages.toolsUnit || 'tools'}`;
     }
   };
 
@@ -116,12 +114,13 @@
       return;
     }
 
-    const statusMeta = getStatusMeta(tool.status);
     applyBadge(document.querySelector('[data-tool-plan-badge]'), tool.status);
+
+    const messages = getMessages();
 
     const title = document.querySelector('[data-tool-title]');
     if (title) {
-      title.textContent = `${tool.name} — ${statusMeta.label}`;
+      title.textContent = `${tool.name} — ${messages.betaFreeLabel || 'BETA (FREE)'}`;
     }
 
     const description = document.querySelector('[data-tool-description]');
