@@ -39,11 +39,13 @@ Para ejecutarlos localmente:
 
 ```bash
 npm install
-npx playwright install --with-deps chromium
+npx playwright install chromium
 python3 -m http.server 4173 &
 npm run qa:axe
 npm run qa:lighthouse
 ```
+
+> Nota: En entornos sin `apt` o detrás de proxy, usa `npx playwright install chromium` (sin `--with-deps`) para instalar solo el navegador.
 
 ## TEAM_ACCESS en beta (sin backend)
 
