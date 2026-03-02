@@ -32,86 +32,8 @@
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value) || 0);
   const pct = (value) => `${(Number(value) || 0).toFixed(1)}%`;
 
-  const copy = {
-    en: {
-      monthlyCashFlow: 'Monthly Cash Flow',
-      annualCashFlow: 'Annual Cash Flow',
-      rentSuggestedMonthly: 'Suggested Monthly Rent',
-      rentAnnualIncome: 'Projected Annual Income',
-      rentGrossYield: 'Projected Gross Yield',
-      rentNetAfterExpenses: 'Annual Net After Expenses',
-      estimatedArv: 'Estimated ARV',
-      maxOffer: 'Maximum Offer (70% Rule)',
-      totalFinancingCost: 'Total Financing Cost',
-      monthlyInterestCarry: 'Monthly Interest Carry',
-      freeHint: 'Free mode: quick estimate with purchase, rehab, holding and sale costs only.',
-      proHint: 'Pro mode enabled: includes financing stack, MAO strategy checks, risk buffer and sensitivity table.',
-      requiredField: 'Required field',
-      cannotBeNegative: 'Cannot be negative',
-      outOfRange: 'Value out of allowed range',
-      profit: 'Profit',
-      mao: 'MAO',
-      cashToClose: 'Cash to Close',
-      totalCosts: 'Total Costs',
-      roi: 'ROI',
-      breakEven: 'Break-even',
-      dealScore: 'Deal Score',
-      costBreakdown: 'Cost Breakdown',
-      section: 'Section',
-      total: 'Total',
-      acquisition: 'Acquisition',
-      rehabContingency: 'Rehab + contingency',
-      holding: 'Holding',
-      selling: 'Selling',
-      financing: 'Financing',
-      sensitivityResults: 'Sensitivity Results',
-      scenario: 'Scenario',
-      low: 'Low',
-      base: 'Base',
-      high: 'High',
-      resultPrompt: 'Enter your numbers and click calculate.'
-    },
-    es: {
-      monthlyCashFlow: 'Flujo de caja mensual',
-      annualCashFlow: 'Flujo de caja anual',
-      rentSuggestedMonthly: 'Renta mensual sugerida',
-      rentAnnualIncome: 'Ingreso anual proyectado',
-      rentGrossYield: 'Rendimiento bruto proyectado',
-      rentNetAfterExpenses: 'Neto anual después de gastos',
-      estimatedArv: 'ARV estimado',
-      maxOffer: 'Oferta máxima (regla del 70%)',
-      totalFinancingCost: 'Costo total del financiamiento',
-      monthlyInterestCarry: 'Carga mensual de intereses',
-      freeHint: 'Modo gratis: estimación rápida con compra, rehab, holding y costos de venta.',
-      proHint: 'Modo Pro: incluye estructura de financiamiento, MAO por objetivos, buffer de riesgo y sensibilidades.',
-      requiredField: 'Campo obligatorio',
-      cannotBeNegative: 'No puede ser negativo',
-      outOfRange: 'Valor fuera del rango permitido',
-      profit: 'Ganancia',
-      mao: 'MAO',
-      cashToClose: 'Efectivo para cerrar',
-      totalCosts: 'Costos totales',
-      roi: 'ROI',
-      breakEven: 'Punto de equilibrio',
-      dealScore: 'Puntaje de operación',
-      costBreakdown: 'Desglose de costos',
-      section: 'Sección',
-      total: 'Total',
-      acquisition: 'Adquisición',
-      rehabContingency: 'Rehab + contingencia',
-      holding: 'Holding',
-      selling: 'Venta',
-      financing: 'Financiamiento',
-      sensitivityResults: 'Resultados de sensibilidad',
-      scenario: 'Escenario',
-      low: 'Bajo',
-      base: 'Base',
-      high: 'Alto',
-      resultPrompt: 'Ingresa tus datos y haz clic en calcular.'
-    }
-  };
-
-  const getLang = () => (document.documentElement.lang === 'es' ? 'es' : 'en');
+  const getMessages = () => window.IBI18n?.getCurrentMessages?.() || {};
+  const t = (key, fallback = '') => getMessages()[key] || fallback;
 
   const setupCurrencyInputs = () => {
     form.querySelectorAll('input[data-format="currency"]').forEach((input) => {
@@ -143,7 +65,7 @@
     const isPro = selected === 'pro';
     form.querySelectorAll('.pro-only').forEach((section) => section.classList.toggle('is-hidden', !isPro));
     if (planHint) {
-      planHint.textContent = isPro ? copy[getLang()].proHint : copy[getLang()].freeHint;
+      planHint.textContent = isPro ? t('proHint', 'Pro mode enabled: includes financing stack, MAO strategy checks, risk buffer and sensitivity table.') : t('freeHint', 'Free mode: quick estimate with purchase, rehab, holding and sale costs only.');
     }
   };
 
@@ -186,60 +108,58 @@
     errorNode.textContent = message;
   };
 
-  const validateFields = (rules, t) => {
+  const validateFields = (rules, messages) => {
     clearFieldErrors();
     const invalid = [];
     rules.forEach((rule) => {
       const value = parseNumeric(form.elements[rule.name]?.value);
       const isBlank = String(form.elements[rule.name]?.value || '').trim() === '';
       if (rule.required && isBlank) {
-        setFieldError(rule.name, t.requiredField);
+        setFieldError(rule.name, messages.requiredField);
         invalid.push(rule.name);
         return;
       }
       if (!Number.isFinite(value)) {
-        setFieldError(rule.name, t.outOfRange);
+        setFieldError(rule.name, messages.outOfRange);
         invalid.push(rule.name);
         return;
       }
       if (!rule.allowNegative && value < 0) {
-        setFieldError(rule.name, t.cannotBeNegative);
+        setFieldError(rule.name, messages.cannotBeNegative);
         invalid.push(rule.name);
         return;
       }
       if (rule.min !== undefined && value < rule.min) {
-        setFieldError(rule.name, t.outOfRange);
+        setFieldError(rule.name, messages.outOfRange);
         invalid.push(rule.name);
         return;
       }
       if (rule.max !== undefined && value > rule.max) {
-        setFieldError(rule.name, t.outOfRange);
+        setFieldError(rule.name, messages.outOfRange);
         invalid.push(rule.name);
       }
     });
 
     if (invalid.length) {
-      showValidationError(t.outOfRange);
+      showValidationError(messages.outOfRange);
       form.elements[invalid[0]]?.focus();
       return false;
     }
     return true;
   };
 
-  const validateRange = (value, min, max) => Number.isFinite(value) && value >= min && value <= max;
-
   const requiredFields = ['salePrice', 'purchasePrice', 'rehabCost'];
-  const validateFlip = (t) => {
+  const validateFlip = (messages) => {
     let valid = true;
     requiredFields.forEach((field) => {
       const input = form.elements[field];
       if (!input) return;
       input.setCustomValidity('');
       if (!input.value) {
-        input.setCustomValidity(t.requiredField);
+        input.setCustomValidity(messages.requiredField);
         valid = false;
       } else if (Number(input.value) < 0) {
-        input.setCustomValidity(t.cannotBeNegative);
+        input.setCustomValidity(messages.cannotBeNegative);
         valid = false;
       }
     });
@@ -253,17 +173,16 @@
 
     form.addEventListener('reset', () => {
       setTimeout(() => {
-        const t = copy[getLang()];
         syncPlanMode();
         setCards([
-          { label: t.profit, value: '$0' },
-          { label: t.mao, value: '$0' },
-          { label: t.cashToClose, value: '$0' },
-          { label: t.totalCosts, value: '$0' },
-          { label: t.roi, value: '0.0%' },
-          { label: t.breakEven, value: '$0' }
+          { label: t('profit', 'Profit'), value: '$0' },
+          { label: t('mao', 'MAO'), value: '$0' },
+          { label: t('cashToClose', 'Cash to Close'), value: '$0' },
+          { label: t('totalCosts', 'Total Costs'), value: '$0' },
+          { label: t('roi', 'ROI'), value: '0.0%' },
+          { label: t('breakEven', 'Break-even'), value: '$0' }
         ]);
-        if (output) output.textContent = copy[getLang()].resultPrompt || 'Enter your numbers and click calculate.';
+        if (output) output.textContent = t('resultPrompt', 'Enter your numbers and click calculate.');
       }, 0);
     });
 
@@ -301,7 +220,7 @@
         clearValidationError();
         clearFieldErrors();
         setCards([]);
-        if (output) output.textContent = copy[getLang()].resultPrompt;
+        if (output) output.textContent = t('resultPrompt', 'Enter your numbers and click calculate.');
       }, 0);
     });
 
@@ -319,8 +238,7 @@
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const lang = getLang();
-    const t = copy[lang];
+    const messages = getMessages();
     clearValidationError();
 
     if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcRun === 'function') {
@@ -330,7 +248,7 @@
     const num = (name) => parseNumeric(values[name]);
 
     if (type === 'flip') {
-      if (!validateFlip(t)) return;
+      if (!validateFlip(messages)) return;
 
       const purchase = num('purchasePrice');
       const sale = num('salePrice');
@@ -367,38 +285,38 @@
       const score = netProfit > 0 && roi > 15 ? 'A' : netProfit > 0 ? 'B' : 'C';
 
       setCards([
-        { label: t.profit, value: money(netProfit) },
-        { label: t.mao, value: money(mao70) },
-        { label: t.cashToClose, value: money(cashToClose) },
-        { label: t.totalCosts, value: money(totalCosts) },
-        { label: t.roi, value: pct(roi) },
-        { label: t.breakEven, value: money(breakEven) }
+        { label: messages.profit, value: money(netProfit) },
+        { label: messages.mao, value: money(mao70) },
+        { label: messages.cashToClose, value: money(cashToClose) },
+        { label: messages.totalCosts, value: money(totalCosts) },
+        { label: messages.roi, value: pct(roi) },
+        { label: messages.breakEven, value: money(breakEven) }
       ]);
 
       if (output) {
         output.innerHTML = `
-          <div class="badge ${netProfit > 0 ? 'green' : 'red'}">${t.dealScore}: ${score}</div>
-          <h3>${t.costBreakdown}</h3>
+          <div class="badge ${netProfit > 0 ? 'green' : 'red'}">${messages.dealScore}: ${score}</div>
+          <h3>${messages.costBreakdown}</h3>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>${t.section}</th><th>${t.total}</th></tr></thead>
+              <thead><tr><th>${messages.section}</th><th>${messages.total}</th></tr></thead>
               <tbody>
-                <tr><td>${t.acquisition}</td><td>${money(acquisition)}</td></tr>
-                <tr><td>${t.rehabContingency}</td><td>${money(rehabTotal)}</td></tr>
-                <tr><td>${t.holding}</td><td>${money(holdingTotal)}</td></tr>
-                <tr><td>${t.selling}</td><td>${money(sellingTotal)}</td></tr>
-                <tr><td>${t.financing}</td><td>${money(financingTotal)}</td></tr>
+                <tr><td>${messages.acquisition}</td><td>${money(acquisition)}</td></tr>
+                <tr><td>${messages.rehabContingency}</td><td>${money(rehabTotal)}</td></tr>
+                <tr><td>${messages.holding}</td><td>${money(holdingTotal)}</td></tr>
+                <tr><td>${messages.selling}</td><td>${money(sellingTotal)}</td></tr>
+                <tr><td>${messages.financing}</td><td>${money(financingTotal)}</td></tr>
               </tbody>
             </table>
           </div>
-          <h3>${t.sensitivityResults}</h3>
+          <h3>${messages.sensitivityResults}</h3>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>${t.scenario}</th><th>${t.profit}</th></tr></thead>
+              <thead><tr><th>${messages.scenario}</th><th>${messages.profit}</th></tr></thead>
               <tbody>
-                <tr><td>${t.low}</td><td>${money(scenarioLow)}</td></tr>
-                <tr><td>${t.base}</td><td>${money(scenarioBase)}</td></tr>
-                <tr><td>${t.high}</td><td>${money(scenarioHigh)}</td></tr>
+                <tr><td>${messages.low}</td><td>${money(scenarioLow)}</td></tr>
+                <tr><td>${messages.base}</td><td>${money(scenarioBase)}</td></tr>
+                <tr><td>${messages.high}</td><td>${money(scenarioHigh)}</td></tr>
               </tbody>
             </table>
           </div>
@@ -419,7 +337,7 @@
         { name: 'maintenance', min: 0 },
         { name: 'management', min: 0 },
         { name: 'vacancyRate', required: true, min: 0, max: 100 }
-      ], t)) return;
+      ], messages)) return;
 
       const monthlyRent = num('monthlyRent');
       const vacancyRate = num('vacancyRate');
@@ -427,11 +345,11 @@
 
       const cashFlow = monthlyRent * (1 - vacancyRate / 100) - expenses.reduce((sum, value) => sum + value, 0);
       setCards([
-        { label: t.monthlyCashFlow, value: money(cashFlow) },
-        { label: t.annualCashFlow, value: money(cashFlow * 12) },
-        { label: 'Vacancy Rate', value: pct(vacancyRate) }
+        { label: messages.monthlyCashFlow, value: money(cashFlow) },
+        { label: messages.annualCashFlow, value: money(cashFlow * 12) },
+        { label: t('vacancyRateLabel', 'Vacancy Rate'), value: pct(vacancyRate) }
       ]);
-      output.textContent = 'Cash flow calculated.';
+      output.textContent = t('cashFlowCalculated', 'Cash flow calculated.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'cash_flow' });
       }
@@ -445,7 +363,7 @@
         { name: 'annualExpenses', min: 0 },
         { name: 'targetYield', required: true, min: 0, max: 100 },
         { name: 'occupancy', required: true, min: 0, max: 100 }
-      ], t)) return;
+      ], messages)) return;
 
       const propertyValue = num('propertyValue');
       const annualExpenses = num('annualExpenses');
@@ -458,12 +376,12 @@
       const netAfterExpenses = annualIncome - annualExpenses;
 
       setCards([
-        { label: t.rentSuggestedMonthly, value: money(suggestedMonthlyRent) },
-        { label: t.rentAnnualIncome, value: money(annualIncome) },
-        { label: t.rentGrossYield, value: pct(grossYield) },
-        { label: t.rentNetAfterExpenses, value: money(netAfterExpenses) }
+        { label: messages.rentSuggestedMonthly, value: money(suggestedMonthlyRent) },
+        { label: messages.rentAnnualIncome, value: money(annualIncome) },
+        { label: messages.rentGrossYield, value: pct(grossYield) },
+        { label: messages.rentNetAfterExpenses, value: money(netAfterExpenses) }
       ]);
-      output.textContent = 'Rent projection calculated.';
+      output.textContent = t('rentProjectionCalculated', 'Rent projection calculated.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'rent_projection' });
       }
@@ -476,15 +394,15 @@
         { name: 'comp2', required: true, min: 0.01 },
         { name: 'comp3', required: true, min: 0.01 },
         { name: 'repairs', required: true, min: 0 }
-      ], t)) return;
+      ], messages)) return;
 
       const average = (num('comp1') + num('comp2') + num('comp3')) / 3;
       const maxOffer = average * 0.7 - num('repairs');
       setCards([
-        { label: t.estimatedArv, value: money(average) },
-        { label: t.maxOffer, value: money(maxOffer) }
+        { label: messages.estimatedArv, value: money(average) },
+        { label: messages.maxOffer, value: money(maxOffer) }
       ]);
-      output.textContent = 'ARV estimate calculated.';
+      output.textContent = t('arvEstimateCalculated', 'ARV estimate calculated.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'arv_estimate' });
       }
@@ -497,16 +415,16 @@
         { name: 'interestRate', required: true, min: 0, max: 100 },
         { name: 'points', required: true, min: 0, max: 20 },
         { name: 'months', required: true, min: 1 }
-      ], t)) return;
+      ], messages)) return;
 
       const loan = num('loanAmount');
       const interestCost = loan * (num('interestRate') / 100) * (num('months') / 12);
       const totalCost = loan * (num('points') / 100) + interestCost;
       setCards([
-        { label: t.totalFinancingCost, value: money(totalCost) },
-        { label: t.monthlyInterestCarry, value: money(interestCost / Math.max(num('months'), 1)) }
+        { label: messages.totalFinancingCost, value: money(totalCost) },
+        { label: messages.monthlyInterestCarry, value: money(interestCost / Math.max(num('months'), 1)) }
       ]);
-      output.textContent = 'Financing estimate calculated.';
+      output.textContent = t('financingEstimateCalculated', 'Financing estimate calculated.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'financing_estimate' });
       }
