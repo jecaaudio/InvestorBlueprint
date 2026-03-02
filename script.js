@@ -66,10 +66,13 @@
     });
   }
 
-  // Beta free mode keeps every tool link open without premium/pilot gating redirects.
-  if (BETA_FREE_MODE) {
+  // Keep this block disabled while beta free mode is active.
+  if (!BETA_FREE_MODE) {
     document.querySelectorAll('[data-pro-tool="true"]').forEach((link) => {
-      link.removeAttribute('data-pro-tool');
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        window.location.href = 'login.html';
+      });
     });
   }
 
