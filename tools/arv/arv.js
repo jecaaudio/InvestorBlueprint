@@ -17,6 +17,8 @@ const workerUrlInput = document.getElementById("worker-url");
 const saveWorkerBtn = document.getElementById("save-worker-url-btn");
 const demoBtn = document.getElementById("run-demo-btn");
 const calculateBtn = document.getElementById("calculate-btn");
+const demoBanner = document.getElementById("demo-banner");
+const currentOriginEl = document.getElementById("current-origin");
 
 let latestReport = null;
 
@@ -34,11 +36,14 @@ function isWorkerUrlConfigured(url = getWorkerUrl()) {
 
 function updateWorkerStateUi(url = getWorkerUrl()) {
   const configured = isWorkerUrlConfigured(url);
-  calculateBtn.disabled = !configured;
-  calculateBtn.title = configured ? "" : "Configure Worker URL first, or use Run with demo data";
+  calculateBtn.title = configured ? "" : "No Worker URL configured. Submit will run with demo data.";
+
+  if (demoBanner) {
+    demoBanner.hidden = configured;
+  }
 
   if (!configured) {
-    setStatus(workerSetupMessage());
+    setStatus("Beta: usando DEMO data");
   }
 }
 
@@ -48,6 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   workerUrlInput.value = getWorkerUrl();
+  if (currentOriginEl) {
+    currentOriginEl.textContent = window.location.origin;
+  }
   updateWorkerStateUi();
 }, { once: true });
 
@@ -64,16 +72,13 @@ function trackCalcError(reason, extra = {}) {
 
 function mapWorkerError(error, workerUrl) {
   const message = (error?.message || "").trim();
+  const networkError = error instanceof TypeError || message === "Failed to fetch";
 
-  if (message.includes("FORBIDDEN_ORIGIN")) {
-    return `Worker rejected this origin (FORBIDDEN_ORIGIN). Align Worker env ALLOWED_ORIGIN with this site origin: ${window.location.origin}.`;
+  if (message.includes("FORBIDDEN_ORIGIN") || networkError) {
+    return `FORBIDDEN_ORIGIN: configura ALLOWED_ORIGIN en el worker. Origin actual: ${window.location.origin}`;
   }
 
-  if (message === "Failed to fetch") {
-    return `Request failed before receiving a response from ${workerUrl}. Check Worker URL, CORS, and network access.`;
-  }
-
-  return message || "Unable to calculate ARV.";
+  return message || `Unable to calculate ARV using ${workerUrl}.`;
 }
 
 function money(value) {
@@ -278,33 +283,26 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
-  if (!isWorkerUrlConfigured()) {
-    const message = workerSetupMessage();
-    setStatus(message);
-    setError(`${message} Recommended: click "Run with demo data".`);
-    demoBtn.focus();
-    trackCalcError("worker_url_missing", { storage_key: WORKER_URL_STORAGE_KEY });
-    return;
-  }
+  const runWithDemo = !isWorkerUrlConfigured();
 
   setError("");
-  setStatus("Calculating ARV...", true);
+  setStatus(runWithDemo ? "Loading demo data..." : "Calculating ARV...", true);
   resultsEl.hidden = true;
   compsWrap.hidden = true;
   actionRow.hidden = true;
 
   try {
-    const payload = await fetchArv(address);
+    const payload = runWithDemo ? await loadDemoReport() : await fetchArv(address);
     render(payload);
     if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === "function") {
-      window.IBAnalytics.trackCalcSuccess("arv", { result: "arv_estimate" });
+      window.IBAnalytics.trackCalcSuccess("arv", { result: runWithDemo ? "demo_arv_estimate" : "arv_estimate" });
     }
   } catch (error) {
     const workerUrl = getWorkerUrl();
     const errorMessage = mapWorkerError(error, workerUrl);
     setStatus("Failed.");
     setError(errorMessage);
-    trackCalcError("calc_failed", { message: errorMessage, worker_url: workerUrl });
+    trackCalcError("calc_failed", { message: errorMessage, worker_url: workerUrl, mode: runWithDemo ? "demo" : "worker" });
   } finally {
     statusEl.classList.remove("loader");
   }

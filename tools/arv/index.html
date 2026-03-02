@@ -44,6 +44,7 @@
 
         <section class="worker-config" aria-label="Worker configuration">
           <h2>Worker Configuration</h2>
+          <div id="demo-banner" class="demo-banner" hidden>Beta: usando DEMO data</div>
           <div class="worker-config-row">
             <label>
               Worker URL
@@ -92,6 +93,15 @@
             <tbody id="comps-body"></tbody>
           </table>
         </div>
+
+        <section class="troubleshooting" aria-label="Troubleshooting">
+          <h2>Troubleshooting</h2>
+          <ul>
+            <li><strong>No Worker URL?</strong> Keep using <em>Run with demo data</em> to get sample ARV results.</li>
+            <li><strong>FORBIDDEN_ORIGIN error?</strong> Configure <code>ALLOWED_ORIGIN</code> in your worker with this value: <code id="current-origin">unknown</code>.</li>
+            <li><strong>Network/CORS errors?</strong> Verify the Worker URL is correct and that the worker sends CORS headers for this origin.</li>
+          </ul>
+        </section>
       </section>
     </main>
 
