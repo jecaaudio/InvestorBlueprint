@@ -3,36 +3,48 @@
     "id": "flip",
     "name": "Flip Calculator",
     "url": "tools/flip-calculator.html",
-    "status": "beta_free"
+    "status": "beta_free",
+    "description_es": "Analiza compras, rehab, holding y venta para estimar rentabilidad del flip.",
+    "description_en": "Analyze purchase, rehab, holding, and sale costs to estimate your flip profitability."
   },
   {
     "id": "rental_cash_flow",
     "name": "Rental Cash Flow",
     "url": "tools/rental-cash-flow.html",
-    "status": "beta_free"
+    "status": "beta_free",
+    "description_es": "Calcula flujo mensual y anual para evaluar rápidamente una propiedad de renta.",
+    "description_en": "Calculate monthly and annual cash flow to quickly evaluate a rental property."
   },
   {
     "id": "rent",
     "name": "Rent Calculator",
     "url": "tools/rent-calculator.html",
-    "status": "beta_free"
+    "status": "beta_free",
+    "description_es": "Estima renta sugerida, ingreso anual y rendimiento bruto con ocupación esperada.",
+    "description_en": "Estimate suggested rent, annual income, and gross yield using expected occupancy."
   },
   {
     "id": "arv_estimator",
     "name": "ARV Estimator",
     "url": "tools/arv-estimator.html",
-    "status": "beta_free"
+    "status": "beta_free",
+    "description_es": "Calcula el ARV con comparables, ajustes y margen de seguridad.",
+    "description_en": "Estimate ARV with comparables, adjustments, and a safety margin."
   },
   {
     "id": "automated_arv",
     "name": "Automated ARV Tool",
     "url": "tools/arv/",
-    "status": "beta_free"
+    "status": "beta_free",
+    "description_es": "Genera una estimación automatizada de ARV con reporte estructurado.",
+    "description_en": "Generate an automated ARV estimate with a structured report."
   },
   {
     "id": "hard_money",
     "name": "Hard Money Analyzer",
     "url": "tools/hard-money-analyzer.html",
-    "status": "beta_free"
+    "status": "beta_free",
+    "description_es": "Evalúa costo de intereses, puntos y costo total de financiamiento hard money.",
+    "description_en": "Evaluate interest cost, points, and total hard money financing cost."
   }
 ]

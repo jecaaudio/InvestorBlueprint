@@ -7,23 +7,23 @@
   ];
 
   const STATUS_CONFIG = {
-    beta_free: { label: 'BETA (free)', className: 'free', isPro: false }
+    beta_free: { label: 'BETA (FREE)', className: 'free', isPro: false }
   };
 
   const getCurrentLanguage = () => (localStorage.getItem('preferredLanguage') === 'es' ? 'es' : 'en');
 
-  const TOOL_DESCRIPTION_KEYS = {
-    flip: 'toolFlipDesc',
-    rental_cash_flow: 'toolRentalDesc',
-    rent: 'toolRentDesc',
-    arv_estimator: 'toolArvDesc',
-    automated_arv: 'automatedArvDesc',
-    hard_money: 'toolHardMoneyDesc'
-  };
-
   const getMessages = () => {
     const lang = getCurrentLanguage();
     return window.translations?.[lang] || window.translations?.en || {};
+  };
+
+  const getLocalizedDescription = (tool) => {
+    const lang = getCurrentLanguage();
+    if (lang === 'es') {
+      return tool.description_es || tool.description_en || '';
+    }
+
+    return tool.description_en || tool.description_es || '';
   };
 
   const fetchToolsConfig = async () => {
@@ -70,8 +70,7 @@
     title.textContent = tool.name;
 
     const description = document.createElement('p');
-    const descriptionKey = tool.descriptionKey || TOOL_DESCRIPTION_KEYS[tool.id];
-    description.textContent = messages[descriptionKey] || '';
+    description.textContent = getLocalizedDescription(tool);
 
     const link = document.createElement('a');
     link.className = 'card-btn';
@@ -122,8 +121,12 @@
 
     const title = document.querySelector('[data-tool-title]');
     if (title) {
-      const cleanName = tool.name || title.textContent;
-      title.textContent = `${cleanName} — ${statusMeta.label}`;
+      title.textContent = `${tool.name} — ${statusMeta.label}`;
+    }
+
+    const description = document.querySelector('[data-tool-description]');
+    if (description) {
+      description.textContent = getLocalizedDescription(tool);
     }
   };
 
