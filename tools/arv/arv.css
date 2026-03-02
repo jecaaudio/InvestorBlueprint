@@ -119,6 +119,39 @@
   margin: 0;
 }
 
+.demo-banner {
+  margin-bottom: 0.75rem;
+  border: 1px solid #f59e0b;
+  color: #fde68a;
+  background: rgba(120, 53, 15, 0.35);
+  border-radius: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  font-weight: 600;
+}
+
+.troubleshooting {
+  border-top: 1px solid var(--border);
+  margin-top: 0.4rem;
+  padding-top: 0.9rem;
+}
+
+.troubleshooting h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1rem;
+}
+
+.troubleshooting ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--muted);
+  display: grid;
+  gap: 0.45rem;
+}
+
+.troubleshooting code {
+  color: #e2e8f0;
+}
+
 @media (max-width: 720px) {
   .worker-config-row {
     grid-template-columns: 1fr;
