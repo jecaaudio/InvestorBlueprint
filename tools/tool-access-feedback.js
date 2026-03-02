@@ -64,12 +64,13 @@
     const closeButton = document.getElementById('feedbackClose');
     const backdrop = document.getElementById('feedbackBackdrop');
     const modal = document.getElementById('feedbackModal');
+    const panel = document.getElementById('feedbackPanel');
     const form = document.getElementById('feedback-form');
     const status = document.getElementById('feedback-status');
     const toolSelect = document.getElementById('feedback-tool');
     const messageInput = document.getElementById('feedback-message');
 
-    if (!openButton || !closeButton || !backdrop || !modal || !form || !status || !toolSelect || !messageInput) {
+    if (!openButton || !closeButton || !backdrop || !modal || !panel || !form || !status || !toolSelect || !messageInput) {
       return;
     }
 
@@ -85,15 +86,19 @@
       messageInput.focus();
     };
 
-    const closeFeedback = () => {
+    const closeFeedback = ({ returnFocus = true } = {}) => {
       backdrop.hidden = true;
       modal.hidden = true;
       document.body.style.overflow = '';
-      openButton.focus();
+      if (returnFocus) {
+        openButton.focus();
+      }
     };
 
     // Keep closed by default and fully non-interactive until opened.
-    closeFeedback();
+    backdrop.hidden = true;
+    modal.hidden = true;
+    document.body.style.overflow = '';
 
     openButton.addEventListener('click', openFeedback);
     closeButton.addEventListener('click', closeFeedback);
@@ -103,6 +108,10 @@
       if (event.target === modal) {
         closeFeedback();
       }
+    });
+
+    panel.addEventListener('click', (event) => {
+      event.stopPropagation();
     });
 
     document.addEventListener('keydown', (event) => {
