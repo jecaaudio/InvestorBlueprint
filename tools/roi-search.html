@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ROI Search | InvestorBlueprint</title>
+    <meta name="description" content="Search simulated investment properties by desired ROI, location, and property type with an interactive heatmap." />
+    <link rel="canonical" href="https://jecaaudio.github.io/InvestorBlueprint/tools/roi-search.html" />
+    <link rel="stylesheet" href="tool-styles.css" />
+    <script src="tool-access-feedback.js"></script>
+    <link rel="stylesheet" href="../assets/css/cookie-banner.css" />
+  </head>
+  <body data-tool-id="roi_search" data-tool="roi_search">
+    <header class="tool-navbar">
+      <div class="brand-menu">
+        <a class="tool-logo" href="../index.html">InvestorBlueprint</a>
+        <nav class="brand-dropdown" aria-label="Quick navigation">
+          <a href="../index.html" data-i18n="navHome">Home</a>
+          <a href="../index.html#tools" data-i18n="navTools">Tools</a>
+          <a href="../index.html#learn" data-i18n="navLearn">Learn</a>
+          <a href="../pricing.html" data-i18n="navPricing">Pricing</a>
+          <a href="../login.html" data-i18n="navLogin">Login</a>
+        </nav>
+      </div>
+      <div class="lang-switcher" role="group" aria-label="Language selector">
+        <button type="button" class="lang-option" data-lang="en" aria-label="Switch to English">
+          <img class="flag-emoji" src="../assets/flags/us.svg" alt="" aria-hidden="true">
+          EN
+        </button>
+        <button type="button" class="lang-option" data-lang="es" aria-label="Cambiar a Español">
+          <img class="flag-emoji" src="../assets/flags/es.svg" alt="" aria-hidden="true">
+          ES
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <span class="badge free" data-tool-plan-badge></span>
+        <h1 data-tool-title data-i18n="roiTitle">📍 ROI Search</h1>
+        <p data-tool-description data-i18n="roiDescription">Filter simulated opportunities by target return, property type, and location.</p>
+        <form id="tool-form" novalidate>
+          <fieldset>
+            <legend data-i18n="roiFiltersLegend">Search filters</legend>
+            <div class="form-grid">
+              <label for="desiredReturn"><span data-i18n="roiDesiredReturn">Desired return (%)</span></label>
+              <div class="input-control">
+                <input id="desiredReturn" name="desiredReturn" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="8" required />
+                <span class="input-suffix">%</span>
+              </div>
+
+              <label for="location"><span data-i18n="roiLocation">City or ZIP code</span></label>
+              <input id="location" name="location" type="text" placeholder="Miami / 33101" />
+
+              <label for="propertyType"><span data-i18n="roiPropertyType">Property type</span></label>
+              <select id="propertyType" name="propertyType">
+                <option value="all" data-i18n="roiTypeAll">All types</option>
+                <option value="single_family" data-i18n="roiTypeSingleFamily">Single Family</option>
+                <option value="duplex" data-i18n="roiTypeDuplex">Duplex</option>
+                <option value="multifamiliar" data-i18n="roiTypeMultifamiliar">Multifamiliar</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <div class="tool-actions">
+            <button type="submit" data-i18n="roiSubmit">Search ROI</button>
+            <button type="button" id="load-sample" class="secondary" data-i18n="roiUseSample">Use example</button>
+            <button type="reset" class="secondary">Reset</button>
+          </div>
+        </form>
+
+        <aside class="result" role="status" aria-live="polite">
+          <div class="result-grid" id="result-cards"></div>
+          <div id="result" data-i18n="roiResultsReady">Filtered opportunities updated with simulated ROI heatmap points.</div>
+        </aside>
+
+        <section class="roi-results">
+          <h2 data-i18n="roiResultsTitle">Matching properties</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="roiColId">ID</th>
+                  <th data-i18n="roiColCity">City</th>
+                  <th data-i18n="roiColZip">ZIP</th>
+                  <th data-i18n="roiColNeighborhood">Neighborhood</th>
+                  <th data-i18n="roiColType">Type</th>
+                  <th data-i18n="roiColPrice">Price</th>
+                  <th data-i18n="roiColReturn">Return</th>
+                </tr>
+              </thead>
+              <tbody id="result-rows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="roi-map-section">
+          <h2 data-i18n="roiMapHeading">ROI Heatmap</h2>
+          <p data-i18n="roiMapDescription">Neighborhood overlays represent simulated return strength for matching properties.</p>
+          <div class="roi-map-shell">
+            <div id="roi-heatmap" class="roi-map" aria-label="ROI map"></div>
+            <div id="heatmap-layer" class="heatmap-layer" aria-hidden="true"></div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/cookie-banner-component.js"></script>
+    <script src="../assets/js/consent.js"></script>
+    <script src="../assets/js/analytics-ga4.js"></script>
+    <script src="../assets/js/meta-pixel.js"></script>
+    <script src="../assets/js/analytics.js"></script>
+    <script src="../assets/js/track-events.js"></script>
+    <script src="../lang.js"></script>
+    <script src="../assets/js/tools-config.js"></script>
+    <script src="../script.js"></script>
+    <script src="tool-script.js"></script>
+  </body>
+</html>
