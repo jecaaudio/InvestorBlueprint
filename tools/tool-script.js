@@ -211,8 +211,84 @@
     rental: { monthlyRent: 2400, taxes: 220, insurance: 120, maintenance: 180, management: 190, vacancyRate: 5 },
     rent: { propertyValue: 320000, annualExpenses: 9600, targetYield: 8.5, occupancy: 95 },
     arv: { comp1: 305000, comp2: 315000, comp3: 322000, repairs: 38000 },
-    'hard-money': { loanAmount: 210000, interestRate: 11.5, points: 2, months: 9 }
+    'hard-money': { loanAmount: 210000, interestRate: 11.5, points: 2, months: 9 },
+    roi_search: { desiredReturn: 8.5, location: '33101', propertyType: 'single_family' }
   };
+
+  const roiProperties = [
+    { id: 'ROI-101', city: 'Miami', zip: '33101', neighborhood: 'Bayside', type: 'single_family', price: 385000, capRate: 7.8, cocReturn: 9.1, lat: 25.783, lng: -80.197 },
+    { id: 'ROI-102', city: 'Miami', zip: '33127', neighborhood: 'Wynwood North', type: 'multifamiliar', price: 525000, capRate: 8.9, cocReturn: 10.8, lat: 25.806, lng: -80.202 },
+    { id: 'ROI-103', city: 'Orlando', zip: '32801', neighborhood: 'Lake Eola', type: 'duplex', price: 349000, capRate: 7.1, cocReturn: 8.2, lat: 28.541, lng: -81.374 },
+    { id: 'ROI-104', city: 'Tampa', zip: '33602', neighborhood: 'River Arts', type: 'single_family', price: 312000, capRate: 6.6, cocReturn: 7.5, lat: 27.949, lng: -82.458 },
+    { id: 'ROI-105', city: 'Jacksonville', zip: '32202', neighborhood: 'Harborview', type: 'multifamiliar', price: 468000, capRate: 9.4, cocReturn: 11.2, lat: 30.325, lng: -81.658 },
+    { id: 'ROI-106', city: 'Tampa', zip: '33605', neighborhood: 'Ybor Heights', type: 'duplex', price: 298000, capRate: 8.1, cocReturn: 9.4, lat: 27.960, lng: -82.428 }
+  ];
+
+  const roiMapContainer = document.getElementById('roi-heatmap');
+  const roiHeatmapLayer = document.getElementById('heatmap-layer');
+  const roiResultRows = document.getElementById('result-rows');
+
+  const getReturnLabel = (property) => Math.max(property.capRate, property.cocReturn);
+
+  const renderRoiRows = (rows, messages) => {
+    if (!roiResultRows) return;
+    if (!rows.length) {
+      roiResultRows.innerHTML = `<tr><td colspan="7">${t('roiNoResults', 'No simulated properties matched your filters.')}</td></tr>`;
+      return;
+    }
+
+    roiResultRows.innerHTML = rows
+      .map((property) => `
+        <tr>
+          <td>${property.id}</td>
+          <td>${property.city}</td>
+          <td>${property.zip}</td>
+          <td>${property.neighborhood}</td>
+          <td>${({ single_family: messages.roiTypeSingleFamily, duplex: messages.roiTypeDuplex, multifamiliar: messages.roiTypeMultifamiliar }[property.type] || property.type)}</td>
+          <td>${money(property.price)}</td>
+          <td>${pct(getReturnLabel(property))}</td>
+        </tr>
+      `)
+      .join('');
+  };
+
+  const renderRoiHeatmap = (rows) => {
+    if (!roiHeatmapLayer) return;
+    if (!rows.length) {
+      roiHeatmapLayer.innerHTML = '';
+      return;
+    }
+
+    const maxReturn = rows.reduce((max, property) => Math.max(max, getReturnLabel(property)), 0);
+    roiHeatmapLayer.innerHTML = rows
+      .map((property) => {
+        const strength = maxReturn > 0 ? getReturnLabel(property) / maxReturn : 0;
+        const color = `hsla(${Math.max(0, 35 - strength * 35)}, 95%, 56%, ${0.35 + strength * 0.45})`;
+        const left = ((property.lng + 83.2) / 4.2) * 100;
+        const top = ((30.6 - property.lat) / 5.3) * 100;
+        return `<span class="heat-point" style="left:${left}%;top:${top}%;background:${color};">${property.neighborhood}</span>`;
+      })
+      .join('');
+  };
+
+  const initRoiMap = () => {
+    if (!roiMapContainer) return;
+    const mapUrl = 'https://www.google.com/maps?q=florida&output=embed';
+    if (!roiMapContainer.querySelector('iframe')) {
+      const iframe = document.createElement('iframe');
+      iframe.src = mapUrl;
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer-when-downgrade';
+      iframe.title = t('roiMapTitle', 'ROI heatmap preview');
+      roiMapContainer.appendChild(iframe);
+    }
+  };
+
+  if (type === 'roi_search') {
+    initRoiMap();
+    renderRoiRows(roiProperties, getMessages());
+    renderRoiHeatmap(roiProperties);
+  }
 
   if (type !== 'flip') {
     form.addEventListener('reset', () => {
@@ -220,6 +296,12 @@
         clearValidationError();
         clearFieldErrors();
         setCards([]);
+        if (type === 'roi_search') {
+          renderRoiRows(roiProperties, getMessages());
+          renderRoiHeatmap(roiProperties);
+          if (output) output.textContent = t('roiResultsReady', 'Filtered opportunities updated with simulated ROI heatmap points.');
+          return;
+        }
         if (output) output.textContent = t('resultPrompt', 'Enter your numbers and click calculate.');
       }, 0);
     });
@@ -427,6 +509,39 @@
       output.textContent = t('financingEstimateCalculated', 'Financing estimate calculated.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'financing_estimate' });
+      }
+      return;
+    }
+
+    if (type === 'roi_search') {
+      const desiredReturn = num('desiredReturn');
+      const rawLocation = String(values.location || '').trim().toLowerCase();
+      const propertyType = String(values.propertyType || '').trim();
+
+      const filteredRows = roiProperties.filter((property) => {
+        const hitsReturn = getReturnLabel(property) >= desiredReturn;
+        const hitsLocation = !rawLocation || property.city.toLowerCase().includes(rawLocation) || property.zip.includes(rawLocation);
+        const hitsType = !propertyType || propertyType === 'all' || property.type === propertyType;
+        return hitsReturn && hitsLocation && hitsType;
+      });
+
+      renderRoiRows(filteredRows, messages);
+      renderRoiHeatmap(filteredRows);
+
+      setCards([
+        { label: t('roiMatches', 'Matching properties'), value: String(filteredRows.length) },
+        { label: t('roiDesiredReturn', 'Desired return'), value: pct(desiredReturn) },
+        { label: t('roiAverageReturn', 'Avg. return'), value: pct(filteredRows.reduce((sum, property) => sum + getReturnLabel(property), 0) / Math.max(filteredRows.length, 1)) }
+      ]);
+
+      if (output) {
+        output.textContent = filteredRows.length
+          ? t('roiResultsReady', 'Filtered opportunities updated with simulated ROI heatmap points.')
+          : t('roiNoResults', 'No simulated properties matched your filters.');
+      }
+
+      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+        window.IBAnalytics.trackCalcSuccess(type, { result: filteredRows.length ? 'matches_found' : 'no_matches' });
       }
     }
   });
