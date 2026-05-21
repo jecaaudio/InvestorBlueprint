@@ -9,7 +9,77 @@
     '/InvestorBlueprint/assets/i18n/'
   ];
 
+  const FALLBACK_MESSAGES = {
+    en: {
+      requiredField: 'This field is required.',
+      cannotBeNegative: 'This value cannot be negative.',
+      outOfRange: 'Please enter a value within the allowed range.',
+      monthlyCashFlow: 'Monthly cash flow',
+      annualCashFlow: 'Annual cash flow',
+      estimatedArv: 'Estimated ARV',
+      maxOffer: 'Max offer',
+      totalFinancingCost: 'Total financing cost',
+      monthlyInterestCarry: 'Monthly interest carry',
+      profit: 'Profit',
+      mao: 'MAO',
+      cashToClose: 'Cash to close',
+      totalCosts: 'Total costs',
+      roi: 'ROI',
+      breakEven: 'Break-even',
+      dealScore: 'Deal score',
+      costBreakdown: 'Cost breakdown',
+      section: 'Section',
+      total: 'Total',
+      acquisition: 'Acquisition',
+      rehabContingency: 'Rehab + contingency',
+      holding: 'Holding',
+      selling: 'Selling',
+      financing: 'Financing',
+      sensitivityResults: 'Sensitivity results',
+      scenario: 'Scenario',
+      low: 'Low',
+      base: 'Base',
+      high: 'High',
+      proHint: 'Pro mode enabled: includes financing stack, MAO strategy checks, risk buffer and sensitivity table.',
+      freeHint: 'Free mode: quick estimate with purchase, rehab, holding and sale costs only.'
+    },
+    es: {
+      requiredField: 'Este campo es obligatorio.',
+      cannotBeNegative: 'Este valor no puede ser negativo.',
+      outOfRange: 'Ingresa un valor dentro del rango permitido.',
+      monthlyCashFlow: 'Flujo mensual',
+      annualCashFlow: 'Flujo anual',
+      estimatedArv: 'ARV estimado',
+      maxOffer: 'Oferta maxima',
+      totalFinancingCost: 'Costo total de financiamiento',
+      monthlyInterestCarry: 'Interes mensual',
+      profit: 'Ganancia',
+      mao: 'MAO',
+      cashToClose: 'Efectivo al cierre',
+      totalCosts: 'Costos totales',
+      roi: 'ROI',
+      breakEven: 'Punto de equilibrio',
+      dealScore: 'Calificacion del deal',
+      costBreakdown: 'Desglose de costos',
+      section: 'Seccion',
+      total: 'Total',
+      acquisition: 'Adquisicion',
+      rehabContingency: 'Rehab + contingencia',
+      holding: 'Holding',
+      selling: 'Venta',
+      financing: 'Financiamiento',
+      sensitivityResults: 'Resultados de sensibilidad',
+      scenario: 'Escenario',
+      low: 'Bajo',
+      base: 'Base',
+      high: 'Alto',
+      proHint: 'Modo Pro activo: incluye stack de financiamiento, checks de MAO, buffer de riesgo y tabla de sensibilidad.',
+      freeHint: 'Modo gratis: estimacion rapida con compra, rehab, holding y costos de venta.'
+    }
+  };
+
   const normalizeLang = (lang) => (SUPPORTED_LANGS.has(lang) ? lang : DEFAULT_LANG);
+  const withFallbacks = (lang, messages) => ({ ...(FALLBACK_MESSAGES[lang] || {}), ...(messages || {}) });
 
   const getPreferredLanguage = () => {
     const stored = localStorage.getItem('preferredLanguage');
@@ -33,8 +103,8 @@
     }
 
     if (!messages) throw new Error(`Unable to load language file: ${lang}`);
-    CACHE[lang] = messages;
-    return messages;
+    CACHE[lang] = withFallbacks(lang, messages);
+    return CACHE[lang];
   };
 
   const applyTranslations = (messages) => {
@@ -61,7 +131,7 @@
     window.translations = {
       ...window.translations,
       [nextLang]: messages,
-      [DEFAULT_LANG]: CACHE[DEFAULT_LANG] || window.translations?.[DEFAULT_LANG] || {}
+      [DEFAULT_LANG]: CACHE[DEFAULT_LANG] || window.translations?.[DEFAULT_LANG] || FALLBACK_MESSAGES[DEFAULT_LANG]
     };
 
     document.documentElement.lang = nextLang;
@@ -76,7 +146,7 @@
     getPreferredLanguage,
     getCurrentMessages: () => {
       const lang = normalizeLang(document.documentElement.lang);
-      return CACHE[lang] || window.translations?.[lang] || {};
+      return CACHE[lang] || window.translations?.[lang] || FALLBACK_MESSAGES[lang] || {};
     },
     t: (key, fallback = '') => {
       const messages = window.IBI18n.getCurrentMessages();
