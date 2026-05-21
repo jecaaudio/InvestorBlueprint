@@ -2,12 +2,13 @@ import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
 
 const baseUrl = process.env.AXE_BASE_URL || 'http://127.0.0.1:4173';
+const siteBasePath = (process.env.AXE_SITE_BASE_PATH || '/InvestorBlueprint').replace(/\/$/, '');
 const pages = [
-  '/InvestorBlueprint/index.html',
-  '/InvestorBlueprint/pricing.html',
-  '/InvestorBlueprint/tools/rental-cash-flow.html',
-  '/InvestorBlueprint/tools/rent-calculator.html',
-  '/InvestorBlueprint/tools/flip-calculator.html'
+  '/index.html',
+  '/pricing.html',
+  '/tools/rental-cash-flow.html',
+  '/tools/rent-calculator.html',
+  '/tools/flip-calculator.html'
 ];
 
 const browser = await chromium.launch({ headless: true });
@@ -17,7 +18,7 @@ let hasViolations = false;
 
 for (const pagePath of pages) {
   const page = await context.newPage();
-  const url = `${baseUrl}${pagePath}`;
+  const url = `${baseUrl}${siteBasePath}${pagePath}`;
   await page.goto(url, { waitUntil: 'networkidle' });
   const results = await new AxeBuilder({ page }).analyze();
 
