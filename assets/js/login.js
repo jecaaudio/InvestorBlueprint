@@ -1,11 +1,6 @@
 (function () {
-  const ACCESS_KEY = 'ib_role';
-  const ACCESS_VALUE = 'TEAM_ACCESS';
   const WAITLIST_KEY = 'ib_waitlist_email';
-  const FALLBACK_PATH = '/InvestorBlueprint/index.html';
-  const TEAM_ACCESS_CODE = 'INVESTOR_TEAM_2026';
-  const TEAM_DOMAIN = '@tudominio.com';
-  const TEAM_ALLOWLIST = ['team@investorblueprint.local', 'admin@investorblueprint.local'];
+  const FALLBACK_PATH = 'index.html';
 
   const form = document.getElementById('access-form');
   const emailInput = document.getElementById('access-email');
@@ -19,19 +14,12 @@
   const resolveNextPath = () => {
     const url = new URL(window.location.href);
     const returnTo = url.searchParams.get('returnTo');
-    if (returnTo && returnTo.startsWith('/')) {
+    if (returnTo && returnTo.startsWith('/') && !returnTo.startsWith('//')) {
       return returnTo;
     }
 
     return FALLBACK_PATH;
   };
-
-  const hasInternalAccess = (email) => email.endsWith(TEAM_DOMAIN) || TEAM_ALLOWLIST.includes(email);
-
-  if (localStorage.getItem(ACCESS_KEY) === ACCESS_VALUE) {
-    window.location.replace(resolveNextPath());
-    return;
-  }
 
   const showError = (message) => {
     error.hidden = false;
@@ -51,7 +39,6 @@
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     const email = emailInput.value.trim().toLowerCase();
-    const teamCode = teamCodeInput.value.trim();
 
     if (!email || !emailInput.checkValidity()) {
       showError('Please enter a valid email address.');
@@ -60,13 +47,7 @@
 
     clearError();
     localStorage.setItem(WAITLIST_KEY, email);
-
-    if (teamCode === TEAM_ACCESS_CODE || hasInternalAccess(email)) {
-      localStorage.setItem(ACCESS_KEY, ACCESS_VALUE);
-      window.location.href = resolveNextPath();
-      return;
-    }
-
-    window.alert('Access requested. We have saved your email and will contact you for pilot access.');
+    window.alert('Access requested. We saved your email and will contact you with beta updates.');
+    window.location.href = resolveNextPath();
   });
 })();
