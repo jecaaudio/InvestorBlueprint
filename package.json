@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "qa:axe": "node scripts/axe-check.mjs",
-    "qa:lighthouse": "LHCI_CHROME_PATH=\"$(node scripts/get-chrome.mjs)\" lhci autorun --config=./lighthouserc.json"
+    "qa:lighthouse": "node scripts/run-lighthouse.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
