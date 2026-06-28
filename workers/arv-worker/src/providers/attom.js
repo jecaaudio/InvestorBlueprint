@@ -11,5 +11,9 @@ export async function getSoldComps() {
 
 // TODO:
 // 1) Implement fetch calls to ATTOM endpoints.
+//    The `address` arg is already trimmed, length-capped, and stripped of
+//    control characters by index.js — still pass it through encodeURIComponent
+//    (or the SDK's param builder) when building the request URL/query string,
+//    never via string concatenation.
 // 2) Map endpoint fields to normalized shape expected by core modules.
 // 3) Add robust pagination/filtering by radius + sold date windows.

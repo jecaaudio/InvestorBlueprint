@@ -4,8 +4,24 @@ import { calculateArv } from "./core/arv.js";
 import * as dummyProvider from "./providers/dummy.js";
 import * as attomProvider from "./providers/attom.js";
 
+// Best-effort only: Cloudflare Workers spin up fresh isolates per request/region,
+// so neither this cache nor the rate limiter below is shared or guaranteed to persist.
+// For real cross-isolate guarantees, back these with KV or a Durable Object.
 const memoryCache = new Map();
-const CACHE_TTL_MS = 60 * 1000; // short-lived cache for local worker isolates
+const CACHE_TTL_MS = 60 * 1000;
+
+const MAX_BODY_BYTES = 10 * 1024; // /api/arv requests are small JSON payloads
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 30;
+const rateLimitHits = new Map();
+
+function isRateLimited(key) {
+  const now = Date.now();
+  const hits = (rateLimitHits.get(key) || []).filter((ts) => now - ts < RATE_LIMIT_WINDOW_MS);
+  hits.push(now);
+  rateLimitHits.set(key, hits);
+  return hits.length > RATE_LIMIT_MAX_REQUESTS;
+}
 
 function json(data, status = 200, origin = "") {
   const headers = { "Content-Type": "application/json" };
@@ -72,16 +88,32 @@ export default {
         return errorResponse("", "FORBIDDEN_ORIGIN", "Origin not allowed", 403);
       }
 
+      if (isRateLimited(allowedOrigin)) {
+        return errorResponse(allowedOrigin, "RATE_LIMITED", "Too many requests, try again shortly.", 429);
+      }
+
+      const contentLength = Number(request.headers.get("Content-Length") || 0);
+      if (contentLength > MAX_BODY_BYTES) {
+        return errorResponse(allowedOrigin, "PAYLOAD_TOO_LARGE", "Request body is too large.", 413);
+      }
+
       let body;
       try {
-        body = await request.json();
+        const rawBody = await request.text();
+        if (rawBody.length > MAX_BODY_BYTES) {
+          return errorResponse(allowedOrigin, "PAYLOAD_TOO_LARGE", "Request body is too large.", 413);
+        }
+        body = JSON.parse(rawBody);
       } catch {
         return errorResponse(allowedOrigin, "INVALID_JSON", "Body must be valid JSON", 400);
       }
 
-      const address = (body?.address || "").trim();
+      const address = (body?.address || "").trim().replace(/[\x00-\x1f\x7f]/g, "");
       if (!address) {
         return errorResponse(allowedOrigin, "ADDRESS_REQUIRED", "Field `address` is required", 400);
+      }
+      if (address.length > 200) {
+        return errorResponse(allowedOrigin, "ADDRESS_TOO_LONG", "Field `address` exceeds 200 characters", 400);
       }
 
       const options = normalizeOptions(body.options || {});
