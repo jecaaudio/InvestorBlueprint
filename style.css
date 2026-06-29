@@ -541,6 +541,28 @@ main {
   justify-content: center;
 }
 
+.auth-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 0.6rem;
+  cursor: pointer;
+}
+
+.auth-tab.is-active {
+  background: var(--primary);
+  color: #0f172a;
+  border-color: var(--primary);
+}
+
 .auth-form input:focus-visible,
 .auth-form button:focus-visible,
 .auth-note a:focus-visible {

@@ -29,32 +29,44 @@
     </header>
 
     <main>
+      <section id="account-panel" class="section auth-layout auth-layout-single" hidden>
+        <article class="card auth-card">
+          <h2>My account</h2>
+          <p>Signed in as <strong id="account-email"></strong></p>
+          <p id="subscription-status"></p>
+          <p id="subscription-detail"></p>
+          <h3>Saved calculations</h3>
+          <ul id="saved-calculations-list"></ul>
+          <button id="logout-btn" class="btn btn-secondary" type="button">Log out</button>
+        </article>
+      </section>
+
       <section class="section auth-layout auth-layout-single">
         <article class="card auth-card">
-          <h2>Request Access</h2>
-          <p>Demo: no pedimos contraseñas ni pagos. Solo registramos tu email para darte acceso.</p>
-          <form id="access-form" class="auth-form" novalidate>
-            <label for="access-email">Email</label>
-            <input
-              id="access-email"
-              type="email"
-              name="email"
-              required
-              autocomplete="email"
-              aria-describedby="access-email-error"
-            />
-            <label for="access-team-code">Team access code (optional)</label>
-            <input
-              id="access-team-code"
-              type="text"
-              name="teamCode"
-              autocomplete="one-time-code"
-              inputmode="text"
-              spellcheck="false"
-            />
-            <div id="access-email-error" role="alert" hidden></div>
-            <button class="btn btn-primary" type="submit" data-cta-click="Request Access">Request Access</button>
+          <div class="auth-tabs" role="tablist">
+            <button id="tab-register" class="auth-tab is-active" type="button" role="tab" aria-selected="true">Create account</button>
+            <button id="tab-login" class="auth-tab" type="button" role="tab" aria-selected="false">Log in</button>
+          </div>
+
+          <div id="auth-message" role="status"></div>
+
+          <form id="register-form" class="auth-form" novalidate>
+            <label for="register-email">Email</label>
+            <input id="register-email" type="email" name="email" required autocomplete="email" aria-describedby="register-email-error" />
+            <label for="register-password">Password</label>
+            <input id="register-password" type="password" name="password" required minlength="8" autocomplete="new-password" />
+            <div id="register-email-error" role="alert" hidden></div>
+            <button class="btn btn-primary" type="submit" data-cta-click="Create Account">Create account</button>
           </form>
+
+          <form id="login-form" class="auth-form" hidden novalidate>
+            <label for="login-email">Email</label>
+            <input id="login-email" type="email" name="email" required autocomplete="email" />
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password" name="password" required autocomplete="current-password" />
+            <button class="btn btn-primary" type="submit" data-cta-click="Login">Log in</button>
+          </form>
+
           <p class="auth-note">
             By continuing, you agree to our <a href="privacy.html">Privacy Policy</a>.
           </p>
@@ -70,6 +82,6 @@
     <script src="assets/js/analytics.js"></script>
     <script src="lang.js"></script>
     <script src="script.js"></script>
-    <script src="assets/js/login.js"></script>
+    <script src="auth.js"></script>
   </body>
 </html>
