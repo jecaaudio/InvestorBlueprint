@@ -1,77 +1,88 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Request Access | InvestorBlueprint</title>
-    <meta name="description" content="Request early access to InvestorBlueprint tools and get notified when new real estate calculators are available." />
-    <link rel="canonical" href="https://jecaaudio.github.io/InvestorBlueprint/login.html" />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/css/cookie-banner.css" />
-    <link rel="stylesheet" href="assets/css/site-theme.css?v=20261018" />
-  </head>
-  <body>
-    <header class="navbar">
-      <div class="brand-menu has-primary-nav">
-        <a class="logo home-link" href="index.html">InvestorBlueprint</a>
-        <div class="brand-dropdown" role="menu" aria-label="Quick navigation">
-          <a href="index.html#tools" data-i18n="navTools">Tools</a>
-          <a href="index.html#learn" data-i18n="navLearn">Learn</a>
-          <a href="pricing.html" data-i18n="navPricing" data-cta-click="Pricing">Pricing</a>
-          <a href="login.html" data-i18n="navLogin" data-auth-link>Login</a>
-        </div>
-      </div>
-      <nav id="primary-nav" class="is-open">
-        <a href="index.html#tools" data-i18n="navTools">Tools</a>
-        <a href="index.html#learn" data-i18n="navLearn">Learn</a>
-        <a href="pricing.html" data-i18n="navPricing" data-cta-click="Pricing">Pricing</a>
-        <a href="login.html" data-i18n="navLogin" data-auth-link>Login</a>
-      </nav>
-    </header>
-
-    <main>
-      <section class="section auth-layout auth-layout-single">
-        <article class="card auth-card">
-          <h2>Request Access</h2>
-          <p>Demo: no pedimos contraseñas ni pagos. Solo registramos tu email para darte acceso.</p>
-          <form id="access-form" class="auth-form" novalidate>
-            <label for="access-email">Email</label>
-            <input
-              id="access-email"
-              type="email"
-              name="email"
-              required
-              autocomplete="email"
-              aria-describedby="access-email-error"
-            />
-            <label for="access-team-code">Team access code (optional)</label>
-            <input
-              id="access-team-code"
-              type="text"
-              name="teamCode"
-              autocomplete="one-time-code"
-              inputmode="text"
-              spellcheck="false"
-            />
-            <div id="access-email-error" role="alert" hidden></div>
-            <button class="btn btn-primary" type="submit" data-cta-click="Request Access">Request Access</button>
-          </form>
-          <p class="auth-note">
-            By continuing, you agree to our <a href="privacy.html">Privacy Policy</a>.
-          </p>
-        </article>
-      </section>
-    </main>
-
-    <script src="assets/js/config.js"></script>
-    <script src="assets/js/cookie-banner-component.js"></script>
-    <script src="assets/js/consent.js"></script>
-    <script src="assets/js/analytics-ga4.js"></script>
-    <script src="assets/js/meta-pixel.js"></script>
-    <script src="assets/js/analytics.js"></script>
-    <script src="lang.js"></script>
-    <script src="script.js"></script>
-    <script src="assets/js/login.js"></script>
-    <script src="assets/js/site-theme.js?v=20261018"></script>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Acceso y registro | InvestorBlueprint</title>
+<meta name="description" content="Solicita acceso, inicia sesión y revisa tu estado en InvestorBlueprint.">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="assets/css/site-theme.css?v=20261018">
+<link rel="stylesheet" href="assets/css/member-access.css">
+<link rel="stylesheet" href="assets/css/cookie-banner.css">
+</head>
+<body>
+<header class="navbar">
+ <div class="brand-menu"><a class="logo home-link" href="index.html">InvestorBlueprint</a></div>
+ <nav id="primary-nav"><a href="index.html" data-es="Inicio" data-en="Home">Inicio</a><a href="index.html#tools" data-es="Herramientas" data-en="Tools">Herramientas</a><a href="login.html" data-es="Mi cuenta" data-en="My account">Mi cuenta</a></nav>
+ <div class="lang-switcher" role="group" aria-label="Language">
+  <button class="lang-option" type="button" data-lang="es">ES</button>
+  <button class="lang-option" type="button" data-lang="en">EN</button>
+ </div>
+</header>
+<main>
+<section class="access-hero">
+ <p class="eyebrow">InvestorBlueprint · Members</p>
+ <h1 data-es="Tu acceso a las herramientas inmobiliarias" data-en="Your real estate toolkit starts here">Tu acceso a las herramientas inmobiliarias</h1>
+ <p data-es="Crea tu cuenta, confirma tu correo y solicita autorización. El administrador decide quién puede utilizar la plataforma." data-en="Create an account, verify your email, and request authorization. The administrator approves who can use the platform.">Crea tu cuenta, confirma tu correo y solicita autorización. El administrador decide quién puede utilizar la plataforma.</p>
+</section>
+<div class="access-grid">
+ <section class="card access-card" id="member-login">
+  <div class="access-tabs" role="tablist" aria-label="Access options">
+   <button id="tab-register" type="button" aria-selected="true" data-es="Solicitar acceso" data-en="Request access">Solicitar acceso</button>
+   <button id="tab-login" type="button" aria-selected="false" data-es="Iniciar sesión" data-en="Sign in">Iniciar sesión</button>
+   <button id="tab-recover" type="button" aria-selected="false" data-es="Recuperar contraseña" data-en="Reset password">Recuperar contraseña</button>
+  </div>
+  <div id="portal-message" class="access-message" role="status" aria-live="polite" hidden></div>
+  <form id="registration-form" class="access-form">
+   <label><span data-es="Nombre" data-en="Name">Nombre</span><input id="signup-name" name="name" autocomplete="name" maxlength="120" required></label>
+   <label><span data-es="Correo electrónico" data-en="Email">Correo electrónico</span><input id="signup-email" type="email" name="email" autocomplete="email" required></label>
+   <label><span data-es="Crear contraseña (12 caracteres mínimo)" data-en="Create password (12 characters minimum)">Crear contraseña (12 caracteres mínimo)</span><input id="signup-password" type="password" name="password" autocomplete="new-password" minlength="12" required></label>
+   <button class="btn btn-primary" type="submit" data-es="Crear solicitud" data-en="Submit request">Crear solicitud</button>
+  </form>
+  <form id="login-form" class="access-form" hidden>
+   <label><span data-es="Correo electrónico" data-en="Email">Correo electrónico</span><input id="signin-email" type="email" autocomplete="username" required></label>
+   <label><span data-es="Contraseña" data-en="Password">Contraseña</span><input id="signin-password" type="password" autocomplete="current-password" required></label>
+   <button class="btn btn-primary" type="submit" data-es="Entrar" data-en="Sign in">Entrar</button>
+  </form>
+  <form id="recover-form" class="access-form" hidden>
+   <label><span data-es="Correo de recuperación" data-en="Recovery email">Correo de recuperación</span><input id="recover-email" type="email" autocomplete="email" required></label>
+   <button class="btn btn-primary" type="submit" data-es="Enviar recuperación" data-en="Send recovery email">Enviar recuperación</button>
+  </form>
+  <form id="new-password-form" class="access-form" hidden>
+   <label><span data-es="Nueva contraseña" data-en="New password">Nueva contraseña</span><input id="new-password" type="password" autocomplete="new-password" minlength="12" required></label>
+   <button type="submit" class="btn btn-primary" data-es="Actualizar contraseña" data-en="Update password">Actualizar contraseña</button>
+  </form>
+ </section>
+ <aside class="card access-card">
+  <h2 data-es="¿Cómo funciona el acceso?" data-en="How does access work?">¿Cómo funciona el acceso?</h2>
+  <ol class="access-benefits">
+   <li data-es="Te registras con correo y contraseña." data-en="Create your account using email and password.">Te registras con correo y contraseña.</li>
+   <li data-es="Confirmas tu dirección de correo electrónico." data-en="Confirm your email address.">Confirmas tu dirección de correo electrónico.</li>
+   <li data-es="El administrador revisa y aprueba tu solicitud." data-en="The administrator reviews and approves your request.">El administrador revisa y aprueba tu solicitud.</li>
+   <li data-es="Una vez aprobada y habilitado el entorno protegido, accedes a las herramientas." data-en="Once approved and the protected environment is enabled, you can access the tools.">Una vez aprobada y habilitado el entorno protegido, accedes a las herramientas.</li>
+  </ol>
+  <div id="account-summary" hidden>
+   <hr>
+   <h2 data-es="Mi cuenta" data-en="My account">Mi cuenta</h2>
+   <p id="member-email"></p>
+   <div class="access-status" id="member-status"></div>
+   <p id="member-detail"></p>
+   <a href="admin.html" id="admin-link" class="btn btn-primary" hidden data-es="Panel de administración" data-en="Admin dashboard">Panel de administración</a>
+   <button id="signout-button" class="btn" type="button" hidden data-es="Cerrar sesión" data-en="Sign out">Cerrar sesión</button>
+  </div>
+  <p class="access-note" data-es="Tus datos de acceso los valida el proveedor de autenticación. La contraseña no se guarda en esta página ni en GitHub." data-en="Your login credentials are verified by the authentication provider. Passwords are never stored in this page or in GitHub.">Tus datos de acceso los valida el proveedor de autenticación. La contraseña no se guarda en esta página ni en GitHub.</p>
+  <p><a href="privacy.html" data-es="Política de privacidad" data-en="Privacy policy">Política de privacidad</a></p>
+ </aside>
+</div>
+</main>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/cookie-banner-component.js"></script>
+<script src="assets/js/consent.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/js/member-auth-config.js"></script>
+<script src="assets/js/member-access.js"></script>
+<script src="lang.js"></script>
+<script src="assets/js/member-i18n.js"></script>
+<script src="assets/js/site-theme.js?v=20261018"></script>
+</body>
 </html>
