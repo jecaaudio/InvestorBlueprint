@@ -193,10 +193,10 @@ const ids=['state','county','city','propertyType','price','assumed','mortgage1',
 const currencyIds=new Set(["price","assumed","mortgage1","mortgage2","otherDebt","creditDollar","settlement","admin","propertyTax","recording","misc","stateTaxOverride","localTax","scenarioStep"]);
 const money=x=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(x);
 function parseCurrency(value){
- let s=String(value??'').trim().replace(/[^\\d,.\\-]/g,'');
+ let s=String(value??'').trim().replace(/[^\d,.\-]/g,'');
  if(!s)return 0;
  if(s.includes(',')&&s.includes('.')){
-  if(s.lastIndexOf(',')>s.lastIndexOf('.'))s=s.replace(/\\./g,'').replace(',', '.');
+  if(s.lastIndexOf(',')>s.lastIndexOf('.'))s=s.replace(/\./g,'').replace(',', '.');
   else s=s.replace(/,/g,'');
  }else if(s.includes(',')){
   const bits=s.split(',');
