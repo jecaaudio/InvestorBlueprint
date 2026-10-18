@@ -45,6 +45,8 @@
         $('tab-'+(panel==='registration'?'register':panel))?.setAttribute('aria-selected',String(panel===name));
       }
     }
+    const entryParams=new URLSearchParams(window.location.search);
+    if(entryParams.has('returnTo')||entryParams.get('reason')==='login') showPanel('login');
     async function updateAccount(){
       try{
         const profile=await readProfile();
