@@ -14,6 +14,11 @@
 
   const getMessages = () => window.IBI18n?.getCurrentMessages?.() || {};
 
+  const getLocalizedName = (tool) => {
+    const lang = getCurrentLanguage();
+    return (lang === 'es' ? tool.name_es : tool.name_en) || tool.name || '';
+  };
+
   const getLocalizedDescription = (tool) => {
     const lang = getCurrentLanguage();
     if (lang === 'es') {
@@ -65,7 +70,7 @@
     badge.textContent = messages.betaFreeLabel || 'BETA (FREE)';
 
     const title = document.createElement('h3');
-    title.textContent = tool.name;
+    title.textContent = getLocalizedName(tool);
 
     const description = document.createElement('p');
     description.textContent = getLocalizedDescription(tool);
@@ -120,7 +125,7 @@
 
     const title = document.querySelector('[data-tool-title]');
     if (title) {
-      title.textContent = `${tool.name} — ${messages.betaFreeLabel || 'BETA (FREE)'}`;
+      title.textContent = `${getLocalizedName(tool)} — ${messages.betaFreeLabel || 'BETA (FREE)'}`;
     }
 
     const description = document.querySelector('[data-tool-description]');
