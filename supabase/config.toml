@@ -1,0 +1,2 @@
+[functions.member-access-check]
+verify_jwt = true
