@@ -18,7 +18,9 @@
     window.location.replace(loginUrl.href);
   };
 
+  let permanentlyLocked = false;
   const lock = () => {
+    permanentlyLocked = true;
     root.classList.add("ib-access-denied");
     const show = () => {
       if (!document.body || root.classList.contains("ib-access-granted")) return;
@@ -58,7 +60,7 @@
       if (response.status === 403) { redirect("approval"); return; }
       if (!response.ok) { lock(); return; }
       const result = await response.json();
-      if (result.authorized !== true || result.status !== "approved") { lock(); return; }
+      if (result.authorized !== true || result.status !== "approved" || permanentlyLocked) { lock(); return; }
       root.classList.remove("ib-access-denied");
       root.classList.add("ib-access-granted");
       window.IB_TOOL_AUTHORIZED = true;
