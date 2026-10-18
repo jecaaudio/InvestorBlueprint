@@ -25,7 +25,7 @@ function response(status: number, data: Record<string, unknown>) {
   });
 }
 Deno.serve(async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") return response(204, {});
+  if (req.method === "OPTIONS") return new Response(null, {status: 204, headers: cors});
   if (req.method !== "GET") return response(405, { error: "method_not_allowed" });
   const bearer = req.headers.get("Authorization") || "";
   if (!/^Bearer\s+\S+$/.test(bearer)) return response(401, { error: "authentication_required" });
