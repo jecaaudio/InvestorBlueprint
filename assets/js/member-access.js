@@ -125,7 +125,7 @@
     $('admin-root').hidden=false;
     $('admin-denied').hidden=true;
     $('admin-identity').textContent=profile.email;
-    $('admin-logout')?.addEventListener('click',async()=>{await client.auth.signOut();location.href='login.html'});
+    $('admin-logout')?.addEventListener('click',async()=>{await client.auth.signOut();location.href=(document.body.dataset.memberLoginPath||'login.html')});
     const list=$('member-list'),filter=$('member-filter'),reload=$('members-refresh');
     const allowed=['approved','rejected','suspended','pending'];
     async function loadMembers(){
