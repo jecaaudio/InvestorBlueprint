@@ -54,5 +54,15 @@
     "status": "beta_free",
     "description_es": "Filtra propiedades simuladas por retorno objetivo, ubicación y tipo de activo.",
     "description_en": "Filter simulated properties by target return, location, and asset type."
+  },
+  {
+    "id": "seller_net",
+    "name": "Seller Net Calculator",
+    "name_es": "Calculadora de Venta",
+    "name_en": "Seller Net Calculator",
+    "url": "calculadora-venta/",
+    "status": "beta_free",
+    "description_es": "Calcula los gastos de cierre y el dinero neto del vendedor. Selecciona estado y condado y consulta las fuentes legales disponibles.",
+    "description_en": "Calculate closing costs and seller net proceeds. Choose a state and county and review available legal sources."
   }
 ]
