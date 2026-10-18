@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Administración de usuarios | InvestorBlueprint</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="assets/css/site-theme.css?v=20261018">
+<link rel="stylesheet" href="assets/css/member-access.css">
+</head>
+<body>
+<header class="navbar">
+ <div class="brand-menu"><a class="logo home-link" href="index.html">InvestorBlueprint</a></div>
+ <nav id="primary-nav"><a href="index.html" data-es="Inicio" data-en="Home">Inicio</a><a href="login.html" data-es="Mi cuenta" data-en="My account">Mi cuenta</a></nav>
+ <div class="lang-switcher" role="group" aria-label="Language">
+  <button class="lang-option" type="button" data-lang="es">ES</button>
+  <button class="lang-option" type="button" data-lang="en">EN</button>
+ </div>
+</header>
+<main>
+ <section class="access-hero">
+  <p class="eyebrow">InvestorBlueprint · Admin</p>
+  <h1 data-es="Panel de administración" data-en="Administrator dashboard">Panel de administración</h1>
+  <p data-es="Aprueba, rechaza o suspende las cuentas que solicitan acceso. Todas las decisiones quedan registradas." data-en="Approve, decline or suspend member requests. All decisions are recorded.">Aprueba, rechaza o suspende las cuentas que solicitan acceso. Todas las decisiones quedan registradas.</p>
+ </section>
+ <div id="admin-denied" class="card access-card">
+  <h2 data-es="Acceso restringido" data-en="Restricted access">Acceso restringido</h2>
+  <p data-es="Solo una cuenta administradora, autenticada y aprobada, puede utilizar este panel." data-en="Only an authenticated, approved administrator account can access this dashboard.">Solo una cuenta administradora, autenticada y aprobada, puede utilizar este panel.</p>
+  <a href="login.html" class="btn btn-primary" data-es="Iniciar sesión" data-en="Sign in">Iniciar sesión</a>
+ </div>
+ <div id="admin-root" class="card access-card" hidden>
+  <div class="admin-controls">
+   <div>
+    <strong id="admin-identity"></strong>
+    <p class="access-note" data-es="Administración de solicitudes" data-en="Access request management">Administración de solicitudes</p>
+   </div>
+   <button class="btn" id="admin-logout" type="button" data-es="Cerrar sesión" data-en="Sign out">Cerrar sesión</button>
+  </div>
+  <div id="admin-message" class="access-message" role="status" hidden></div>
+  <div class="admin-controls">
+   <label><span data-es="Filtrar solicitudes" data-en="Filter requests">Filtrar solicitudes</span>
+    <select id="member-filter">
+     <option value="all" data-es="Todas" data-en="All">Todas</option>
+     <option value="pending" data-es="Pendientes" data-en="Pending">Pendientes</option>
+     <option value="approved" data-es="Aprobadas" data-en="Approved">Aprobadas</option>
+     <option value="rejected" data-es="Rechazadas" data-en="Rejected">Rechazadas</option>
+     <option value="suspended" data-es="Suspendidas" data-en="Suspended">Suspendidas</option>
+    </select>
+   </label>
+   <span><span data-es="Cuentas visibles:" data-en="Visible accounts:">Cuentas visibles:</span> <strong id="member-total">0</strong></span>
+   <button type="button" class="btn" id="members-refresh" data-es="Actualizar" data-en="Refresh">Actualizar</button>
+  </div>
+  <div id="member-list" class="member-list" aria-live="polite"></div>
+  <p class="access-note" data-es="El administrador puede aprobar el acceso, pero la autorización de las calculadoras se activará solo cuando las herramientas estén alojadas en una ruta protegida por el servidor." data-en="Approvals are recorded now; calculator authorization will only become effective once the tools are served behind a server-side access gate.">El administrador puede aprobar el acceso, pero la autorización de las calculadoras se activará solo cuando las herramientas estén alojadas en una ruta protegida por el servidor.</p>
+ </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/js/member-auth-config.js"></script>
+<script src="assets/js/member-access.js"></script>
+<script src="lang.js"></script>
+<script src="assets/js/member-i18n.js"></script>
+<script src="assets/js/site-theme.js?v=20261018"></script>
+</body>
+</html>
