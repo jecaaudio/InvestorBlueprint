@@ -55,3 +55,15 @@ This feature lives on \`feature/secure-member-access-20261018\` and is **not pro
 
 ## Status
 The database migration, UX, and admin-review UI are staged in GitHub; they are not connected to a live Supabase project. No live users, role grants, password, billing, or legitimate route restriction is claimed yet.
+
+## Verified live environment — 2026-10-18
+
+- Supabase project: `ppeyoovykxomxinumibk` (JECA Free, us-east-2)
+- Owner's verified account: Jansel2913@gmail.com; role `admin`, status `approved` (verified after tests)
+- Migration: `init_investorblueprint_member_access`; RLS on all three tables
+- RLS checks: approved administrator sees own profile; a different simulated UUID sees zero rows; anonymous role receives permission denied. Simulated unauthorized update returned zero rows. Tests were performed inside transactions with rollback.
+- Live Supabase Edge Function: `member-access-check` (version 1, active, `verify_jwt=true`). This endpoint verifies a signed-in user and reads current approval from the RLS-protected table. Source is in `supabase/functions/member-access-check/index.ts`.
+- **No calculator routes have been protected yet.** Publishing a login on GitHub Pages alone will not restrict static tools.
+- Authentication configuration in Supabase (redirect allowlist, SMTP for customer signups, server-side minimum password policy) still needs dashboard setup and real mobile QA.
+- Supabase security advisor reports `auth_leaked_password_protection`: leaked password protection is **only available on Pro and above**, not JECA Free. Do not claim this safeguard is enabled. User must explicitly accept plan charges before upgrade.
+- Do not merge the draft PR or block current tool URLs until backend-verified protected-host migration and session/revocation tests are complete.
