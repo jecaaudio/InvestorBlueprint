@@ -20,7 +20,7 @@
   const statusLabel=status=>({pending:t('Pendiente de aprobación','Awaiting approval'),approved:t('Acceso aprobado','Access approved'),rejected:t('Solicitud rechazada','Request declined'),suspended:t('Acceso suspendido','Access suspended')}[status]||status);
   const requireBackend=()=>{
     if(client)return true;
-    say('portal-message',t('La autenticación segura aún no está activada. Se necesita conectar y configurar Supabase.','Secure authentication is not live yet. Connect and configure Supabase.'),'warning');
+    say('portal-message',t('No se pudo cargar el servicio de inicio de sesión. Actualiza la página o intenta de nuevo en Safari.','The sign-in service could not load. Refresh the page or try Safari.'),'error');
     return false;
   };
   window.IBMemberAuth={client,readProfile,statusLabel,t,say,configured:!!client};
@@ -48,7 +48,7 @@
     async function updateAccount(){
       try{
         const profile=await readProfile();
-        if(!profile){$('account-summary').hidden=true;return}
+        if(!profile){$('account-summary').hidden=true;return null}
         $('account-summary').hidden=false;
         $('member-email').textContent=profile.email;
         $('member-status').textContent=statusLabel(profile.access_status);
@@ -60,7 +60,8 @@
           :t('Para obtener más información, contacta al administrador.','Contact the administrator for more information.');
         $('admin-link').hidden=!(profile.role==='admin'&&profile.access_status==='approved');
         $('signout-button').hidden=false;
-      }catch(e){say('portal-message',e.message,'error')}
+        return profile;
+      }catch(e){say('portal-message',e.message,'error');return null}
     }
     client.auth.onAuthStateChange((ev)=>{
       if(ev==='PASSWORD_RECOVERY'){$('new-password-form').hidden=false;showPanel('login')}
@@ -84,7 +85,21 @@
         const {error}=await client.auth.signInWithPassword({email:$('signin-email').value.trim().toLowerCase(),password:$('signin-password').value});
         if(error)throw error;
         say('portal-message',t('Sesión iniciada. Consulta el estado de tu solicitud.','Signed in. Your request status is shown below.'),'success');
-        login.reset();await updateAccount();
+        login.reset();
+        const profile=await updateAccount();
+        if(profile?.access_status==='approved'){
+          const raw=new URLSearchParams(window.location.search).get('returnTo')||'';
+          const ok=raw.startsWith('/InvestorBlueprint/tools/')||raw.startsWith('/InvestorBlueprint/calculadora-venta/');
+          if(ok && !raw.startsWith('//') && !raw.includes('\\')) {
+            const target=new URL(raw,window.location.origin);
+            if(target.origin===window.location.origin){window.location.assign(target.href);return}
+          }
+          if(profile.role==='admin'){
+            window.location.assign(window.location.pathname.endsWith('/preview-login.html')?'preview-admin.html':'admin.html');
+          }else{
+            window.location.assign('index.html#tools');
+          }
+        }
       }catch(err){say('portal-message',err.message,'error')}
       finally{setBusy(login,false)}
     });
