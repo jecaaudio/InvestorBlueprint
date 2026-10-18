@@ -67,6 +67,16 @@ html[data-theme="dark"] .mini-preferences .icon-pref:hover{border-color:#83dff5;
 .mini-preferences .icon-pref:active {transform:scale(.96)}
 .mini-preferences .icon-pref:focus-visible {outline:3px solid #32a4ba;outline-offset:2px}
 input.currency-input{text-align:right;font-variant-numeric:tabular-nums;font-weight:650;letter-spacing:.01em}
+
+.field[hidden]{display:none!important}
+.second-mortgage-toggle{padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);margin-top:4px}
+.second-mortgage-toggle .checkbox{display:flex;align-items:center;gap:9px;cursor:pointer}
+.second-mortgage-toggle input{width:19px;height:19px;min-height:19px;min-width:19px;margin:0;accent-color:#147589}
+.return-to-tools{display:inline-flex;align-items:center;gap:7px;width:fit-content;margin-bottom:12px;padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:var(--white);font-size:.83rem;font-weight:700;text-decoration:none;color:var(--ink)}
+.return-to-tools:hover,.return-to-tools:focus-visible{border-color:var(--blue);outline-offset:2px}
+html[data-theme="dark"] .second-mortgage-toggle{background:#172738}
+html[data-theme="dark"] .return-to-tools{background:#172738;color:#eaf2fb}
+@media print{.return-to-tools{display:none!important}}
 </style>
 <script>
 (function(){try{const chosen=localStorage.getItem('seller-net-ui-theme')||'system';
@@ -78,6 +88,7 @@ document.documentElement.lang=localStorage.getItem('seller-net-ui-lang')==='en'?
 </head>
 <body>
 <main class="container">
+<a class="return-to-tools only-screen" href="../index.html#tools"><span aria-hidden="true">←</span><span>Volver a herramientas</span></a>
 <noscript><div role="alert" style="padding:14px;margin:0 0 14px;border-radius:12px;border:2px solid #ba661b;background:#fff1d8;color:#553719;font-size:15px;font-weight:600">Esta vista no permite JavaScript. Para utilizar la calculadora y cambiar idioma/apariencia, ábrela como sitio web en un navegador. / JavaScript is disabled in this preview. Open the page in a browser to use the interactive controls.</div></noscript>
 <header class="top">
 <div><p class="eyebrow">Real estate · Seller net sheet</p><h1>Calculadora nacional de venta inmobiliaria</h1><p class="sub">Estima el dinero neto que recibe el vendedor; separa deuda, gastos y tributos. <strong>Reglas fiscales respaldadas por fuentes, sin tasas inventadas.</strong></p></div>
@@ -107,8 +118,9 @@ document.documentElement.lang=localStorage.getItem('seller-net-ui-lang')==='en'?
 <div class="fields">
 <div class="field"><label for="price">Precio de venta (USD)</label><input id="price" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="385000" /></div>
 <div class="field"><label for="assumed">Deuda asumida por el comprador y NO incluida en el precio ($)</label><input id="assumed" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="0" /><span class="help">Solo para determinar la base imponible cuando corresponde. No es deuda que el vendedor paga en cierre.</span></div>
-<div class="field"><label for="mortgage1">Liquidación primera hipoteca ($)</label><input id="mortgage1" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="150000" /></div>
-<div class="field"><label for="mortgage2">Liquidación segunda hipoteca ($)</label><input id="mortgage2" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="86000" /></div>
+<div class="field"><label for="mortgage1">Saldo pendiente de hipoteca ($)</label><input id="mortgage1" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="150000" /></div>
+<div class="field wide second-mortgage-toggle"><label class="checkbox" for="hasSecondMortgage"><input type="checkbox" id="hasSecondMortgage" /> <span>Agregar segunda hipoteca (opcional)</span></label></div>
+<div class="field" id="secondMortgageField" hidden><label for="mortgage2">Saldo segunda hipoteca ($)</label><input id="mortgage2" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="86000" /></div>
 <div class="field wide"><label for="otherDebt">Otros saldos, intereses y gastos de payoff ($)</label><input id="otherDebt" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="0" /></div>
 </div>
 </section>
@@ -190,7 +202,7 @@ function populateCounties(code, selected=''){
  $('countyHelp').textContent=currentLang==='en'?`${rows.length} jurisdictions for the chosen state.`:`${rows.length} jurisdicciones en el estado elegido.`;
 }
 
-const ids=['state','county','city','propertyType','price','assumed','mortgage1','mortgage2','otherDebt','listingPct','buyerAgentPct','creditPct','creditDollar','settlement','admin','propertyTax','recording','misc','stateTaxOverride','localTax','sellerShare','isExempt','scenarioStep'];
+const ids=['state','county','city','propertyType','price','assumed','mortgage1','hasSecondMortgage','mortgage2','otherDebt','listingPct','buyerAgentPct','creditPct','creditDollar','settlement','admin','propertyTax','recording','misc','stateTaxOverride','localTax','sellerShare','isExempt','scenarioStep'];
 const currencyIds=new Set(["price","assumed","mortgage1","mortgage2","otherDebt","creditDollar","settlement","admin","propertyTax","recording","misc","stateTaxOverride","localTax","scenarioStep"]);
 const money=x=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(x);
 function parseCurrency(value){
@@ -224,9 +236,9 @@ function initializeCurrencyControls(){
  }
 }
 
-const defaults={state:'KY',county:'Jefferson',city:'Louisville',propertyType:'single',price:'385000',assumed:'0',mortgage1:'150000',mortgage2:'86000',otherDebt:'0',listingPct:'3',buyerAgentPct:'3',creditPct:'3',creditDollar:'0',settlement:'550',admin:'250',propertyTax:'2918.84',recording:'0',misc:'0',stateTaxOverride:'',localTax:'0',sellerShare:'100',isExempt:false,scenarioStep:'5000'};
+const defaults={state:'KY',county:'Jefferson',city:'Louisville',propertyType:'single',price:'385000',assumed:'0',mortgage1:'150000',hasSecondMortgage:false,mortgage2:'0',otherDebt:'0',listingPct:'3',buyerAgentPct:'3',creditPct:'3',creditDollar:'0',settlement:'550',admin:'250',propertyTax:'2918.84',recording:'0',misc:'0',stateTaxOverride:'',localTax:'0',sellerShare:'100',isExempt:false,scenarioStep:'5000'};
 function load(data){const selectedState=data.state??defaults.state;state.value=selectedState;populateCounties(selectedState,data.county??defaults.county);ids.forEach(id=>{if(id==='state'||id==='county')return;const e=$(id);if(e.type==='checkbox')e.checked=Boolean(data[id]);else if(currencyIds.has(id)){const raw=data[id]??defaults[id];e.value=(id==='stateTaxOverride'&&String(raw).trim()==='')?'':money(parseCurrency(raw));}else e.value=data[id]??defaults[id]});}
-try{const saved=JSON.parse(localStorage.getItem(storageKey));load({...defaults,...saved});}catch(e){load(defaults)}
+try{const saved=JSON.parse(localStorage.getItem(storageKey))||{};if(saved.hasSecondMortgage===undefined && saved.mortgage2!==undefined)saved.hasSecondMortgage=parseCurrency(saved.mortgage2)>0;load({...defaults,...saved});}catch(e){load(defaults)}
 const n=id=>{const val=currencyIds.has(id)?parseCurrency($(id).value):Number($(id).value);return Number.isFinite(val)?Math.max(0,val):0};
 const baseURL='https://';
 const sources={
@@ -252,7 +264,7 @@ function getTransfer(price){
 }
 function calc(price){
  const tax=getTransfer(price);
- const debt=n('mortgage1')+n('mortgage2')+n('otherDebt');
+ const debt=n('mortgage1')+($('hasSecondMortgage').checked?n('mortgage2'):0)+n('otherDebt');
  const commission=price*(Math.min(100,n('listingPct'))+Math.min(100,n('buyerAgentPct')))/100;
  const concessions=price*Math.min(100,n('creditPct'))/100+n('creditDollar');
  const closing=n('settlement')+n('admin')+n('propertyTax')+n('recording')+n('misc');
@@ -296,6 +308,10 @@ const staticEnglish={
   "Deuda asumida por el comprador y NO incluida en el precio ($)": "Debt assumed by buyer and NOT included in the price ($)",
   "Solo para determinar la base imponible cuando corresponde. No es deuda que el vendedor paga en cierre.": "Only used to determine the taxable base when applicable. This is not debt paid off by the seller at closing.",
   "Liquidación primera hipoteca ($)": "First mortgage payoff ($)",
+  "Saldo pendiente de hipoteca ($)": "Outstanding mortgage payoff ($)",
+  "Agregar segunda hipoteca (opcional)": "Add second mortgage (optional)",
+  "Saldo segunda hipoteca ($)": "Second mortgage payoff ($)",
+  "Volver a herramientas": "Back to tools",
   "Liquidación segunda hipoteca ($)": "Second mortgage payoff ($)",
   "Otros saldos, intereses y gastos de payoff ($)": "Other debt balances, interest, and payoff fees ($)",
   "3 · Gastos de venta y cierre": "3 · Sale and closing costs",
@@ -423,6 +439,9 @@ if(window.matchMedia){const media=window.matchMedia('(prefers-color-scheme: dark
  if(media.addEventListener)media.addEventListener('change',()=>{if(themeSelect.value==='system')setTheme('system')});}
 
 function render(){
+  const hasSecond=$('hasSecondMortgage').checked;
+  $('secondMortgageField').hidden=!hasSecond;
+  $('mortgage2').disabled=!hasSecond;
  const code=state.value,res=calc(n('price'));const {tax}=res;
  const known=tax.known;
  const label=state.options[state.selectedIndex]?.textContent||'';
