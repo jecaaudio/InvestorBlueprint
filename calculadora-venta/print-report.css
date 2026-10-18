@@ -1,0 +1,41 @@
+/* InvestorBlueprint: stand-alone printable seller settlement report */
+#printReport {display:none}
+@page {size:letter;margin:0.48in 0.60in 0.48in 0.60in}
+@media print {
+ html,body,html[data-theme="dark"],html[data-theme="dark"] body {background:#fff!important;color:#152638!important;color-scheme:light!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ body>main.container,body>main,body>noscript{display:none!important}
+ #printReport{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;font:9pt/1.35 Arial,Helvetica,sans-serif;color:#152638!important;background:#fff!important}
+ #printReport *{box-sizing:border-box}
+ #printReport h1,#printReport h2,#printReport h3,#printReport p{margin-top:0}
+ #printReport .pr-header{display:flex;justify-content:space-between;gap:20px;padding-bottom:10px;border-bottom:2px solid #17677e;margin-bottom:10px}
+ #printReport .pr-brand{color:#14687c;font-size:9pt;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+ #printReport h1{font-size:18pt;letter-spacing:-.035em;line-height:1.15;margin:4px 0 5px;color:#10283a}
+ #printReport .pr-subhead,#printReport .pr-meta{font-size:8.2pt;color:#526779}
+ #printReport .pr-meta{text-align:right;min-width:135px;padding-top:4px}
+ #printReport .pr-meta strong{color:#152638}
+ #printReport .pr-property{border:1px solid #dce5eb;border-radius:6px;padding:8px 10px;margin-bottom:9px;display:flex;flex-wrap:wrap;gap:8px 20px;background:#f8fafc!important}
+ #printReport .pr-property span{display:block;font-size:7.4pt;color:#577082;margin-bottom:2px}
+ #printReport .pr-property strong{font-size:9.1pt}
+ #printReport .pr-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-bottom:10px}
+ #printReport .pr-metric{border:1px solid #d6e2e9;padding:7px 9px 7px;border-radius:5px;min-width:0}
+ #printReport .pr-metric span{display:block;color:#526779;font-size:7.4pt;margin-bottom:5px}
+ #printReport .pr-metric strong{display:block;font-size:12pt;color:#17344a;white-space:nowrap;font-variant-numeric:tabular-nums}
+ #printReport .pr-metric.primary{background:#e6f3f3!important;border:1.4px solid #388c96}
+ #printReport .pr-metric.primary strong{color:#095467}
+ #printReport .pr-section{margin:0 0 8px;break-inside:avoid-page;page-break-inside:avoid}
+ #printReport h2{margin:0 0 5px;color:#14576c;font-size:10pt;font-weight:750;border-bottom:1px solid #c8d7e1;padding-bottom:5px}
+ #printReport .pr-table{border-collapse:collapse;width:100%;table-layout:fixed}
+ #printReport .pr-table th,#printReport .pr-table td{padding:3px 7px;text-align:left;vertical-align:top;border-bottom:1px solid #e7edf2}
+ #printReport .pr-table th{font-size:7.5pt;text-transform:uppercase;letter-spacing:.025em;color:#64798b;background:#f1f6f9!important}
+ #printReport .pr-table td:last-child,#printReport .pr-table th:last-child{text-align:right;width:33%;white-space:nowrap;font-variant-numeric:tabular-nums}
+ #printReport .pr-table .pr-total td{padding-top:7px;padding-bottom:7px;font-weight:700;border-top:1.5px solid #8eb0c0;border-bottom:0;background:#f1f7f9!important}
+ #printReport .pr-flag{padding:6px 9px;border-left:3px solid #ad7622;background:#fff7e8!important;font-size:8pt;margin:7px 0 8px;break-inside:avoid}
+ #printReport .pr-note{color:#53697d;font-size:7.6pt;margin:6px 0 0}
+ #printReport .pr-source{padding:3px 0;font-size:7.5pt;break-inside:avoid}
+ #printReport .pr-source a{color:#12647b!important;text-decoration:underline}
+ #printReport .pr-sources{break-inside:avoid-page;page-break-inside:avoid}
+ #printReport .pr-disclaimer{margin-top:8px;padding-top:5px;border-top:1px solid #d2dce4;color:#4a6074;font-size:7.4pt}
+ #printReport .pr-footer{margin-top:5px;text-align:right;font-size:7.1pt;color:#718396}
+ #printReport tr,#printReport .pr-header,#printReport .pr-summary,#printReport .pr-property{break-inside:avoid;page-break-inside:avoid}
+ #printReport .pr-scenario-table td:nth-child(2),#printReport .pr-scenario-table th:nth-child(2){text-align:right}
+}
