@@ -1,0 +1,38 @@
+/* InvestorBlueprint membership and admin panel */
+.access-hero{margin:18px 0 26px;padding:29px;border:1px solid var(--site-border,var(--border));background:var(--panel);border-radius:17px}
+.access-hero h1{font-size:clamp(1.55rem,3.2vw,2.4rem);letter-spacing:-.035em;margin:0 0 8px}
+.access-hero p{margin:0;color:var(--muted)}
+.access-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:20px;align-items:start}
+.access-card{padding:24px!important}
+.access-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:19px}
+.access-tabs button{border:1px solid var(--site-border,var(--border));border-radius:9px;background:var(--panel);color:var(--text);padding:9px 12px;cursor:pointer;font-weight:650}
+.access-tabs button[aria-selected=true]{background:var(--site-soft,var(--panel));border-color:var(--primary);color:var(--primary)}
+.access-form{display:grid;gap:14px}
+.access-form[hidden],section[hidden],article[hidden],div[hidden]{display:none!important}
+.access-form label{display:grid;gap:6px;font-size:.87rem;font-weight:650}
+.access-form input{width:100%;min-height:45px;border:1px solid var(--site-border,var(--border));border-radius:9px;padding:10px 12px;font-size:1rem}
+.access-form .btn{margin-top:5px;justify-self:start}
+.access-message{padding:11px 14px;border:1px solid var(--site-border,var(--border));border-radius:10px;background:var(--site-soft,var(--panel));margin:15px 0;color:var(--text)}
+.access-message[data-state="error"]{border-color:#ba5555}
+.access-message[data-state="warning"]{border-color:#b88c42}
+.access-message[data-state="success"]{border-color:#498c78}
+.access-message[hidden]{display:none}
+.access-benefits{padding-left:20px;display:grid;gap:12px;color:var(--muted)}
+.access-benefits strong{color:var(--text)}
+.access-status{font-size:1.4rem;font-weight:800;color:var(--primary);margin:8px 0 14px}
+.access-status[data-state="suspended"],.access-status[data-state="rejected"]{color:#b94f52}
+.access-status[data-state="pending"]{color:#b47b2b}
+.access-note{font-size:.87rem;color:var(--muted);line-height:1.5}
+.member-list{display:grid;gap:10px;margin:18px 0}
+.member-row{border:1px solid var(--site-border,var(--border));border-radius:11px;padding:15px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--panel)}
+.member-info{display:grid;gap:4px;min-width:0;flex:1}
+.member-info small{color:var(--muted);overflow-wrap:anywhere}
+.member-status{font-size:.75rem;font-weight:700;color:var(--primary)}
+.member-status[data-state="pending"]{color:#a46b1e}
+.member-status[data-state="rejected"],.member-status[data-state="suspended"]{color:#b4474c}
+.member-actions{display:flex;gap:8px;flex-wrap:wrap}
+.member-actions select{padding:9px;border:1px solid var(--site-border,var(--border));border-radius:8px;min-width:165px}
+.member-actions button{align-self:center}
+.admin-controls{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:15px 0}
+.admin-controls select{min-height:40px;padding:8px;border-radius:8px}
+@media(max-width:780px){.access-grid{grid-template-columns:minmax(0,1fr)}.access-hero{padding:20px}.access-card{padding:18px!important}.member-row{align-items:stretch}.member-actions{width:100%}.member-actions select{flex:1}}
