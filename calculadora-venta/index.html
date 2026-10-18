@@ -422,7 +422,7 @@ function applyLanguage(lang){
  document.title=showLang('Calculadora Nacional de Venta Inmobiliaria | Seller Net','Nationwide Real Estate Sale Calculator | Seller Net');
  document.querySelector('meta[name="description"]').content=showLang('Calculadora de neto al vendedor con selección de estado, jurisdicción, comisiones, hipotecas y cierre. Muestra fuentes legales y estado de verificación.','Seller net proceeds calculator with state, jurisdiction, commissions, mortgages, and closing cost inputs. Includes legal sources and rule-verification status.');
  populateCounties(state.value,$('county').value);$('city').placeholder=showLang('Ej. Louisville','e.g. Louisville');
- try{localStorage.setItem(uiLangKey,currentLang)}catch(e){}
+ try{localStorage.setItem(uiLangKey,currentLang);localStorage.setItem('preferredLanguage',currentLang)}catch(e){}
  $('languageSelect').value=currentLang;
  updateMiniPrefs();
  render();
@@ -431,7 +431,7 @@ const themeSelect=$('themeSelect');
 let selectedTheme='system';try{selectedTheme=localStorage.getItem(uiThemeKey)||'system'}catch(e){}
 if(!['system','light','dark'].includes(selectedTheme))selectedTheme='system';
 themeSelect.value=selectedTheme;setTheme(selectedTheme);
-try{currentLang=localStorage.getItem(uiLangKey)==='en'?'en':'es'}catch(e){currentLang='es'}
+try{const preferred=localStorage.getItem('preferredLanguage')||localStorage.getItem(uiLangKey);currentLang=preferred==='en'?'en':'es'}catch(e){currentLang='es'}
 $('languageSelect').value=currentLang;
 $('languageSelect').addEventListener('change',ev=>applyLanguage(ev.target.value));
 themeSelect.addEventListener('change',ev=>setTheme(ev.target.value));
@@ -562,6 +562,6 @@ window.sellerNetPresentation={changeLanguage:applyLanguage,changeTheme:setTheme}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
-<script src="print-report.js?v=20261018" defer></script>
+<script src="print-report.js?v=20261018-optionalmortgage" defer></script>
 </body>
 </html>
