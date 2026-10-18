@@ -40,7 +40,7 @@
   const feeRows=fees.filter(([,v])=>typeof v==='string'||v!==0).map(([k,v])=>cell(k,typeof v==='number'?money(v):v)).join('');
   const debts=[
     [L('Primera hipoteca','First mortgage'),num('mortgage1')],
-    [L('Segunda hipoteca','Second mortgage'),num('mortgage2')],
+    [L('Segunda hipoteca','Second mortgage'),$('hasSecondMortgage')?.checked?num('mortgage2'):0],
     [L('Otros saldos e intereses de payoff','Other payoff balances and fees'),num('otherDebt')]
   ].filter(([,v])=>v!==0).map(([k,v])=>cell(k,money(v))).join('');
   const scenarioRows=[...($('scenarios')?.querySelectorAll('tr')||[])].map(tr=>{
