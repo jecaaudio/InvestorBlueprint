@@ -66,6 +66,7 @@ html[data-theme="dark"] .mini-preferences .icon-pref:hover{border-color:#83dff5;
 .mini-preferences .icon-pref {position:relative;z-index:2;touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;user-select:none;-webkit-user-select:none}
 .mini-preferences .icon-pref:active {transform:scale(.96)}
 .mini-preferences .icon-pref:focus-visible {outline:3px solid #32a4ba;outline-offset:2px}
+input.currency-input{text-align:right;font-variant-numeric:tabular-nums;font-weight:650;letter-spacing:.01em}
 </style>
 <script>
 (function(){try{const chosen=localStorage.getItem('seller-net-ui-theme')||'system';
@@ -103,37 +104,37 @@ document.documentElement.lang=localStorage.getItem('seller-net-ui-lang')==='en'?
 </section>
 <section class="card"><h2>2 · Venta y saldos pendientes</h2>
 <div class="fields">
-<div class="field"><label for="price">Precio de venta (USD)</label><input id="price" type="number" min="0" step="100" value="385000" /></div>
-<div class="field"><label for="assumed">Deuda asumida por el comprador y NO incluida en el precio ($)</label><input id="assumed" type="number" min="0" step="100" value="0" /><span class="help">Solo para determinar la base imponible cuando corresponde. No es deuda que el vendedor paga en cierre.</span></div>
-<div class="field"><label for="mortgage1">Liquidación primera hipoteca ($)</label><input id="mortgage1" type="number" min="0" step="100" value="150000" /></div>
-<div class="field"><label for="mortgage2">Liquidación segunda hipoteca ($)</label><input id="mortgage2" type="number" min="0" step="100" value="86000" /></div>
-<div class="field wide"><label for="otherDebt">Otros saldos, intereses y gastos de payoff ($)</label><input id="otherDebt" type="number" min="0" step="50" value="0" /></div>
+<div class="field"><label for="price">Precio de venta (USD)</label><input id="price" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="385000" /></div>
+<div class="field"><label for="assumed">Deuda asumida por el comprador y NO incluida en el precio ($)</label><input id="assumed" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="0" /><span class="help">Solo para determinar la base imponible cuando corresponde. No es deuda que el vendedor paga en cierre.</span></div>
+<div class="field"><label for="mortgage1">Liquidación primera hipoteca ($)</label><input id="mortgage1" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="150000" /></div>
+<div class="field"><label for="mortgage2">Liquidación segunda hipoteca ($)</label><input id="mortgage2" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="86000" /></div>
+<div class="field wide"><label for="otherDebt">Otros saldos, intereses y gastos de payoff ($)</label><input id="otherDebt" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="0" /></div>
 </div>
 </section>
 <section class="card"><h2>3 · Gastos de venta y cierre</h2><div class="fields">
 <div class="field"><label for="listingPct">Comisión agente del vendedor (%)</label><input id="listingPct" type="number" min="0" max="100" step="0.1" value="3" /></div>
 <div class="field"><label for="buyerAgentPct">Comisión agente del comprador pagada por vendedor (%)</label><input id="buyerAgentPct" type="number" min="0" max="100" step="0.1" value="3" /></div>
 <div class="field"><label for="creditPct">Concesión al comprador (%)</label><input id="creditPct" type="number" min="0" max="100" step="0.1" value="3" /></div>
-<div class="field"><label for="creditDollar">Concesión adicional fija ($)</label><input id="creditDollar" type="number" min="0" step="100" value="0" /><span class="help">Se suma a la concesión porcentual. Evita incluir aquí la misma comisión.</span></div>
-<div class="field"><label for="settlement">Título, cierre y documentos ($)</label><input id="settlement" type="number" min="0" step="10" value="550" /></div>
-<div class="field"><label for="admin">Honorarios administrativos ($)</label><input id="admin" type="number" min="0" step="10" value="250" /></div>
-<div class="field"><label for="propertyTax">Property taxes prorrateados, a cargo vendedor ($)</label><input id="propertyTax" type="number" min="0" step="0.01" value="2918.84" /><span class="help">No se calcula automáticamente: depende de la fecha, lo pagado y el contrato.</span></div>
-<div class="field"><label for="recording">Registro de escritura a cargo del vendedor ($)</label><input id="recording" type="number" min="0" step="1" value="0" /></div>
-<div class="field wide"><label for="misc">Otros gastos del vendedor ($)</label><input id="misc" type="number" min="0" step="10" value="0" /></div>
+<div class="field"><label for="creditDollar">Concesión adicional fija ($)</label><input id="creditDollar" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="0" /><span class="help">Se suma a la concesión porcentual. Evita incluir aquí la misma comisión.</span></div>
+<div class="field"><label for="settlement">Título, cierre y documentos ($)</label><input id="settlement" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="550" /></div>
+<div class="field"><label for="admin">Honorarios administrativos ($)</label><input id="admin" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="250" /></div>
+<div class="field"><label for="propertyTax">Property taxes prorrateados, a cargo vendedor ($)</label><input id="propertyTax" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="2918.84" /><span class="help">No se calcula automáticamente: depende de la fecha, lo pagado y el contrato.</span></div>
+<div class="field"><label for="recording">Registro de escritura a cargo del vendedor ($)</label><input id="recording" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="0" /></div>
+<div class="field wide"><label for="misc">Otros gastos del vendedor ($)</label><input id="misc" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="0" /></div>
 </div>
 <p class="field-note help">Las comisiones, concesiones y la distribución de gastos se establecen por contrato; no son porcentajes obligatorios.</p>
 </section>
 <section class="card"><h2>4 · Impuesto de transferencia <span id="stateMode" class="status">Verificando estado</span></h2>
 <div class="fields">
-<div class="field"><label for="stateTaxOverride">Impuesto base de transferencia confirmado ($)</label><input type="number" min="0" step="0.01" id="stateTaxOverride" placeholder="Automático donde disponible" /><span class="help">Dejar vacío usa la fórmula verificada; en estados sin fórmula validada, introduce aquí el monto confirmado.</span></div>
-<div class="field"><label for="localTax">Impuesto condal / municipal adicional a cargo del vendedor ($)</label><input type="number" id="localTax" min="0" step="0.01" value="0" /><span class="help">Introducir por separado. Nunca se supone que sea $0 si no se verificó.</span></div>
+<div class="field"><label for="stateTaxOverride">Impuesto base de transferencia confirmado ($)</label><input type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" id="stateTaxOverride" placeholder="Automático donde disponible" /><span class="help">Dejar vacío usa la fórmula verificada; en estados sin fórmula validada, introduce aquí el monto confirmado.</span></div>
+<div class="field"><label for="localTax">Impuesto condal / municipal adicional a cargo del vendedor ($)</label><input type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" id="localTax" value="0" /><span class="help">Introducir por separado. Nunca se supone que sea $0 si no se verificó.</span></div>
 <div class="field"><label for="sellerShare">Parte del impuesto base que paga el vendedor (%)</label><input id="sellerShare" type="number" min="0" max="100" step="1" value="100" /><span class="help">La obligación jurídica y la distribución contractual pueden diferir.</span></div>
 <div class="field"><label for="isExempt" class="checkbox" style="margin-top:18px"><input id="isExempt" type="checkbox" /> Exención de transferencia confirmada</label><span class="help">Marca solo si la exención fue verificada con la compañía de título o autoridad. No elimina otros gastos.</span></div>
 </div>
 <div id="taxExplanation" class="banner" style="margin-top:14px" aria-live="polite"></div>
 </section>
 <section class="card"><h2>5 · Comparación de precios</h2>
-<div class="two"><div class="field"><label for="scenarioStep">Incremento por escenario ($)</label><input id="scenarioStep" type="number" min="0" step="1000" value="5000" /></div><div class="small" style="align-self:center">Los impuestos y las comisiones se vuelven a calcular en cada escenario. Las deudas y los gastos fijos permanecen iguales.</div></div>
+<div class="two"><div class="field"><label for="scenarioStep">Incremento por escenario ($)</label><input id="scenarioStep" type="text" inputmode="decimal" autocomplete="off" class="currency-input" data-currency="USD" value="5000" /></div><div class="small" style="align-self:center">Los impuestos y las comisiones se vuelven a calcular en cada escenario. Las deudas y los gastos fijos permanecen iguales.</div></div>
 <div class="table-wrap"><table><thead><tr><th>Precio</th><th>Gastos + impuesto del vendedor</th><th>Neto estimado</th></tr></thead><tbody id="scenarios"></tbody></table></div>
 </section>
 <section class="card"><h2>Fuentes legales y alcance</h2><div id="sourceList" aria-live="polite"></div><p class="foot-notice">Versión de prueba multijurisdiccional, revisión: 18 octubre 2026. Calcula el <em>neto estimado al vendedor</em>, no las ganancias de capital ni la declaración fiscal. Es necesaria validación contractual, bancaria y con la compañía de títulos antes del cierre.</p></section>
@@ -189,11 +190,43 @@ function populateCounties(code, selected=''){
 }
 
 const ids=['state','county','city','propertyType','price','assumed','mortgage1','mortgage2','otherDebt','listingPct','buyerAgentPct','creditPct','creditDollar','settlement','admin','propertyTax','recording','misc','stateTaxOverride','localTax','sellerShare','isExempt','scenarioStep'];
+const currencyIds=new Set(["price","assumed","mortgage1","mortgage2","otherDebt","creditDollar","settlement","admin","propertyTax","recording","misc","stateTaxOverride","localTax","scenarioStep"]);
+const money=x=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(x);
+function parseCurrency(value){
+ let s=String(value??'').trim().replace(/[^\\d,.\\-]/g,'');
+ if(!s)return 0;
+ if(s.includes(',')&&s.includes('.')){
+  if(s.lastIndexOf(',')>s.lastIndexOf('.'))s=s.replace(/\\./g,'').replace(',', '.');
+  else s=s.replace(/,/g,'');
+ }else if(s.includes(',')){
+  const bits=s.split(',');
+  if(bits.length===2&&bits[1].length>=1&&bits[1].length<=2)s=s.replace(',','.');
+  else s=s.replace(/,/g,'');
+ }
+ const n=Number(s);
+ return Number.isFinite(n)?Math.max(0,n):0;
+}
+function formatCurrencyField(id){
+ const el=$(id);
+ if(id==='stateTaxOverride'&&!el.value.trim())return;
+ el.value=money(parseCurrency(el.value));
+}
+function initializeCurrencyControls(){
+ for(const id of currencyIds){
+  const el=$(id);
+  el.addEventListener('focus',()=>{
+   if(id==='stateTaxOverride'&&!el.value.trim())return;
+   el.value=parseCurrency(el.value).toFixed(2);
+   el.select();
+  });
+  el.addEventListener('blur',()=>{formatCurrencyField(id);render();});
+ }
+}
+
 const defaults={state:'KY',county:'Jefferson',city:'Louisville',propertyType:'single',price:'385000',assumed:'0',mortgage1:'150000',mortgage2:'86000',otherDebt:'0',listingPct:'3',buyerAgentPct:'3',creditPct:'3',creditDollar:'0',settlement:'550',admin:'250',propertyTax:'2918.84',recording:'0',misc:'0',stateTaxOverride:'',localTax:'0',sellerShare:'100',isExempt:false,scenarioStep:'5000'};
-function load(data){const selectedState=data.state??defaults.state;state.value=selectedState;populateCounties(selectedState,data.county??defaults.county);ids.forEach(id=>{if(id==='state'||id==='county')return;const e=$(id);if(e.type==='checkbox')e.checked=Boolean(data[id]);else e.value=data[id]??defaults[id]});}
+function load(data){const selectedState=data.state??defaults.state;state.value=selectedState;populateCounties(selectedState,data.county??defaults.county);ids.forEach(id=>{if(id==='state'||id==='county')return;const e=$(id);if(e.type==='checkbox')e.checked=Boolean(data[id]);else if(currencyIds.has(id)){const raw=data[id]??defaults[id];e.value=(id==='stateTaxOverride'&&String(raw).trim()==='')?'':money(parseCurrency(raw));}else e.value=data[id]??defaults[id]});}
 try{const saved=JSON.parse(localStorage.getItem(storageKey));load({...defaults,...saved});}catch(e){load(defaults)}
-const n=id=>{const val=Number($(id).value);return Number.isFinite(val)?Math.max(0,val):0};
-const money=x=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(x);
+const n=id=>{const val=currencyIds.has(id)?parseCurrency($(id).value):Number($(id).value);return Number.isFinite(val)?Math.max(0,val):0};
 const baseURL='https://';
 const sources={
 KY:[['Kentucky Revised Statutes §142.050','https://apps.legislature.ky.gov/law/statutes/statute.aspx?id=43160','$0.50 por cada $500 de valor o fracción; tributo al transmitente.']],
@@ -444,12 +477,13 @@ function render(){
  for(let i=0;i<3;i++){
   const r=calc(n('price')+i*step);const tr=document.createElement('tr');[money(r.price),money(r.fees)+(r.tax.known?'':showLang(' + pendiente',' + pending')),money(r.net)+(r.tax.known?'':' *')].forEach((s,j)=>{const td=document.createElement('td');td.textContent=s;if(j===2)td.style.fontWeight='750';tr.appendChild(td)});table.appendChild(tr);
  }
- try{const data={};ids.forEach(id=>data[id]=$(id).type==='checkbox'?$(id).checked:$(id).value);localStorage.setItem(storageKey,JSON.stringify(data));}catch(e){}
+ try{const data={};ids.forEach(id=>data[id]=$(id).type==='checkbox'?$(id).checked:currencyIds.has(id)?(id==='stateTaxOverride'&&!$(id).value.trim()?'':String(n(id))):$(id).value);localStorage.setItem(storageKey,JSON.stringify(data));}catch(e){}
 }
 function calcAutomatic(code,basis,miami,prop){if(code==='KY'||code==='IL')return Math.ceil(basis/500)*.5;if(code==='FL')return Math.ceil(basis/100)*((miami?.6:.7)+(miami&&prop!=='single'?.45:0));if(code==='TX')return 0;return NaN;}
 function escapeHTML(x){return String(x).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-ids.forEach(id=>{if(id==='state')return;$(id).addEventListener('input',render);$(id).addEventListener('change',render)});
-state.addEventListener('change',()=>{populateCounties(state.value,'');$('city').value='';$('stateTaxOverride').value='';$('localTax').value='0';$('isExempt').checked=false;$('sellerShare').value='100';render();});
+initializeCurrencyControls();
+ ids.forEach(id=>{if(id==='state')return;$(id).addEventListener('input',render);$(id).addEventListener('change',render)});
+state.addEventListener('change',()=>{populateCounties(state.value,'');$('city').value='';$('stateTaxOverride').value='';$('localTax').value=money(0);$('isExempt').checked=false;$('sellerShare').value='100';render();});
 $('resetButton').addEventListener('click',()=>{if(confirm(showLang('¿Restablecer todos los valores al ejemplo inicial?','Reset all values to the original example?'))){load(defaults);render();}});
 $('printButton').addEventListener('click',()=>window.print());
 $('csvButton').addEventListener('click',()=>{
