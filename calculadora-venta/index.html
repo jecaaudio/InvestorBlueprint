@@ -74,6 +74,7 @@ const dark=chosen==='dark'||(chosen==='system'&&window.matchMedia('(prefers-colo
 document.documentElement.dataset.theme=dark?'dark':'light';
 document.documentElement.lang=localStorage.getItem('seller-net-ui-lang')==='en'?'en':'es';}catch(e){document.documentElement.dataset.theme='light';}})();
 </script>
+<link rel="stylesheet" href="print-report.css?v=20261018" />
 </head>
 <body>
 <main class="container">
@@ -542,5 +543,6 @@ window.sellerNetPresentation={changeLanguage:applyLanguage,changeTheme:setTheme}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+<script src="print-report.js?v=20261018" defer></script>
 </body>
 </html>
