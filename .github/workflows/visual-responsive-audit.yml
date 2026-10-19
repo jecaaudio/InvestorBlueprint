@@ -1,0 +1,39 @@
+name: Visual responsive audit (isolated)
+on:
+  push:
+    branches:
+      - audit/visual-responsive-20261019
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install chromium --with-deps
+      - name: Render responsive pages and record layout issues
+        shell: bash
+        run: |
+          set -e
+          python3 -u -m http.server 4173 --bind 127.0.0.1 --directory .. >/tmp/ib-audit-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          for t in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4173/InvestorBlueprint/account.html >/dev/null; then break; fi
+            sleep 0.5
+          done
+          node scripts/visual-audit.mjs
+      - name: Store screenshots and complete measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-responsive-audit
+          path: visual-audit-artifacts/
+          if-no-files-found: warn
