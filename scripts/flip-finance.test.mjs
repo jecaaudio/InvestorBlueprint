@@ -52,3 +52,26 @@ test('no spurious ROI when net capital is zero or negative',()=>{
 test('extreme selling fee never generates fictitious break-even',()=>{
   assert.equal(calc({...basic,realtorPct:100,concessionPct:1}).breakEven,null);
 });
+
+test('rental monthly and annual effective cash flow',()=>{
+ const r=window.IBSimpleFinanceModels.rentalModel(2400,5,[220,120,180,190]);
+ near(r.monthlyCashFlow,1570,'rental month');
+ near(r.annualCashFlow,18840,'rental year');
+});
+test('gross rent target with annual expense disclosure',()=>{
+ const r=window.IBSimpleFinanceModels.rentModel(320000,9600,8.5,95);
+ near(r.annualIncome,27200,'gross rent collected');
+ near(r.grossYield,8.5,'gross yield');
+ near(r.netAfterExpenses,17600,'net annual');
+});
+test('three-comp simple ARV with seventy-percent heuristic',()=>{
+ const r=window.IBSimpleFinanceModels.arvModel([305000,315000,322000],38000);
+ near(r.average,314000,'ARV average');
+ near(r.maxOffer,181800,'MAO 70 heuristic');
+});
+test('hard money principal, points and simple annual interest',()=>{
+ const r=window.IBSimpleFinanceModels.hardMoneyModel(210000,11.5,2,9);
+ near(r.interestCost,18112.5,'interest');
+ near(r.totalCost,22312.5,'interest plus points');
+ near(r.monthlyInterest,2012.5,'monthly interest');
+});
