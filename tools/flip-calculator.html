@@ -1,90 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flip Calculator | InvestorBlueprint</title>
-    <meta name="description" content="Analyze fix-and-flip deals with robust math, validation, and fast decision support." />
-    <link rel="canonical" href="https://jecaaudio.github.io/InvestorBlueprint/tools/flip-calculator.html" />
-    <link rel="stylesheet" href="tool-styles.css" />
-    <link rel="stylesheet" href="../assets/css/flip-calculator.css" />
-    <script src="tool-access-feedback.js"></script>
-    <link rel="stylesheet" href="../assets/css/cookie-banner.css" />
-    <link rel="stylesheet" href="../assets/css/site-theme.css?v=20261018" />
-  <!-- Temporary fail-closed front-end gate; migrate tool assets to protected hosting before launch. -->
-    <style>html:not(.ib-access-granted):not(.ib-access-error-visible) body{visibility:hidden!important}</style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/member-auth-config.js"></script>
-    <script src="../assets/js/tool-access-guard.js?v=20261018-access2" data-root="../"></script>
-  </head>
-  <body data-tool-id="flip" data-tool="flip">
-    <header class="tool-navbar">
-      <div class="brand-menu">
-        <a class="tool-logo" href="../index.html">InvestorBlueprint</a>
-        <nav class="brand-dropdown" aria-label="Quick navigation">
-          <a href="../index.html" data-i18n="navHome">Home</a><a href="../index.html#tools" data-i18n="navTools">Tools</a>
-          <a href="../index.html#learn" data-i18n="navLearn">Learn</a><a href="../pricing.html" data-i18n="navPricing">Pricing</a>
-          <a href="../login.html" data-i18n="navLogin">Login</a>
-        </nav>
-      </div>
-      <div class="lang-switcher" role="group" aria-label="Language selector">
-        <button type="button" class="lang-option" data-lang="en"><img class="flag-emoji" src="../assets/flags/us.svg" alt="" aria-hidden="true">EN</button>
-        <button type="button" class="lang-option" data-lang="es"><img class="flag-emoji" src="../assets/flags/es.svg" alt="" aria-hidden="true">ES</button>
-      </div>
-    </header>
-
-    <main class="container">
-      <section class="fc-wrap pro-tool-card" id="flip-calculator">
-        <span class="badge free" data-tool-plan-badge></span>
-        <header class="fc-header">
-          <div>
-            <h2 class="fc-title" data-tool-title>Flip Calculator</h2>
-            <p class="fc-subtitle" data-tool-description>Financial diagnostics with live updates and resilient validation.</p>
-          </div>
-        </header>
-
-        <div class="fc-grid">
-          <div class="fc-panel">
-            <div class="fc-section"><h3>Inputs</h3>
-              <div class="fc-row"><label for="arv">ARV <button type="button" class="info-icon" aria-label="What is ARV?" data-tooltip="Estimated value after repairs based on recent comparable sales.">!</button></label><input class="fc-input money" id="arv" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="purchasePrice">Purchase Price <button type="button" class="info-icon" aria-label="What is Purchase Price?" data-tooltip="Agreed purchase price (excluding closing costs).">!</button></label><input class="fc-input money" id="purchasePrice" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="rehab">Rehab Costs <button type="button" class="info-icon" aria-label="What are Rehab Costs?" data-tooltip="Total renovation cost (materials, labor, and permits).">!</button></label><input class="fc-input money" id="rehab" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="holdingMonths">Holding Months <button type="button" class="info-icon" aria-label="What are Holding Months?" data-tooltip="Estimated months from purchase to sale.">!</button></label><input class="fc-input" id="holdingMonths" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="holdingMonthlyCost">Holding Monthly Cost <button type="button" class="info-icon" aria-label="What is Holding Monthly Cost?" data-tooltip="Monthly carrying costs: taxes, insurance, utilities, lawn care, etc.">!</button></label><input class="fc-input money" id="holdingMonthlyCost" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="buyClosingCosts">Buy Closing Costs <button type="button" class="info-icon" aria-label="What are Buy Closing Costs?" data-tooltip="Closing costs when buying: title, lender fees, recording, etc.">!</button></label><input class="fc-input money" id="buyClosingCosts" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="sellClosingCosts">Sell Closing Costs <button type="button" class="info-icon" aria-label="What are Sell Closing Costs?" data-tooltip="Closing costs when selling (excluding agent commission).">!</button></label><input class="fc-input money" id="sellClosingCosts" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="agentCommissionPct">Agent Commission % <button type="button" class="info-icon" aria-label="What is Agent Commission?" data-tooltip="Total commission percentage (listing + buyer agent).">!</button></label><input class="fc-input percent" id="agentCommissionPct" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="loanAmount">Loan Amount <button type="button" class="info-icon" aria-label="What is Loan Amount?" data-tooltip="Borrowed amount (hard money/loan).">!</button></label><input class="fc-input money" id="loanAmount" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="interestRatePct">Interest Rate % <button type="button" class="info-icon" aria-label="What is Interest Rate?" data-tooltip="Annual loan interest rate.">!</button></label><input class="fc-input percent" id="interestRatePct" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="pointsPct">Points % <button type="button" class="info-icon" aria-label="What are Points?" data-tooltip="Loan points (upfront fee). 1 point = 1% of the loan amount.">!</button></label><input class="fc-input percent" id="pointsPct" type="text" inputmode="decimal" autocomplete="off" /></div>
-              <div class="fc-row"><label for="downPayment">Down Payment <button type="button" class="info-icon" aria-label="What is Down Payment?" data-tooltip="Cash you bring to closing (if applicable).">!</button></label><input class="fc-input money" id="downPayment" type="text" inputmode="decimal" autocomplete="off" /></div>
-            </div>
-          </div>
-
-          <div class="fc-results" id="fcReportArea">
-            <div class="fc-kpis">
-              <div class="fc-card"><div class="fc-card-label">Net Profit</div><div class="fc-card-value" id="outNetProfit">$0</div></div>
-              <div class="fc-card"><div class="fc-card-label">ROI</div><div class="fc-card-value" id="outROI">0%</div></div>
-              <div class="fc-card"><div class="fc-card-label">Total Costs</div><div class="fc-card-value" id="outTotalCosts">$0</div></div>
-              <div class="fc-card"><div class="fc-card-label">Break-even Sale Price</div><div class="fc-card-value" id="outBreakEven">$0</div></div>
-              <div class="fc-card"><div class="fc-card-label">Max Offer (70% Rule)</div><div class="fc-card-value" id="outMaxOffer70">$0</div></div>
-              <div class="fc-card"><div class="fc-card-label">Decision</div><div class="fc-card-value" id="outDecision" data-state="bad">NO GO</div></div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <script src="../assets/js/config.js"></script>
-    <script src="../assets/js/cookie-banner-component.js"></script>
-    <script src="../assets/js/consent.js"></script>
-    <script src="../assets/js/analytics-ga4.js"></script>
-    <script src="../assets/js/meta-pixel.js"></script>
-    <script src="../assets/js/analytics.js"></script>
-    <script src="../lang.js"></script>
-    <script src="../assets/js/tools-config.js"></script>
-    <script src="../script.js"></script>
-    <script src="../assets/js/flip-calculator.js"></script>
-    <script src="../assets/js/site-theme.js?v=20261018"></script>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Calculadora de Flip · InvestorBlueprint</title>
+<style>
+:root{color-scheme:light dark}*{box-sizing:border-box}
+body{margin:0;background:#f5f7fb;color:#172b3d;font:16px system-ui,-apple-system,sans-serif}
+main{width:min(520px,92vw);margin:12vh auto;padding:28px;border:1px solid #dce5ef;background:#fff;border-radius:16px;box-shadow:0 10px 25px #09192714}
+h1{font-size:1.25rem;margin:0 0 10px}
+p{line-height:1.6;color:#4b6175}
+a{display:inline-flex;padding:10px 14px;border-radius:9px;background:#146d82;color:#fff;text-decoration:none;font-weight:700}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>InvestorBlueprint · Calculadora de Flip</h1>
+<p id="secure-loading-message" role="status">Verificando tu sesión y autorización…</p>
+<a id="secure-login-link" hidden href="../login.html">Iniciar sesión / Sign in</a>
+<noscript>Para usar esta herramienta necesitas activar JavaScript e iniciar sesión.</noscript>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/member-auth-config.js"></script>
+<script src="../assets/js/secure-tool-loader.js?v=20261018-protected1" data-root="../" data-tool="flip"></script>
+</body>
 </html>
