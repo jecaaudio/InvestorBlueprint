@@ -6,8 +6,9 @@ const siteBasePath = (process.env.AXE_SITE_BASE_PATH || '/InvestorBlueprint').re
 const pages = [
   '/index.html',
   '/pricing.html',
-  '/tools/rental-cash-flow.html',
-  '/tools/rent-calculator.html',
+  '/login.html',
+  '/admin.html',
+  '/privacy.html',
   '/tools/flip-calculator.html'
 ];
 
