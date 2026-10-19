@@ -1,98 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hard Money Analyzer | InvestorBlueprint</title>
-    <meta name="description" content="Evaluate hard money loan costs, points, carrying expenses, and payoff scenarios before funding a deal." />
-    <link rel="canonical" href="https://jecaaudio.github.io/InvestorBlueprint/tools/hard-money-analyzer.html" />
-    <link rel="stylesheet" href="tool-styles.css" />
-      <script src="tool-access-feedback.js"></script>
-    <link rel="stylesheet" href="../assets/css/cookie-banner.css" />
-    <link rel="stylesheet" href="../assets/css/site-theme.css?v=20261018" />
-  <!-- Temporary fail-closed front-end gate; migrate tool assets to protected hosting before launch. -->
-    <style>html:not(.ib-access-granted):not(.ib-access-error-visible) body{visibility:hidden!important}</style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/member-auth-config.js"></script>
-    <script src="../assets/js/tool-access-guard.js?v=20261018-access2" data-root="../"></script>
-  </head>
-  <body data-tool-id="hard_money" data-tool="hard-money">
-    <header class="tool-navbar">
-      <div class="brand-menu">
-        <a class="tool-logo" href="../index.html">InvestorBlueprint</a>
-        <nav class="brand-dropdown" aria-label="Quick navigation">
-          <a href="../index.html" data-i18n="navHome">Home</a>
-          <a href="../index.html#tools" data-i18n="navTools">Tools</a>
-          <a href="../index.html#learn" data-i18n="navLearn">Learn</a>
-          <a href="../pricing.html" data-i18n="navPricing">Pricing</a>
-          <a href="../login.html" data-i18n="navLogin">Login</a>
-        </nav>
-      </div>
-      <div class="lang-switcher" role="group" aria-label="Language selector">
-        <button type="button" class="lang-option" data-lang="en" aria-label="Switch to English">
-          <img class="flag-emoji" src="../assets/flags/us.svg" alt="" aria-hidden="true">
-          EN
-        </button>
-        <button type="button" class="lang-option" data-lang="es" aria-label="Cambiar a Español">
-          <img class="flag-emoji" src="../assets/flags/es.svg" alt="" aria-hidden="true">
-          ES
-        </button>
-      </div>
-    </header>
-
-    <main class="container">
-      <section class="card pro-tool-card">
-        <span class="badge free" data-tool-plan-badge></span>
-        <div class="tool-upgrade-overlay" role="note">
-          <strong>Beta: tool available. Please send feedback below.</strong>
-        </div>
-        <h1 data-tool-title data-i18n="hardMoneyTitle">💰 Hard Money Analyzer</h1>
-        <p data-tool-description data-i18n="hardMoneyDesc">Fill in lender terms to estimate total financing cost and monthly interest carry.</p>
-        <form id="tool-form" novalidate>
-          <fieldset>
-            <legend>Loan terms</legend>
-            <div class="form-grid">
-              <label for="loanAmount"><span data-i18n="hardMoneyLoan">Loan Amount</span></label>
-              <div class="input-control"><input id="loanAmount" name="loanAmount" type="number" inputmode="decimal" min="0" step="0.01" required aria-describedby="loanAmount-help loanAmount-error" /><span class="input-suffix">USD</span></div>
-              <small id="loanAmount-help" class="help-text">Enter total amount financed by the lender.</small>
-              <p id="loanAmount-error" class="field-error" role="alert" hidden></p>
-
-              <label for="interestRate"><span data-i18n="hardMoneyInterest">Interest Rate</span></label>
-              <div class="input-control"><input id="interestRate" name="interestRate" type="number" inputmode="decimal" min="0" max="100" step="0.1" required aria-describedby="interestRate-error" /><span class="input-suffix">%</span></div>
-              <p id="interestRate-error" class="field-error" role="alert" hidden></p>
-
-              <label for="points"><span data-i18n="hardMoneyPoints">Lender Points</span></label>
-              <div class="input-control"><input id="points" name="points" type="number" inputmode="decimal" min="0" max="20" step="0.1" required aria-describedby="points-error" /><span class="input-suffix">%</span></div>
-              <p id="points-error" class="field-error" role="alert" hidden></p>
-
-              <label for="months"><span data-i18n="hardMoneyMonths">Loan Term</span></label>
-              <div class="input-control"><input id="months" name="months" type="number" inputmode="decimal" min="1" step="1" required aria-describedby="months-error" /><span class="input-suffix">months</span></div>
-              <p id="months-error" class="field-error" role="alert" hidden></p>
-            </div>
-          </fieldset>
-          <p id="tool-validation" class="form-feedback" role="alert" hidden></p>
-          <div class="tool-actions">
-            <button type="submit" data-i18n="calculate">Calculate</button>
-            <button type="button" id="load-sample" class="secondary">Use example</button>
-            <button type="reset" class="secondary">Reset</button>
-          </div>
-        </form>
-        <aside class="result result-panel" role="status" aria-live="polite">
-          <div class="result-grid" id="result-cards"></div>
-          <div id="result" data-i18n="resultPrompt">Enter your numbers and click calculate.</div>
-        </aside>
-      </section>
-    </main>
-    <script src="../assets/js/config.js"></script>
-    <script src="../assets/js/cookie-banner-component.js"></script>
-    <script src="../assets/js/consent.js"></script>
-    <script src="../assets/js/analytics-ga4.js"></script>
-    <script src="../assets/js/meta-pixel.js"></script>
-    <script src="../assets/js/analytics.js"></script>
-    <script src="../lang.js"></script>
-    <script src="../assets/js/tools-config.js"></script>
-    <script src="../script.js"></script>
-    <script src="tool-script.js"></script>
-    <script src="../assets/js/site-theme.js?v=20261018"></script>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Hard Money · InvestorBlueprint</title>
+<style>
+:root{color-scheme:light dark}*{box-sizing:border-box}
+body{margin:0;background:#f5f7fb;color:#172b3d;font:16px system-ui,-apple-system,sans-serif}
+main{width:min(520px,92vw);margin:12vh auto;padding:28px;border:1px solid #dce5ef;background:#fff;border-radius:16px;box-shadow:0 10px 25px #09192714}
+h1{font-size:1.25rem;margin:0 0 10px}
+p{line-height:1.6;color:#4b6175}
+a{display:inline-flex;padding:10px 14px;border-radius:9px;background:#146d82;color:#fff;text-decoration:none;font-weight:700}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>InvestorBlueprint · Hard Money</h1>
+<p id="secure-loading-message" role="status">Verificando tu sesión y autorización…</p>
+<a id="secure-login-link" hidden href="../login.html">Iniciar sesión / Sign in</a>
+<noscript>Para usar esta herramienta necesitas activar JavaScript e iniciar sesión.</noscript>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/member-auth-config.js"></script>
+<script src="../assets/js/secure-tool-loader.js?v=20261018-protected1" data-root="../" data-tool="hard-money"></script>
+</body>
 </html>
