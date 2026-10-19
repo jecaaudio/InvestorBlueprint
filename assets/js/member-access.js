@@ -59,14 +59,22 @@
     $('tab-register')?.addEventListener('click',()=>showPanel('registration'));
     $('tab-login')?.addEventListener('click',()=>showPanel('login'));
     $('tab-recover')?.addEventListener('click',()=>showPanel('recover'));
-    $('toggle-signin-password')?.addEventListener('click',()=>{
-      const input=$('signin-password'),button=$('toggle-signin-password');
-      if(!input||!button)return;
-      const reveal=input.type==='password';
-      input.type=reveal?'text':'password';
-      button.setAttribute('aria-pressed',String(reveal));
-      button.textContent=reveal?t('Ocultar contraseña','Hide password'):t('Mostrar contraseña','Show password');
-    });
+    // Shared visibility control for signup, sign-in and password recovery.
+    function wirePasswordVisibility(buttonId,inputId){
+      const button=$(buttonId),input=$(inputId);
+      if(!button||!input)return;
+      button.addEventListener('click',()=>{
+        const visible=input.type==='password';
+        input.type=visible?'text':'password';
+        button.setAttribute('aria-pressed',String(visible));
+        button.dataset.es=visible?'Ocultar contraseña':'Mostrar contraseña';
+        button.dataset.en=visible?'Hide password':'Show password';
+        button.textContent=t(button.dataset.es,button.dataset.en);
+      });
+    }
+    wirePasswordVisibility('toggle-signup-password','signup-password');
+    wirePasswordVisibility('toggle-signin-password','signin-password');
+    wirePasswordVisibility('toggle-new-password','new-password');
     let canSetRecoveredPassword=false;
     function showPanel(name){
       for(const [panel,form] of [['registration',registration],['login',login],['recover',recovery]]){
