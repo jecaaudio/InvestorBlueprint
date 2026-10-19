@@ -1,121 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ARV Tool | InvestorBlueprint</title>
-    <meta name="description" content="Automated ARV tool to analyze subject properties, nearby comps, and projected value with exportable output." />
-    <link rel="canonical" href="https://jecaaudio.github.io/InvestorBlueprint/tools/arv/" />
-    <link rel="stylesheet" href="../tool-styles.css" />
-    <link rel="stylesheet" href="arv.css" />
-      <script src="../tool-access-feedback.js"></script>
-    <link rel="stylesheet" href="../../assets/css/cookie-banner.css" />
-    <link rel="stylesheet" href="../../assets/css/site-theme.css?v=20261018" />
-  <!-- Temporary fail-closed front-end gate; migrate tool assets to protected hosting before launch. -->
-    <style>html:not(.ib-access-granted):not(.ib-access-error-visible) body{visibility:hidden!important}</style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../../assets/js/member-auth-config.js"></script>
-    <script src="../../assets/js/tool-access-guard.js?v=20261018-access2" data-root="../../"></script>
-  </head>
-  <body data-tool-id="automated_arv">
-    <header class="tool-navbar">
-      <div class="brand-menu">
-        <a class="tool-logo" href="../../index.html">InvestorBlueprint</a>
-        <nav class="brand-dropdown" aria-label="Quick navigation">
-          <a href="../../index.html">Home</a>
-          <a href="../../index.html#tools">Tools</a>
-          <a href="../../index.html#learn">Learn</a>
-          <a href="../../pricing.html">Pricing</a>
-          <a href="../../login.html">Login</a>
-        </nav>
-      </div>
-    </header>
-
-    <main class="container">
-      <section class="card arv-shell pro-tool-card">
-        <span class="badge free" data-tool-plan-badge></span>
-        <div class="tool-upgrade-overlay" role="note">
-          <strong>Beta: tool available. Please send feedback below.</strong>
-        </div>
-        <h1 data-tool-title>🏠 Automated ARV Tool</h1>
-        <p data-tool-description>Enter an address to get subject details, sold comps, and an ARV estimate.</p>
-
-        <form id="arv-form" class="arv-form">
-          <label>
-            Address
-            <input id="address" name="address" type="text" placeholder="123 Main St, Miami, FL" required />
-          </label>
-          <button type="submit" id="calculate-btn">Calculate ARV</button>
-        </form>
-
-        <section class="worker-config" aria-label="Worker configuration">
-          <h2>Worker Configuration</h2>
-          <div id="demo-banner" class="demo-banner" hidden>Beta: usando DEMO data</div>
-          <div class="worker-config-row">
-            <label>
-              Worker URL
-              <input id="worker-url" type="url" placeholder="https://your-worker.workers.dev" />
-            </label>
-            <button type="button" id="save-worker-url-btn">Save</button>
-            <button type="button" id="run-demo-btn">Run with demo data</button>
-          </div>
-        </section>
-
-        <div id="status" class="status" aria-live="polite">Ready.</div>
-        <div id="error" class="error" role="alert" hidden></div>
-
-        <section class="result-grid" id="results" hidden>
-          <article class="metric-block">
-            <h2>Subject</h2>
-            <div id="subject-fields" class="kv-grid"></div>
-          </article>
-
-          <article class="metric-block">
-            <h2>ARV</h2>
-            <div id="arv-fields" class="kv-grid"></div>
-          </article>
-        </section>
-
-        <div class="action-row" id="action-row" hidden>
-          <button type="button" id="copy-btn">Copy report</button>
-          <button type="button" id="export-btn">Export JSON</button>
-        </div>
-
-        <div class="table-wrap" id="comps-wrap" hidden>
-          <table>
-            <thead>
-              <tr>
-                <th>Address</th>
-                <th>Distance (mi)</th>
-                <th>Sold Date</th>
-                <th>Sold Price</th>
-                <th>Beds</th>
-                <th>Baths</th>
-                <th>Sqft</th>
-                <th>Price/Sqft</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody id="comps-body"></tbody>
-          </table>
-        </div>
-
-        <section class="troubleshooting" aria-label="Troubleshooting">
-          <h2>Troubleshooting</h2>
-          <ul>
-            <li><strong>No Worker URL?</strong> Keep using <em>Run with demo data</em> to get sample ARV results.</li>
-            <li><strong>FORBIDDEN_ORIGIN error?</strong> Configure <code>ALLOWED_ORIGIN</code> in your worker with this value: <code id="current-origin">unknown</code>.</li>
-            <li><strong>Network/CORS errors?</strong> Verify the Worker URL is correct and that the worker sends CORS headers for this origin.</li>
-          </ul>
-        </section>
-      </section>
-    </main>
-
-    <script src="../../assets/js/tools-config.js"></script>
-    <script src="arv.js"></script>
-    <script src="../../assets/js/config.js"></script>
-    <script src="../../assets/js/cookie-banner-component.js"></script>
-    <script src="../../assets/js/consent.js"></script>
-    <script src="../../assets/js/site-theme.js?v=20261018"></script>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ARV automatizado · InvestorBlueprint</title>
+<style>
+:root{color-scheme:light dark}*{box-sizing:border-box}
+body{margin:0;background:#f5f7fb;color:#172b3d;font:16px system-ui,-apple-system,sans-serif}
+main{width:min(520px,92vw);margin:12vh auto;padding:28px;border:1px solid #dce5ef;background:#fff;border-radius:16px;box-shadow:0 10px 25px #09192714}
+h1{font-size:1.25rem;margin:0 0 10px}
+p{line-height:1.6;color:#4b6175}
+a{display:inline-flex;padding:10px 14px;border-radius:9px;background:#146d82;color:#fff;text-decoration:none;font-weight:700}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>InvestorBlueprint · ARV automatizado</h1>
+<p id="secure-loading-message" role="status">Verificando tu sesión y autorización…</p>
+<a id="secure-login-link" hidden href="../../login.html">Iniciar sesión / Sign in</a>
+<noscript>Para usar esta herramienta necesitas activar JavaScript e iniciar sesión.</noscript>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../assets/js/member-auth-config.js"></script>
+<script src="../../assets/js/secure-tool-loader.js?v=20261018-protected1" data-root="../../" data-tool="automated-arv"></script>
+</body>
 </html>
