@@ -1,4 +1,39 @@
 (function () {
+  // Pure flip model; full-draw interest is a conservative simplified estimate.
+  const calculateFlipFinance = (x) => {
+    const acquisition=x.purchase+x.buyerClosing+x.titleFees+x.prorations+x.inspectionCost;
+    const holdingTotal=x.monthlyHolding*x.holdingMonths;
+    const sellingRate=(x.realtorPct+x.concessionPct+x.sellerClosingPct)/100;
+    const sellingFixed=x.stagingCost+x.transferTax;
+    const isFinanced=x.isPro&&x.financingType!=='cash';
+    const derivedLoan=x.purchase*x.loanPurchasePct/100+x.rehabTotal*x.loanRehabPct/100;
+    const fundedPrincipal=isFinanced?(x.loanAmount>0?x.loanAmount:derivedLoan):0;
+    const financeCosts=isFinanced?fundedPrincipal*x.pointsPct/100+
+      fundedPrincipal*x.interestRate/100*x.holdingMonths/12+
+      (x.drawFee+x.drawInspectionFee)*x.drawCount+
+      x.originationFees+x.loanClosingCosts+x.prepayPenalty:0;
+    const fixedCosts=acquisition+x.rehabTotal+holdingTotal+sellingFixed+financeCosts;
+    function profitAtSale(gross){
+      const beforeTax=gross-fixedCosts-gross*sellingRate;
+      const provisionalTax=Math.max(0,beforeTax)*x.taxRate/100;
+      return {profit:beforeTax-provisionalTax,sellingTotal:sellingFixed+gross*sellingRate,tax:provisionalTax};
+    }
+    const base=profitAtSale(x.sale);
+    const cashCommitted=acquisition+x.rehabTotal+holdingTotal+financeCosts-fundedPrincipal;
+    return {
+      acquisition,holdingTotal,rehabTotal:x.rehabTotal,financedAmount:fundedPrincipal,
+      financingTotal:financeCosts,sellingTotal:base.sellingTotal,
+      taxAmount:base.tax,totalCosts:x.sale-base.profit,netProfit:base.profit,
+      cashCommitted,roi:cashCommitted>0?base.profit/cashCommitted*100:null,
+      breakEven:sellingRate<1?fixedCosts/(1-sellingRate):null,
+      mao70:x.sale*0.7-x.rehabTotal,
+      scenarioLow:profitAtSale(x.sale*0.95).profit,
+      scenarioBase:base.profit,
+      scenarioHigh:profitAtSale(x.sale*1.05).profit
+    };
+  };
+  if(typeof window!=='undefined')window.IBCalculateFlipFinance=calculateFlipFinance;
+
   const onDomReady = (callback) => {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', callback, { once: true });
@@ -332,47 +367,29 @@
     if (type === 'flip') {
       if (!validateFlip(messages)) return;
 
-      const purchase = num('purchasePrice');
-      const sale = num('salePrice');
-      const rehabTotal = num('rehabCost') * (1 + num('contingencyPct') / 100);
-      const acquisition = purchase + num('earnestDeposit') + num('buyerClosing') + num('titleFees') + num('prorations') + num('inspectionCost');
-      const monthlyHolding = num('insuranceMonthly') + num('taxesMonthly') + num('utilitiesMonthly') + num('maintenanceMonthly') + num('hoaMonthly') + num('miscMonthly');
-      const holdingTotal = monthlyHolding * num('holdingMonths');
-      const sellingTotal = sale * ((num('realtorPct') + num('concessionPct') + num('sellerClosingPct')) / 100) + num('stagingCost') + num('transferTax');
-      const projectCost = acquisition + rehabTotal + holdingTotal + sellingTotal;
-
-      const isPro = (values.planMode || 'free') === 'pro';
-      let financedAmount = 0;
-      let financingTotal = 0;
-      if (isPro && values.financingType !== 'cash') {
-        financedAmount = Math.max(num('loanAmount'), purchase * (num('loanPurchasePct') / 100) + rehabTotal * (num('loanRehabPct') / 100));
-        const monthlyInterestBase = values.financingType === 'hard-money' ? purchase : financedAmount;
-        financingTotal =
-          financedAmount * (num('pointsPct') / 100) +
-          monthlyInterestBase * (num('interestRate') / 100) * (num('holdingMonths') / 12) +
-          (num('drawFee') + num('drawInspectionFee')) * num('drawCount') +
-          num('originationFees') + num('loanClosingCosts') + num('prepayPenalty');
-      }
-
-      const taxAmount = Math.max(sale - projectCost - financingTotal, 0) * (num('taxRate') / 100);
-      const netProfit = sale - projectCost - financingTotal - taxAmount;
-      const cashToClose = acquisition + rehabTotal + holdingTotal + financingTotal - financedAmount;
-      const roi = cashToClose > 0 ? (netProfit / cashToClose) * 100 : 0;
-      const mao70 = sale * 0.7 - rehabTotal;
-      const totalCosts = projectCost + financingTotal + taxAmount;
-      const breakEven = totalCosts;
-      const scenarioLow = sale * 0.95 - (totalCosts + rehabTotal * 0.1);
-      const scenarioBase = netProfit;
-      const scenarioHigh = sale * 1.05 - (totalCosts - rehabTotal * 0.1);
-      const score = netProfit > 0 && roi > 15 ? 'A' : netProfit > 0 ? 'B' : 'C';
-
+      const model=calculateFlipFinance({
+        purchase:num('purchasePrice'),sale:num('salePrice'),
+        rehabTotal:num('rehabCost')*(1+num('contingencyPct')/100),
+        buyerClosing:num('buyerClosing'),titleFees:num('titleFees'),prorations:num('prorations'),inspectionCost:num('inspectionCost'),
+        monthlyHolding:['insuranceMonthly','taxesMonthly','utilitiesMonthly','maintenanceMonthly','hoaMonthly','miscMonthly'].map(num).reduce((a,b)=>a+b,0),
+        holdingMonths:num('holdingMonths'),realtorPct:num('realtorPct'),concessionPct:num('concessionPct'),
+        sellerClosingPct:num('sellerClosingPct'),stagingCost:num('stagingCost'),transferTax:num('transferTax'),
+        isPro:(values.planMode||'free')==='pro',financingType:values.financingType,
+        loanAmount:num('loanAmount'),loanPurchasePct:num('loanPurchasePct'),loanRehabPct:num('loanRehabPct'),
+        pointsPct:num('pointsPct'),interestRate:num('interestRate'),drawFee:num('drawFee'),
+        drawInspectionFee:num('drawInspectionFee'),drawCount:num('drawCount'),originationFees:num('originationFees'),
+        loanClosingCosts:num('loanClosingCosts'),prepayPenalty:num('prepayPenalty'),taxRate:num('taxRate')
+      });
+      const {acquisition,rehabTotal,holdingTotal,sellingTotal,financingTotal,totalCosts,netProfit,
+        cashCommitted,roi,mao70,breakEven,scenarioLow,scenarioBase,scenarioHigh}=model;
+      const score=netProfit>0&&roi!==null&&roi>15?'A':netProfit>0?'B':'C';
       setCards([
         { label: messages.profit, value: money(netProfit) },
         { label: messages.mao, value: money(mao70) },
-        { label: messages.cashToClose, value: money(cashToClose) },
+        { label: t('cashCommittedLabel', 'Net capital committed'), value: money(cashCommitted) },
         { label: messages.totalCosts, value: money(totalCosts) },
-        { label: messages.roi, value: pct(roi) },
-        { label: messages.breakEven, value: money(breakEven) }
+        { label: messages.roi, value: roi===null?'N/A':pct(roi) },
+        { label: messages.breakEven, value: breakEven===null?'N/A':money(breakEven) }
       ]);
 
       if (output) {
@@ -391,6 +408,7 @@
               </tbody>
             </table>
           </div>
+          <p class="access-note">${t('flipMathNotes', 'Earnest money credits the purchase price. Interest assumes fully drawn principal for the hold; net committed capital is not cash due at closing.')}</p>
           <h3>${messages.sensitivityResults}</h3>
           <div class="table-wrap">
             <table>
