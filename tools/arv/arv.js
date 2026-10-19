@@ -233,12 +233,18 @@ async function fetchArv(address) {
 }
 
 async function loadDemoReport() {
-  const response = await fetch(DEMO_DATA_PATH);
-  if (!response.ok) {
-    throw new Error("Unable to load demo data.");
-  }
-
-  return response.json();
+  // A bundled illustrative report prevents deployment-file omissions.
+  // These figures are fictitious and must never be represented as a market valuation.
+  return {
+    subject:{address:"123 EXAMPLE St, Sample City, FL",beds:3,baths:2,sqft:1580,propertyType:"Single Family",yearBuilt:1997,lotSqft:5200},
+    comps:[
+      {address:"110 EXAMPLE Ave",distanceMiles:0.24,soldDate:"2026-01-18",soldPrice:515000,beds:3,baths:2,sqft:1540,pricePerSqft:334,score:0.941},
+      {address:"78 SAMPLE Rd",distanceMiles:0.37,soldDate:"2025-12-05",soldPrice:528000,beds:3,baths:2,sqft:1625,pricePerSqft:325,score:0.913},
+      {address:"250 DEMO Ct",distanceMiles:0.51,soldDate:"2025-11-21",soldPrice:499000,beds:3,baths:2,sqft:1498,pricePerSqft:333,score:0.894}
+    ],
+    arv:{estimate:522000,low:506000,high:538000,confidence:82,method:"DEMO weighted-comps",ppsfWeighted:331},
+    meta:{generatedAt:new Date().toISOString(),provider:"DEMO - FABRICATED DATA",warnings:["DEMO ONLY: fictional properties and sample numbers, not a real appraisal or market value."]}
+  };
 }
 
 saveWorkerBtn.addEventListener("click", () => {
