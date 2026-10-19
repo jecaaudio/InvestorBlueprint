@@ -58,14 +58,16 @@ Si estas sirviendo desde la carpeta del proyecto y no desde la carpeta padre, ej
 AXE_SITE_BASE_PATH= npm run qa:axe
 ```
 
-## Acceso beta
+## Acceso y seguridad (octubre de 2026)
 
-Durante la beta, las herramientas no requieren contrasena, pago ni `TEAM_ACCESS` para usarse.
+- InvestorBlueprint usa Supabase Auth (correo y contraseña), perfiles de usuarios con aprobación administrativa y políticas RLS.
+- El administrador principal registrado está aprobado en Supabase. **Nunca** se guardan contraseñas ni claves secretas en GitHub.
+- `login.html` permite solicitar acceso, iniciar sesión y recuperar la contraseña; `admin.html` solo consulta datos con RLS para administradores aprobados.
+- Las ocho direcciones de herramientas son *loaders*: el HTML de la calculadora llega desde la Edge Function `ib-protected-tools` únicamente tras validar una sesión y el permiso actualizado en Supabase.
+- El workflow publica un sitio seleccionado (`public-site/`) y no la raíz completa del repositorio; archivos internos, demos y scripts antiguos quedan excluidos de GitHub Pages.
+- **Limitación importante:** este repositorio continúa siendo público y su historial contiene versiones antiguas del código de las calculadoras. Las librerías JavaScript que ejecuta el navegador tampoco son secretas. Para proteger propiedad intelectual, migrar a un repositorio privado y mover la lógica confidencial al servidor.
+- La organización Supabase `JECA` continúa en el plan **Free**. La protección de contraseñas filtradas solo está disponible en Supabase Pro.
+- Pendiente en el panel de Supabase: **Authentication → URL Configuration**. Configurar **Site URL** como `https://jecaaudio.github.io/InvestorBlueprint/` y añadir `https://jecaaudio.github.io/InvestorBlueprint/login.html` en **Redirect URLs**. Esta configuración no se puede gestionar con las acciones del conector Supabase disponibles actualmente.
+- El flujo de recuperación por correo y el login desde iPhone requieren pruebas reales. El envío de correos a clientes externos exige configurar SMTP apropiado.
+- Una implementación solo con GitHub Pages **no** proporciona confidencialidad del código que se ejecute en el navegador.
 
-El formulario de `login.html` funciona como solicitud de acceso/lista de contacto:
-
-- Valida que el email tenga formato correcto.
-- Guarda el email en `localStorage` con la clave `ib_waitlist_email`.
-- Redirige al usuario de vuelta al sitio.
-
-Esto es un flujo de demo/frontend. Para capturar emails de verdad, conecta el formulario a un backend, Formspree, Supabase, Firebase, Airtable o Google Sheets.
