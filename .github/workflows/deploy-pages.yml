@@ -38,6 +38,7 @@ jobs:
           rm -f public-site/assets/js/login.js public-site/assets/js/tool-access-guard.js
           cp tools/*.html tools/*.css tools/tool-script.js tools/tool-access-feedback.js public-site/tools/
           cp tools/arv/index.html tools/arv/arv.css tools/arv/arv.js public-site/tools/arv/
+          cp -R tools/arv/fixtures public-site/tools/arv/fixtures
           cp calculadora-venta/index.html calculadora-venta/print-report.css calculadora-venta/print-report.js public-site/calculadora-venta/
           touch public-site/.nojekyll
           # Fail deployment if a calculator is accidentally embedded into a public entry page.
@@ -50,6 +51,7 @@ jobs:
           test -f public-site/account.html
           test -f public-site/assets/js/account-settings.js
           test -f public-site/manifest.webmanifest
+          test -f public-site/tools/arv/fixtures/demo-report.json
           test ! -e public-site/auth.js
           test ! -e public-site/workers
           test ! -e public-site/preview-login.html
