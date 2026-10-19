@@ -36,7 +36,8 @@ function isWorkerUrlConfigured(url = getWorkerUrl()) {
 
 function updateWorkerStateUi(url = getWorkerUrl()) {
   const configured = isWorkerUrlConfigured(url);
-  calculateBtn.title = configured ? "" : "No Worker URL configured. Submit will run with demo data.";
+  calculateBtn.title = configured ? "" : "Live ARV is not configured. Use the Demo button for sample data.";
+  calculateBtn.disabled = !configured;
 
   if (demoBanner) {
     demoBanner.hidden = configured;
@@ -283,26 +284,29 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
-  const runWithDemo = !isWorkerUrlConfigured();
+  if(!isWorkerUrlConfigured()){
+    setError("Real valuation is unavailable. Configure a valuation provider, or use the Demo button for example data.");
+    return;
+  }
 
   setError("");
-  setStatus(runWithDemo ? "Loading demo data..." : "Calculating ARV...", true);
+  setStatus("Calculating ARV...", true);
   resultsEl.hidden = true;
   compsWrap.hidden = true;
   actionRow.hidden = true;
 
   try {
-    const payload = runWithDemo ? await loadDemoReport() : await fetchArv(address);
+    const payload = await fetchArv(address);
     render(payload);
     if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === "function") {
-      window.IBAnalytics.trackCalcSuccess("arv", { result: runWithDemo ? "demo_arv_estimate" : "arv_estimate" });
+      window.IBAnalytics.trackCalcSuccess("arv", { result: "arv_estimate" });
     }
   } catch (error) {
     const workerUrl = getWorkerUrl();
     const errorMessage = mapWorkerError(error, workerUrl);
     setStatus("Failed.");
     setError(errorMessage);
-    trackCalcError("calc_failed", { message: errorMessage, worker_url: workerUrl, mode: runWithDemo ? "demo" : "worker" });
+    trackCalcError("calc_failed", { message: errorMessage, worker_url: workerUrl, mode: "worker" });
   } finally {
     statusEl.classList.remove("loader");
   }
