@@ -102,6 +102,21 @@
     sec.setAttribute('aria-label','Print-ready seller settlement estimate');
     document.body.appendChild(sec);
   }
+  if(!$('ib-report-notes')){
+    const printButton=$('printButton');
+    if(printButton?.parentElement){
+      const box=document.createElement('div'),label=document.createElement('label'),area=document.createElement('textarea');
+      box.className='ib-report-notes-panel';
+      box.style.cssText='margin:16px 0;padding:14px;border:1px solid #dce5ef;border-radius:12px';
+      label.htmlFor='ib-report-notes';label.textContent=L('Notas del análisis para exportar','Analysis notes to export');
+      label.style.cssText='display:block;font-weight:650;margin-bottom:8px';
+      area.id='ib-report-notes';area.rows=4;area.maxLength=3000;
+      area.style.cssText='box-sizing:border-box;width:100%;padding:10px;border-radius:8px';
+      area.placeholder=L('Supuestos, riesgos, condiciones y verificaciones pendientes.','Assumptions, risks, conditions and follow-up checks.');
+      area.addEventListener('input',refresh);
+      box.append(label,area);printButton.parentElement.after(box);
+    }
+  }
   $('printButton')?.addEventListener('click',refresh,true);
   window.addEventListener('beforeprint',refresh);
   refresh();
