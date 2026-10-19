@@ -36,6 +36,15 @@
     if(response.status===401){await client.auth.signOut();window.location.replace(loginURL.href);return;}
     if(response.status===403){fail('Tu cuenta necesita aprobación antes de abrir esta calculadora.');return;}
     if(!response.ok)throw Error('Server returned '+response.status);
+    // Reset the previous member's report metadata *before* fetching settings.
+    // A failed RLS/network lookup must not leak a former user's name/company.
+    const safeDefaults={
+      ib_display_name:'',ib_company_name:'',ib_document_language:'es',
+      ib_report_detail:'detailed',ib_notes_detail:'detailed'
+    };
+    try{
+      for(const [key,value] of Object.entries(safeDefaults))localStorage.setItem(key,value);
+    }catch(error){console.warn('Local report preferences are unavailable')}
     // Refresh document preferences under the currently authenticated member.
     // Never reuse a previous account's exported author name or language.
     try{
