@@ -65,8 +65,12 @@
        .select('display_name,company_name,interface_language,document_language,report_detail,notes_detail')
        .eq('user_id',user.id).maybeSingle();
      if(settingsError)throw settingsError;
-     fill(settings);
-     if(settings)setCache(settings);
+     const effective=settings||{
+       display_name:'',company_name:'',interface_language:'es',
+       document_language:'es',report_detail:'detailed',notes_detail:'detailed'
+     };
+     fill(effective);
+     setCache(effective);
      $('account-email').textContent=user.email||profile.email||'';
      $('account-role').textContent=profile.role==='admin'?t('Rol: administrador','Role: administrator'):t('Rol: miembro','Role: member');
      const status={approved:t('Cuenta aprobada','Account approved'),pending:t('Pendiente de aprobación','Awaiting approval'),rejected:t('Solicitud rechazada','Request declined'),suspended:t('Cuenta suspendida','Account suspended')};
@@ -99,6 +103,9 @@
      });
      $('account-signout').addEventListener('click',async()=>{
        await client.auth.signOut();
+       for(const key of ['ib_document_language','ib_report_detail','ib_notes_detail','ib_display_name','ib_company_name']){
+         try{localStorage.removeItem(key)}catch(error){}
+       }
        window.location.assign('login.html?reason=login');
      });
    }catch(error){

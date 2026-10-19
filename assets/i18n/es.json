@@ -254,5 +254,6 @@
   "useCase2Title": "Compra, reparación y reventa",
   "useCase2Description": "Evalúa compra, ARV, rehabilitación, financiamiento, ganancias y riesgos.",
   "useCase3Title": "Propiedades de renta",
-  "useCase3Description": "Estima ingresos, vacancia, mantenimiento y flujo de caja."
+  "useCase3Description": "Estima ingresos, vacancia, mantenimiento y flujo de caja.",
+  "navAccount": "Mi perfil"
 }

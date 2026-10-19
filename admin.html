@@ -41,7 +41,7 @@
     <strong id="admin-identity"></strong>
     <p class="access-note" data-es="Administración de solicitudes" data-en="Access request management">Administración de solicitudes</p>
    </div>
-   <a href="account.html" class="btn" data-es="Mi perfil y configuración" data-en="Profile and settings">Mi perfil y configuración</a>\n   <a href="index.html#tools" class="btn" data-es="Usar calculadoras" data-en="Use calculators">Usar calculadoras</a>\n   <button class="btn" id="admin-logout" type="button" data-es="Cerrar sesión" data-en="Sign out">Cerrar sesión</button>
+   <button class="btn" id="admin-logout" type="button" data-es="Cerrar sesión" data-en="Sign out">Cerrar sesión</button>
   </div>
   <div id="admin-message" class="access-message" role="status" hidden></div>
   <div class="admin-controls">
@@ -58,7 +58,7 @@
    <button type="button" class="btn" id="members-refresh" data-es="Actualizar" data-en="Refresh">Actualizar</button>
   </div>
   <div id="member-list" class="member-list" aria-live="polite"></div>
-  <p class="access-note" data-es="Las calculadoras actuales comprueban la autorización en Supabase antes de entregar el contenido. Puedes abrirlas desde el menú superior." data-en="Current calculators verify Supabase approval before delivering their content. Open them from the menu above.">El administrador puede aprobar el acceso, pero la autorización de las calculadoras se activará solo cuando las herramientas estén alojadas en una ruta protegida por el servidor.</p>
+  <p class="access-note" data-es="La autorización de las calculadoras ya se comprueba en Supabase antes de entregar su contenido. La aprobación y suspensión de cuentas tienen efecto sobre las nuevas solicitudes." data-en="Supabase verifies calculator access before delivering protected content. Account approval and suspension affect subsequent access requests.">El administrador puede aprobar el acceso, pero la autorización de las calculadoras se activará solo cuando las herramientas estén alojadas en una ruta protegida por el servidor.</p>
  </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

@@ -254,5 +254,6 @@
   "useCase2Title": "Buy, renovate, and resell",
   "useCase2Description": "Evaluate acquisition, ARV, rehab, financing, profitability, and risks.",
   "useCase3Title": "Rental properties",
-  "useCase3Description": "Estimate revenue, vacancy, maintenance, and cash flow."
+  "useCase3Description": "Estimate revenue, vacancy, maintenance, and cash flow.",
+  "navAccount": "My profile"
 }

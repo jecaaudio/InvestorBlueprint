@@ -36,21 +36,30 @@
     if(response.status===401){await client.auth.signOut();window.location.replace(loginURL.href);return;}
     if(response.status===403){fail('Tu cuenta necesita aprobación antes de abrir esta calculadora.');return;}
     if(!response.ok)throw Error('Server returned '+response.status);
+    // Refresh document preferences under the currently authenticated member.
+    // Never reuse a previous account's exported author name or language.
+    try{
+      const {data:prefs,error:prefsError}=await client.from('member_preferences')
+        .select('display_name,company_name,interface_language,document_language,report_detail,notes_detail')
+        .eq('user_id',session.user.id).maybeSingle();
+      if(!prefsError){
+        const p=prefs||{display_name:'',company_name:'',interface_language:'es',
+          document_language:'es',report_detail:'detailed',notes_detail:'detailed'};
+        const settings={
+          ib_display_name:p.display_name||'',ib_company_name:p.company_name||'',
+          ib_document_language:p.document_language==='en'?'en':'es',
+          ib_report_detail:p.report_detail==='summary'?'summary':'detailed',
+          ib_notes_detail:p.notes_detail==='summary'?'summary':'detailed'
+        };
+        for(const [key,value] of Object.entries(settings))localStorage.setItem(key,value);
+      }
+    }catch(error){console.warn('Member report preferences could not be synced',error)}
     let markup=await response.text();
     if(!/^<!doctype html>/i.test(markup.trim())||markup.length<1200)throw Error('Unexpected protected page');
     if(assetBase){
       const url=new URL(assetBase,window.location.href);
       markup=markup.replace(/<head(\s[^>]*)?>/i,(match)=>match+'<base href="'+url.href+'">');
     }
-    // Keep a persistent profile route in every protected calculator, including
-    // the seller's print-first tool. No administrative link is shown here.
-    const profileShortcut='<a id="ib-account-shortcut" href="/InvestorBlueprint/account.html" aria-label="Mi perfil / My account" '+
-      'style="position:fixed;bottom:14px;right:14px;z-index:9999;background:#146d82;color:#fff;'+
-      'text-decoration:none;border-radius:999px;padding:12px 16px;font:600 14px system-ui;'+
-      'box-shadow:0 5px 16px #0004">Mi perfil / My profile</a>';
-    markup=markup.replace(/<\/head>/i,
-      '<style>@media print{#ib-account-shortcut{display:none!important}}</style></head>');
-    markup=markup.replace(/<\/body>/i,profileShortcut+'</body>');
     // This navigation delivers the HTML only AFTER the server authorizes the user.
     document.open();document.write(markup);document.close();
   }catch(err){

@@ -20,7 +20,7 @@
 <body class="ib-membership-page">
 <header class="navbar">
  <div class="brand-menu"><a class="logo home-link brand-lockup" href="index.html" aria-label="InvestorBlueprint - inicio"><img class="brand-icon" src="assets/brand/favicon.svg" width="45" height="45" alt="" aria-hidden="true"><span class="brand-name" aria-hidden="true"><span class="brand-name-investor">Investor</span><span class="brand-name-blueprint">Blueprint</span></span></a></div>
- <nav id="primary-nav"><a href="index.html" data-es="Inicio" data-en="Home">Inicio</a><a href="index.html#tools" data-es="Herramientas" data-en="Tools">Herramientas</a><a href="account.html" data-es="Mi perfil" data-en="My profile">Mi perfil</a><a href="admin.html" data-es="Administración" data-en="Administration" id="login-admin-link" hidden>Administración</a></nav>
+ <nav id="primary-nav"><a href="index.html" data-es="Inicio" data-en="Home">Inicio</a><a href="index.html#tools" data-es="Herramientas" data-en="Tools">Herramientas</a><a href="account.html" data-es="Mi perfil" data-en="My profile">Mi perfil</a></nav>
  <div class="lang-switcher" role="group" aria-label="Language">
   <button class="lang-option" type="button" data-lang="es">ES</button>
   <button class="lang-option" type="button" data-lang="en">EN</button>
@@ -34,10 +34,10 @@
 </section>
 <div class="access-grid">
  <section class="card access-card" id="member-login">
-  <div class="access-tabs" role="tablist" aria-label="Access options">
-   <button id="tab-register" type="button" aria-selected="true" data-es="Solicitar acceso" data-en="Request access">Solicitar acceso</button>
-   <button id="tab-login" type="button" aria-selected="false" data-es="Iniciar sesión" data-en="Sign in">Iniciar sesión</button>
-   <button id="tab-recover" type="button" aria-selected="false" data-es="Recuperar contraseña" data-en="Reset password">Recuperar contraseña</button>
+  <div class="access-tabs" role="group" aria-label="Access options">
+   <button id="tab-register" type="button" aria-pressed="true" data-es="Solicitar acceso" data-en="Request access">Solicitar acceso</button>
+   <button id="tab-login" type="button" aria-pressed="false" data-es="Iniciar sesión" data-en="Sign in">Iniciar sesión</button>
+   <button id="tab-recover" type="button" aria-pressed="false" data-es="Recuperar contraseña" data-en="Reset password">Recuperar contraseña</button>
   </div>
   <div id="portal-message" class="access-message" role="status" aria-live="polite" hidden></div>
   <form id="registration-form" class="access-form">
@@ -82,7 +82,7 @@
    <p id="member-email"></p>
    <div class="access-status" id="member-status"></div>
    <p id="member-detail"></p>
-   <a href="account.html" id="account-link" class="btn" hidden data-es="Mi perfil y configuración" data-en="My profile and settings">Mi perfil y configuración</a>\n   <a href="admin.html" id="admin-link" class="btn btn-primary" hidden data-es="Panel de administración" data-en="Admin dashboard">Panel de administración</a>
+   <a href="admin.html" id="admin-link" class="btn btn-primary" hidden data-es="Panel de administración" data-en="Admin dashboard">Panel de administración</a>
    <button id="signout-button" class="btn" type="button" hidden data-es="Cerrar sesión" data-en="Sign out">Cerrar sesión</button>
   </div>
   <p class="access-note" data-es="Tus datos de acceso los valida el proveedor de autenticación. La contraseña no se guarda en esta página ni en GitHub." data-en="Your login credentials are verified by the authentication provider. Passwords are never stored in this page or in GitHub.">Tus datos de acceso los valida el proveedor de autenticación. La contraseña no se guarda en esta página ni en GitHub.</p>

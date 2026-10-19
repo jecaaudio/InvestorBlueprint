@@ -6,6 +6,18 @@ on:
   workflow_dispatch:
 
 jobs:
+  structure-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Test public routes, member forms and PWA assets
+        run: node --test scripts/site-smoke.test.mjs scripts/member-recovery.test.mjs scripts/flip-finance.test.mjs scripts/member-recovery.test.mjs
+
   quality-gates:
     runs-on: ubuntu-latest
 
@@ -27,9 +39,16 @@ jobs:
 
       - name: Run axe accessibility checks
         run: |
-          npx http-server .. -p 4173 --silent &
+          python3 -u -m http.server 4173 --bind 127.0.0.1 --directory .. &
           SERVER_PID=$!
           trap "kill $SERVER_PID" EXIT
+          for n in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4173/InvestorBlueprint/index.html >/dev/null; then
+              break
+            fi
+            sleep 0.5
+          done
+          curl -fsS http://127.0.0.1:4173/InvestorBlueprint/index.html >/dev/null
           npm run qa:axe
 
       - name: Run Lighthouse CI assertions

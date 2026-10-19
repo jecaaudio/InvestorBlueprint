@@ -79,7 +79,7 @@
     function showPanel(name){
       for(const [panel,form] of [['registration',registration],['login',login],['recover',recovery]]){
         if(form)form.hidden=panel!==name;
-        $('tab-'+(panel==='registration'?'register':panel))?.setAttribute('aria-selected',String(panel===name));
+        $('tab-'+(panel==='registration'?'register':panel))?.setAttribute('aria-pressed',String(panel===name));
       }
       if(newPassword && name!=='new-password')newPassword.hidden=true;
     }
@@ -108,14 +108,11 @@
         $('member-status').textContent=statusLabel(profile.access_status);
         $('member-status').dataset.state=profile.access_status;
         $('member-detail').textContent=profile.access_status==='approved'
-          ?t('Tu acceso está aprobado. Las herramientas pasarán al área protegida cuando se complete el despliegue seguro.','Your access is approved. Tools will move into the protected area after secure deployment is completed.')
+          ?t('Tu acceso está aprobado. Puedes usar las calculadoras desde Mi perfil.','Your access is approved. Open the calculators from My profile.')
           :profile.access_status==='pending'
           ?t('Solicitud recibida. El administrador revisará tu cuenta antes de autorizar las herramientas.','Request received. The administrator must approve your account before you can use the tools.')
           :t('Para obtener más información, contacta al administrador.','Contact the administrator for more information.');
-        const adminAccess=profile.role==='admin'&&profile.access_status==='approved';
-        $('admin-link').hidden=!adminAccess;
-        if($('login-admin-link'))$('login-admin-link').hidden=!adminAccess;
-        if($('account-link'))$('account-link').hidden=false;
+        $('admin-link').hidden=!(profile.role==='admin'&&profile.access_status==='approved');
         $('signout-button').hidden=false;
         return profile;
       }catch(e){say('portal-message',e.message,'error');return null}
@@ -158,7 +155,6 @@
             const target=new URL(raw,window.location.origin);
             if(target.origin===window.location.origin){window.location.assign(target.href);return}
           }
-          // Administrators have the same member landing as every other account.
           window.location.assign('account.html');
         }
       }catch(err){
@@ -226,8 +222,6 @@
     });
     $('signout-button')?.addEventListener('click',async()=>{
       await client.auth.signOut();$('account-summary').hidden=true;
-      if($('account-link'))$('account-link').hidden=true;
-      if($('login-admin-link'))$('login-admin-link').hidden=true;
       say('portal-message',t('Sesión cerrada.','Signed out.'),'success');
     });
     await updateAccount();
