@@ -88,6 +88,31 @@ for(const spec of pages){
      const bytes=await page.screenshot({type:'jpeg',quality:42,fullPage:false});
      console.log('VISUAL_IMAGE:'+name+':'+bytes.toString('base64'));
    }
+   if(spec.name==='inicio'&&width===390){
+     await page.waitForTimeout(600);
+     const state=await page.evaluate(()=>{
+       const nav=document.querySelector('#primary-nav');const links=[...nav.querySelectorAll('a')];
+       return{navHeight:Math.round(nav.getBoundingClientRect().height),expanded:document.querySelector('#menu-toggle')?.getAttribute('aria-expanded'),
+         links:links.map(el=>({text:el.textContent.trim(),visible:el.getClientRects().length>0,y:Math.round(el.getBoundingClientRect().top)}))};
+     });
+     console.log('EXTRA_MENU:'+JSON.stringify(state));
+     const screenshot=await page.screenshot({type:'jpeg',quality:42});
+     console.log('VISUAL_IMAGE:inicio-menu-open-390:'+screenshot.toString('base64'));
+   }
+   if(spec.name==='perfil'&&width===390){
+     await page.locator('#account-settings-form').scrollIntoViewIfNeeded();
+     await page.waitForTimeout(220);
+     const screenshot=await page.screenshot({type:'jpeg',quality:42});
+     console.log('VISUAL_IMAGE:perfil-settings-390:'+screenshot.toString('base64'));
+     await page.locator('#siteThemeToggle').click().catch(()=>{});
+     await page.waitForTimeout(160);
+     const dark=await page.screenshot({type:'jpeg',quality:42});
+     console.log('VISUAL_IMAGE:perfil-dark-390:'+dark.toString('base64'));
+   }
+   if(spec.name==='precios'&&width===390){
+     const screenshot=await page.screenshot({type:'jpeg',quality:42});
+     console.log('VISUAL_IMAGE:precios-390:'+screenshot.toString('base64'));
+   }
   }catch(error){report.push({page:spec.name,width,error:String(error).slice(0,500),jsErrors:errors})}
   await context.close();
  }
