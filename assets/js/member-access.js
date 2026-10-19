@@ -47,6 +47,14 @@
     $('tab-register')?.addEventListener('click',()=>showPanel('registration'));
     $('tab-login')?.addEventListener('click',()=>showPanel('login'));
     $('tab-recover')?.addEventListener('click',()=>showPanel('recover'));
+    $('toggle-signin-password')?.addEventListener('click',()=>{
+      const input=$('signin-password'),button=$('toggle-signin-password');
+      if(!input||!button)return;
+      const reveal=input.type==='password';
+      input.type=reveal?'text':'password';
+      button.setAttribute('aria-pressed',String(reveal));
+      button.textContent=reveal?t('Ocultar contraseña','Hide password'):t('Mostrar contraseña','Show password');
+    });
     let canSetRecoveredPassword=false;
     function showPanel(name){
       for(const [panel,form] of [['registration',registration],['login',login],['recover',recovery]]){
