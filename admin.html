@@ -18,7 +18,7 @@
 <body>
 <header class="navbar">
  <div class="brand-menu"><a class="logo home-link brand-lockup" href="index.html" aria-label="InvestorBlueprint - inicio"><img class="brand-icon" src="assets/brand/favicon.svg" width="45" height="45" alt="" aria-hidden="true"><span class="brand-name" aria-hidden="true"><span class="brand-name-investor">Investor</span><span class="brand-name-blueprint">Blueprint</span></span></a></div>
- <nav id="primary-nav"><a href="index.html" data-es="Inicio" data-en="Home">Inicio</a><a href="login.html" data-es="Mi cuenta" data-en="My account">Mi cuenta</a></nav>
+ <nav id="primary-nav"><a href="index.html" data-es="Inicio" data-en="Home">Inicio</a><a href="account.html" data-es="Mi perfil" data-en="My profile">Mi perfil</a><a href="index.html#tools" data-es="Calculadoras" data-en="Calculators">Calculadoras</a></nav>
  <div class="lang-switcher" role="group" aria-label="Language">
   <button class="lang-option" type="button" data-lang="es">ES</button>
   <button class="lang-option" type="button" data-lang="en">EN</button>
@@ -41,7 +41,7 @@
     <strong id="admin-identity"></strong>
     <p class="access-note" data-es="Administración de solicitudes" data-en="Access request management">Administración de solicitudes</p>
    </div>
-   <button class="btn" id="admin-logout" type="button" data-es="Cerrar sesión" data-en="Sign out">Cerrar sesión</button>
+   <a href="account.html" class="btn" data-es="Mi perfil y configuración" data-en="Profile and settings">Mi perfil y configuración</a>\n   <a href="index.html#tools" class="btn" data-es="Usar calculadoras" data-en="Use calculators">Usar calculadoras</a>\n   <button class="btn" id="admin-logout" type="button" data-es="Cerrar sesión" data-en="Sign out">Cerrar sesión</button>
   </div>
   <div id="admin-message" class="access-message" role="status" hidden></div>
   <div class="admin-controls">
@@ -58,7 +58,7 @@
    <button type="button" class="btn" id="members-refresh" data-es="Actualizar" data-en="Refresh">Actualizar</button>
   </div>
   <div id="member-list" class="member-list" aria-live="polite"></div>
-  <p class="access-note" data-es="El administrador puede aprobar el acceso, pero la autorización de las calculadoras se activará solo cuando las herramientas estén alojadas en una ruta protegida por el servidor." data-en="Approvals are recorded now; calculator authorization will only become effective once the tools are served behind a server-side access gate.">El administrador puede aprobar el acceso, pero la autorización de las calculadoras se activará solo cuando las herramientas estén alojadas en una ruta protegida por el servidor.</p>
+  <p class="access-note" data-es="Las calculadoras actuales comprueban la autorización en Supabase antes de entregar el contenido. Puedes abrirlas desde el menú superior." data-en="Current calculators verify Supabase approval before delivering their content. Open them from the menu above.">El administrador puede aprobar el acceso, pero la autorización de las calculadoras se activará solo cuando las herramientas estén alojadas en una ruta protegida por el servidor.</p>
  </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
