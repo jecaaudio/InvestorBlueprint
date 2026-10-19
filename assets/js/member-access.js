@@ -112,7 +112,10 @@
           :profile.access_status==='pending'
           ?t('Solicitud recibida. El administrador revisará tu cuenta antes de autorizar las herramientas.','Request received. The administrator must approve your account before you can use the tools.')
           :t('Para obtener más información, contacta al administrador.','Contact the administrator for more information.');
-        $('admin-link').hidden=!(profile.role==='admin'&&profile.access_status==='approved');
+        const adminAccess=profile.role==='admin'&&profile.access_status==='approved';
+        $('admin-link').hidden=!adminAccess;
+        if($('login-admin-link'))$('login-admin-link').hidden=!adminAccess;
+        if($('account-link'))$('account-link').hidden=false;
         $('signout-button').hidden=false;
         return profile;
       }catch(e){say('portal-message',e.message,'error');return null}
@@ -150,16 +153,13 @@
         const profile=await updateAccount();
         if(profile?.access_status==='approved'){
           const raw=new URLSearchParams(window.location.search).get('returnTo')||'';
-          const ok=raw.startsWith('/InvestorBlueprint/tools/')||raw.startsWith('/InvestorBlueprint/calculadora-venta/');
+          const ok=raw.startsWith('/InvestorBlueprint/tools/')||raw.startsWith('/InvestorBlueprint/calculadora-venta/')||raw==='/InvestorBlueprint/account.html';
           if(ok && !raw.startsWith('//') && !raw.includes('\\')) {
             const target=new URL(raw,window.location.origin);
             if(target.origin===window.location.origin){window.location.assign(target.href);return}
           }
-          if(profile.role==='admin'){
-            window.location.assign(window.location.pathname.endsWith('/preview-login.html')?'preview-admin.html':'admin.html');
-          }else{
-            window.location.assign('index.html#tools');
-          }
+          // Administrators have the same member landing as every other account.
+          window.location.assign('account.html');
         }
       }catch(err){
         const invalid=err?.code==='invalid_credentials'||/invalid login credentials/i.test(err?.message||'');
@@ -226,6 +226,8 @@
     });
     $('signout-button')?.addEventListener('click',async()=>{
       await client.auth.signOut();$('account-summary').hidden=true;
+      if($('account-link'))$('account-link').hidden=true;
+      if($('login-admin-link'))$('login-admin-link').hidden=true;
       say('portal-message',t('Sesión cerrada.','Signed out.'),'success');
     });
     await updateAccount();
