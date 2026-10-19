@@ -59,7 +59,7 @@
     function showPanel(name){
       for(const [panel,form] of [['registration',registration],['login',login],['recover',recovery]]){
         if(form)form.hidden=panel!==name;
-        $('tab-'+(panel==='registration'?'register':panel))?.setAttribute('aria-selected',String(panel===name));
+        $('tab-'+(panel==='registration'?'register':panel))?.setAttribute('aria-pressed',String(panel===name));
       }
       if(newPassword && name!=='new-password')newPassword.hidden=true;
     }
