@@ -26,3 +26,8 @@ Updated 2026-10-19. Passing arithmetic tests does not certify property values, l
 4. Do not pass off demo ARV as real valuation.
 5. Test login, account, admin return, and reports on iPhone Safari and desktop.
 6. Keep Supabase JECA on Free unless the user expressly approves a different plan.
+
+## Reconciliation validation
+- Pull request branch was reconciled with the latest main commit without replacing deployed source files.
+- Main versus reconciled branch shows only this audit document as a pending change.
+- GitHub Actions Quality and member-profile regression workflows completed successfully for reconciliation commit 9e954678d45016c81488fd176db359f74a712548.
