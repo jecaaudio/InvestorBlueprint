@@ -44,12 +44,13 @@
    <label><span data-es="Nombre" data-en="Name">Nombre</span><input id="signup-name" name="name" autocomplete="name" maxlength="120" required></label>
    <label><span data-es="Correo electrónico" data-en="Email">Correo electrónico</span><input id="signup-email" type="email" name="email" autocomplete="email" required></label>
    <label><span data-es="Crear contraseña (12 caracteres mínimo)" data-en="Create password (12 characters minimum)">Crear contraseña (12 caracteres mínimo)</span><input id="signup-password" type="password" name="password" autocomplete="new-password" minlength="12" required></label>
+   <button id="toggle-signup-password" class="btn password-visibility-toggle" type="button" aria-controls="signup-password" aria-pressed="false" data-es="Mostrar contraseña" data-en="Show password">Mostrar contraseña</button>
    <button class="btn btn-primary" type="submit" data-es="Crear solicitud" data-en="Submit request">Crear solicitud</button>
   </form>
   <form id="login-form" class="access-form" hidden>
    <label><span data-es="Correo electrónico" data-en="Email">Correo electrónico</span><input id="signin-email" type="email" autocomplete="username" required></label>
    <label><span data-es="Contraseña" data-en="Password">Contraseña</span><input id="signin-password" type="password" autocomplete="current-password" required></label>
-   <button id="toggle-signin-password" class="btn" type="button" aria-pressed="false" data-es="Mostrar contraseña" data-en="Show password">Mostrar contraseña</button>
+   <button id="toggle-signin-password" class="btn password-visibility-toggle" type="button" aria-controls="signin-password" aria-pressed="false" data-es="Mostrar contraseña" data-en="Show password">Mostrar contraseña</button>
    <p class="access-note" data-es="Utiliza la contraseña que creaste para tu usuario en Authentication → Users de InvestorBlueprint, no la contraseña de tu cuenta de administración de Supabase." data-en="Use the password created for your InvestorBlueprint user under Authentication → Users, not your Supabase dashboard password.">Utiliza la contraseña que creaste para tu usuario en Authentication → Users de InvestorBlueprint, no la contraseña de tu cuenta de administración de Supabase.</p>
    <button class="btn btn-primary" type="submit" data-es="Entrar" data-en="Sign in">Entrar</button>
    <a href="login.html?recover=1" style="display:inline-block;color:var(--primary);margin-top:8px;" data-es="¿Olvidaste la contraseña? Restablecer acceso" data-en="Forgot password? Reset access">¿Olvidaste la contraseña? Restablecer acceso</a>
@@ -63,6 +64,7 @@
    <h2 data-es="Establecer nueva contraseña" data-en="Set a new password">Establecer nueva contraseña</h2>
    <p class="access-note" data-es="Después de abrir el enlace del correo, permanece en este navegador hasta guardar la nueva contraseña. La sesión se verificará y renovará automáticamente cuando sea posible." data-en="After opening the email link, stay in this browser until your new password is saved. Your session will be verified and refreshed automatically where possible.">Después de abrir el enlace del correo, permanece en este navegador hasta guardar la nueva contraseña. La sesión se verificará y renovará automáticamente cuando sea posible.</p>
    <label><span data-es="Nueva contraseña" data-en="New password">Nueva contraseña</span><input id="new-password" type="password" autocomplete="new-password" minlength="12" required></label>
+   <button id="toggle-new-password" class="btn password-visibility-toggle" type="button" aria-controls="new-password" aria-pressed="false" data-es="Mostrar contraseña" data-en="Show password">Mostrar contraseña</button>
    <button type="submit" class="btn btn-primary" data-es="Actualizar contraseña" data-en="Update password">Actualizar contraseña</button>
   </form>
  </section>
@@ -93,7 +95,7 @@
 <script src="assets/js/consent.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/member-auth-config.js?v=20261018-access2"></script>
-<script src="assets/js/member-access.js?v=20261019-recovery2"></script>
+<script src="assets/js/member-access.js?v=20261019-password-visibility"></script>
 <script src="lang.js"></script>
 <script src="assets/js/member-i18n.js"></script>
 <script src="assets/js/site-theme.js?v=20261018"></script>
