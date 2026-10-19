@@ -102,7 +102,12 @@
             window.location.assign('index.html#tools');
           }
         }
-      }catch(err){say('portal-message',err.message,'error')}
+      }catch(err){
+        const invalid=err?.code==='invalid_credentials'||/invalid login credentials/i.test(err?.message||'');
+        say('portal-message',invalid
+          ?t('Correo o contraseña incorrectos. Comprueba la contraseña creada en Supabase. Si no la recuerdas, selecciona «Recuperar contraseña».','Incorrect email or password. Check the password you created in Supabase, or select “Reset password”.')
+          :t('No fue posible iniciar sesión: ','Could not sign in: ')+(err?.message||t('Error desconocido.','Unknown error.')),'error');
+      }
       finally{setBusy(login,false)}
     });
     recovery?.addEventListener('submit',async e=>{
