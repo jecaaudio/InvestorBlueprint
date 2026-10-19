@@ -24,7 +24,7 @@ async function runRecovery({secondsLeft=3600,updateErrors=[],missingSession=fals
   let onReady;
   const document={
     documentElement:{lang:'es'},
-    getElementById:field,
+    getElementById(id){return id==='admin-root'?null:field(id)},
     addEventListener(name,callback){if(name==='DOMContentLoaded')onReady=callback}
   };
   const currentSession={access_token:'TEST_ONLY_NOT_A_REAL_TOKEN',user:{id:'example'},expires_at:Math.floor(Date.now()/1000)+secondsLeft};
