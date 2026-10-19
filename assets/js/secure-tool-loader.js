@@ -42,6 +42,15 @@
       const url=new URL(assetBase,window.location.href);
       markup=markup.replace(/<head(\s[^>]*)?>/i,(match)=>match+'<base href="'+url.href+'">');
     }
+    // Keep a persistent profile route in every protected calculator, including
+    // the seller's print-first tool. No administrative link is shown here.
+    const profileShortcut='<a id="ib-account-shortcut" href="/InvestorBlueprint/account.html" aria-label="Mi perfil / My account" '+
+      'style="position:fixed;bottom:14px;right:14px;z-index:9999;background:#146d82;color:#fff;'+
+      'text-decoration:none;border-radius:999px;padding:12px 16px;font:600 14px system-ui;'+
+      'box-shadow:0 5px 16px #0004">Mi perfil / My profile</a>';
+    markup=markup.replace(/<\/head>/i,
+      '<style>@media print{#ib-account-shortcut{display:none!important}}</style></head>');
+    markup=markup.replace(/<\/body>/i,profileShortcut+'</body>');
     // This navigation delivers the HTML only AFTER the server authorizes the user.
     document.open();document.write(markup);document.close();
   }catch(err){
