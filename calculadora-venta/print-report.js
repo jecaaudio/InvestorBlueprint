@@ -13,9 +13,9 @@
  };
  const txt=id=>$(id)?.textContent?.trim()||'';
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const pref=(key,fallback)=>{try{return localStorage.getItem(key)||fallback}catch(e){return fallback}};
- const en=()=>pref('ib_document_language',document.documentElement.lang)==='en';
- const detailed=()=>pref('ib_report_detail','detailed')!=='summary';
+ const setting=(key,fallback)=>{try{return localStorage.getItem(key)||fallback}catch(error){return fallback}};
+ const en=()=>setting('ib_document_language',document.documentElement.lang)==='en';
+ const detailed=()=>setting('ib_report_detail','detailed')!=='summary';
  const L=(es,english)=>en()?english:es;
  const cell=(label,value,cls='')=>'<tr'+(cls?' class="'+cls+'"':'')+'><td>'+esc(label)+'</td><td>'+esc(value)+'</td></tr>';
  function createPrintMarkup(){
@@ -55,18 +55,21 @@
     return '<div class="pr-source"><strong>'+esc(name)+'</strong>'+(href?' — <a href="'+esc(href)+'">'+L('Fuente oficial','Official source')+'</a>':'')+'</div>';
   }).join('');
   const date=new Intl.DateTimeFormat(en()?'en-US':'es-US',{year:'numeric',month:'long',day:'numeric'}).format(new Date());
-  const analyst=pref('ib_display_name','').trim(),company=pref('ib_company_name','').trim();
-  const notes=$('ib-report-notes')?.value?.trim()||'';
-  const notesSection=notes?'<section class="pr-section"><h2>'+L('Notas del análisis','Analysis notes')+'</h2><p class="pr-note" style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(notes)+'</p></section>':'';
-  const methodSection=detailed()?'<section class="pr-section"><h2>'+L('Método y supuestos','Method and assumptions')+'</h2><p class="pr-note">'+L('Neto estimado = precio de venta menos saldos pendientes y gastos de venta. Este cálculo no determina el impuesto sobre ganancias de capital.','Estimated proceeds = sale price minus debt payoffs and selling costs. This is not a capital gains tax calculation.')+'</p></section>':'';
-  const notesDisclaimer=notes&&pref('ib_notes_detail','detailed')==='detailed'?'<p class="pr-note">'+L('Notas proporcionadas por el usuario: verificar contra contrato, payoff e información de cierre.','User-provided notes: verify against contract, payoff statements and closing documents.')+'</p>':'';
+  const author=setting('ib_display_name','').trim();
+  const company=setting('ib_company_name','').trim();
+  const userNotes=$('ib-report-notes')?.value?.trim()||'';
+  const notesBlock=userNotes?'<section class="pr-section"><h2>'+L('Notas del análisis','Analysis notes')+'</h2><p class="pr-note" style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(userNotes)+'</p></section>':'';
+  const userNotesGuidance=userNotes&&setting('ib_notes_detail','detailed')==='detailed'?
+    '<section class="pr-section"><h2>'+L('Comprobaciones de las notas','Notes verification checklist')+'</h2><p class="pr-note">'+L('Contrasta estas notas con contrato, inspección, balances de payoff, estimado de la compañía de título y estado real de la propiedad.','Compare these notes against the contract, inspection, payoff balances, title company estimate and actual property condition.')+'</p></section>':'';
+  const methodBlock=detailed()?'<section class="pr-section"><h2>'+L('Cómo se calcula el neto','How net proceeds are calculated')+'</h2><p class="pr-note">'+L('Neto estimado = precio de venta menos payoff de deudas menos gastos de venta. No es una determinación de impuestos sobre ganancias.','Estimated net = sale price minus debt payoffs minus selling costs. This is not a capital gains tax calculation.')+'</p></section>':'';
   const statusNote=pending?
     L('El impuesto estatal de transferencia está pendiente de confirmación: el neto mostrado es parcial.','State transfer tax is not confirmed: net proceeds shown are partial.'):
     L('Los impuestos locales, exenciones y cargos finales deben verificarse para la jurisdicción y contrato.','Local taxes, exemptions, and final charges must be confirmed for the jurisdiction and contract.');
   return '<div class="pr-header">'+
     '<div><div class="pr-brand">InvestorBlueprint · Seller Net</div><h1>'+L('Estimación de venta inmobiliaria','Real estate sale estimate')+'</h1>'+
     '<div class="pr-subhead">'+L('Estado de liquidación estimado para el vendedor · USD','Estimated seller settlement statement · USD')+'</div></div>'+
-    '<div class="pr-meta"><strong>'+L('Preparado','Prepared')+'</strong><div>'+esc(date)+'</div><div>'+L('Documento informativo','Informational estimate')+'</div>'+(analyst?'<div>'+esc(analyst)+'</div>':'')+(company?'<div>'+esc(company)+'</div>':'')+'</div></div>'+
+    '<div class="pr-meta"><strong>'+L('Preparado','Prepared')+'</strong><div>'+esc(date)+'</div><div>'+L('Documento informativo','Informational estimate')+'</div>'+
+      (author?'<div>'+esc(author)+'</div>':'')+(company?'<div>'+esc(company)+'</div>':'')+'</div></div>'+
     '<div class="pr-property">'+
       '<div><span>'+L('Estado','State')+'</span><strong>'+esc(stateName)+'</strong></div>'+
       '<div><span>'+L('Condado / jurisdicción','County / jurisdiction')+'</span><strong>'+esc(countyName)+'</strong></div>'+
@@ -77,18 +80,20 @@
       '<div class="pr-metric"><span>'+L('Pago de deudas','Debt payoffs')+'</span><strong>'+esc(txt('rDebt'))+'</strong></div>'+
       '<div class="pr-metric"><span>'+L('Gastos de venta','Selling costs')+'</span><strong>'+esc(txt('rFees').replace(/\s*\+.*/,''))+'</strong></div>'+
       '<div class="pr-metric primary"><span>'+(pending?L('Neto parcial','Partial net'):L('Neto estimado','Estimated net'))+'</span><strong>'+esc(txt('netValue'))+'</strong></div></div>'+
+    (detailed()?(
     '<section class="pr-section"><h2>01 · '+L('Hipotecas y saldos a liquidar','Mortgage and debt payoffs')+'</h2>'+
       '<table class="pr-table"><tbody>'+debts+cell(L('Total deudas','Total debt payoffs'),txt('rDebt'),'pr-total')+'</tbody></table></section>'+
     '<section class="pr-section"><h2>02 · '+L('Gastos, comisiones e impuestos del vendedor','Seller costs, commissions and taxes')+'</h2>'+
       '<table class="pr-table"><tbody>'+feeRows+cell(L('Total gastos de venta','Total selling costs'),txt('rFees'),'pr-total')+'</tbody></table>'+
-      '<p class="pr-note">'+L('Los cargos de $0 no aparecen en este desglose. Las comisiones y concesiones son negociadas.','Zero-dollar line items are omitted. Commissions and concessions are negotiated.')+'</p></section>'+
+      '<p class="pr-note">'+L('Los cargos de $0 no aparecen en este desglose. Las comisiones y concesiones son negociadas.','Zero-dollar line items are omitted. Commissions and concessions are negotiated.')+'</p></section>'):'')+
     '<div class="pr-flag"><strong>'+L('Validación pendiente:','Verification required:')+'</strong> '+statusNote+' '+L('No dupliques comisiones dentro de concesiones.','Do not duplicate commission payments within concessions.')+'</div>'+
+    (detailed()?(
     '<section class="pr-section"><h2>03 · '+L('Comparación de escenarios','Scenario comparison')+'</h2>'+
       '<table class="pr-table pr-scenario-table"><thead><tr><th>'+L('Precio de venta','Sale price')+'</th><th style="text-align:right">'+L('Gastos de venta','Selling costs')+'</th><th style="text-align:right">'+L('Neto vendedor','Seller net')+'</th></tr></thead><tbody>'+scenarioRows+'</tbody></table></section>'+
     '<section class="pr-section pr-sources"><h2>04 · '+L('Base legal y fuentes oficiales','Legal basis and official sources')+'</h2>'+
       (sourceRows||'<p class="pr-note">'+L('La fórmula de este estado todavía no está verificada; consulte la autoridad oficial.','The tax formula is not yet verified for this state; consult the official authority.')+'</p>')+
-      '<p class="pr-note">'+L('El listado de condados no implica que sus impuestos locales estén verificados.','County selection does not mean local taxes have been verified.')+'</p></section>'+
-    methodSection+notesSection+notesDisclaimer+
+      '<p class="pr-note">'+L('El listado de condados no implica que sus impuestos locales estén verificados.','County selection does not mean local taxes have been verified.')+'</p></section>'):'')+
+    methodBlock+notesBlock+userNotesGuidance+
     '<div class="pr-disclaimer">'+L('Estimación informativa, no es un Closing Disclosure ni un ALTA Settlement Statement. Los saldos reales de payoff, prorrateos, impuestos, exenciones, cargos y distribución contractual de gastos deben confirmarse con la compañía de título. El neto recibido no equivale a la ganancia fiscal.','Informational estimate, not a Closing Disclosure or ALTA Settlement Statement. Actual payoffs, prorations, taxes, exemptions, fees, and contractual cost allocation must be confirmed by the title company. Net proceeds are not taxable capital gains.')+'</div>'+
     '<div class="pr-footer">InvestorBlueprint · '+L('Calculadora de Venta','Seller Net Calculator')+' · '+esc(date)+'</div>';
  }
@@ -103,18 +108,19 @@
     document.body.appendChild(sec);
   }
   if(!$('ib-report-notes')){
-    const printButton=$('printButton');
-    if(printButton?.parentElement){
-      const box=document.createElement('div'),label=document.createElement('label'),area=document.createElement('textarea');
-      box.className='ib-report-notes-panel';
-      box.style.cssText='margin:16px 0;padding:14px;border:1px solid #dce5ef;border-radius:12px';
-      label.htmlFor='ib-report-notes';label.textContent=L('Notas del análisis para exportar','Analysis notes to export');
-      label.style.cssText='display:block;font-weight:650;margin-bottom:8px';
-      area.id='ib-report-notes';area.rows=4;area.maxLength=3000;
-      area.style.cssText='box-sizing:border-box;width:100%;padding:10px;border-radius:8px';
-      area.placeholder=L('Supuestos, riesgos, condiciones y verificaciones pendientes.','Assumptions, risks, conditions and follow-up checks.');
+    const button=$('printButton');
+    if(button&&button.parentElement){
+      const panel=document.createElement('div');panel.className='ib-report-notes-panel';
+      panel.style.cssText='margin:16px 0;padding:14px;border:1px solid #dce5ef;border-radius:12px;background:var(--panel,#fff)';
+      const label=document.createElement('label');
+      label.setAttribute('for','ib-report-notes');
+      label.textContent=L('Notas de análisis para el documento','Analysis notes for the document');
+      label.style.cssText='display:block;font-weight:700;margin-bottom:8px';
+      const area=document.createElement('textarea');area.id='ib-report-notes';area.rows=4;area.maxLength=3000;
+      area.style.cssText='box-sizing:border-box;width:100%;min-height:105px;border-radius:8px;padding:10px';
+      area.placeholder=L('Supuestos, riesgos, condiciones del contrato y comprobaciones pendientes.','Assumptions, risks, contract terms and pending checks.');
       area.addEventListener('input',refresh);
-      box.append(label,area);printButton.parentElement.after(box);
+      panel.append(label,area);button.parentElement.after(panel);
     }
   }
   $('printButton')?.addEventListener('click',refresh,true);
