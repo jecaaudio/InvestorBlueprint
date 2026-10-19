@@ -13,7 +13,9 @@
  };
  const txt=id=>$(id)?.textContent?.trim()||'';
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const en=()=>document.documentElement.lang==='en';
+ const pref=(key,fallback)=>{try{return localStorage.getItem(key)||fallback}catch(e){return fallback}};
+ const en=()=>pref('ib_document_language',document.documentElement.lang)==='en';
+ const detailed=()=>pref('ib_report_detail','detailed')!=='summary';
  const L=(es,english)=>en()?english:es;
  const cell=(label,value,cls='')=>'<tr'+(cls?' class="'+cls+'"':'')+'><td>'+esc(label)+'</td><td>'+esc(value)+'</td></tr>';
  function createPrintMarkup(){
