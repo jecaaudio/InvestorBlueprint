@@ -32,7 +32,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p public-site/tools/arv public-site/calculadora-venta
-          cp index.html login.html admin.html pricing.html privacy.html style.css lang.js script.js robots.txt sitemap.xml public-site/
+          cp index.html login.html admin.html pricing.html privacy.html style.css lang.js script.js robots.txt sitemap.xml manifest.webmanifest public-site/
           cp -R assets public-site/assets
           # Do not deploy deprecated front-end authentication or unused gating scripts.
           rm -f public-site/assets/js/login.js public-site/assets/js/tool-access-guard.js
@@ -47,6 +47,10 @@ jobs:
           fi
           test -f public-site/assets/js/secure-tool-loader.js
           test -f public-site/assets/js/member-access.js
+          test -f public-site/manifest.webmanifest
+          test -f public-site/assets/brand/apple-touch-icon.png
+          test -f public-site/assets/brand/icon-192.png
+          test -f public-site/assets/brand/icon-512.png
           test ! -e public-site/auth.js
           test ! -e public-site/workers
           test ! -e public-site/preview-login.html

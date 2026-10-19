@@ -1,23 +1,11 @@
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { Browser, detectBrowserPlatform, install, resolveBuildId } from '@puppeteer/browsers';
+import { chromium } from 'playwright';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const cacheDir = path.join(rootDir, '.cache', 'chrome');
-const platform = detectBrowserPlatform();
-
-if (!platform) {
-  throw new Error('Could not detect a compatible Chrome for Testing platform.');
-}
-
-const buildId = await resolveBuildId(Browser.CHROME, platform, 'stable');
-const installedBrowser = await install({
-  browser: Browser.CHROME,
-  buildId,
-  cacheDir,
-  platform
-});
+// Use the Chromium installed by the same Playwright step used for axe tests.
+const chromePath = chromium.executablePath();
 
 const lhciBin = process.platform === 'win32'
   ? path.join(rootDir, 'node_modules', '.bin', 'lhci.cmd')
@@ -29,7 +17,7 @@ const child = spawn(lhciBin, ['autorun', '--config=./lighthouserc.json'], {
   shell: false,
   env: {
     ...process.env,
-    LHCI_CHROME_PATH: installedBrowser.executablePath
+    LHCI_CHROME_PATH: chromePath
   }
 });
 

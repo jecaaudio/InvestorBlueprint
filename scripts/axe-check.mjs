@@ -6,8 +6,9 @@ const siteBasePath = (process.env.AXE_SITE_BASE_PATH || '/InvestorBlueprint').re
 const pages = [
   '/index.html',
   '/pricing.html',
-  '/tools/rental-cash-flow.html',
-  '/tools/rent-calculator.html',
+  '/login.html',
+  '/admin.html',
+  '/privacy.html',
   '/tools/flip-calculator.html'
 ];
 
@@ -27,6 +28,10 @@ for (const pagePath of pages) {
     console.error(`\n[axe] ${url} -> ${results.violations.length} violations`);
     for (const violation of results.violations) {
       console.error(`- ${violation.id}: ${violation.help}`);
+      for(const node of violation.nodes.slice(0,5)){
+        console.error(`    selector: ${node.target.join(', ')}`);
+        console.error(`    summary: ${node.failureSummary || 'none'}`);
+      }
     }
   } else {
     console.log(`[axe] ${url} -> 0 violations`);

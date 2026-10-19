@@ -1,0 +1,88 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, existsSync } from 'node:fs';
+import { posix as path } from 'node:path';
+
+const read = file => readFileSync(file, 'utf8');
+const tools = JSON.parse(read('assets/config/tools.json'));
+const knownToolNames = new Set([
+  'flip','rental','rent','arv-estimator','automated-arv',
+  'hard-money','roi-search','seller-net'
+]);
+function publicPageRef(file) {
+  const html=read(file);
+  const match=html.match(/data-tool="([^"]+)"/);
+  assert.ok(match, `Missing protected tool identifier: ${file}`);
+  assert.ok(knownToolNames.has(match[1]), `Unexpected tool identifier: ${file}`);
+  return {html,tool:match[1]};
+}
+
+test('all eight calculator routes are wrappers, not embedded calculators',()=>{
+  assert.equal(tools.length,8);
+  const seen=new Set();
+  for(const tool of tools){
+    const file=tool.url.endsWith('/')?tool.url+'index.html':tool.url;
+    assert.ok(existsSync(file), `Missing tool route ${file}`);
+    const {html,tool:serverName}=publicPageRef(file);
+    assert.ok(html.includes('secure-tool-loader.js'), `Missing signed-in loader ${file}`);
+    assert.ok(html.includes('supabase-js@2'), `Missing Supabase SDK ${file}`);
+    assert.ok(html.length<6000,`Tool implementation accidentally embedded in ${file}`);
+    assert.ok(!html.includes('function calculateFlip')&&!html.includes('STATE_JURISDICTIONS'));
+    seen.add(serverName);
+  }
+  assert.equal(seen.size,8);
+});
+
+test('password recovery and administrator pages contain required controls',()=>{
+  const login=read('login.html'),admin=read('admin.html'),code=read('assets/js/member-access.js');
+  for(const id of ['registration-form','login-form','recover-form','new-password-form','signin-password','toggle-signin-password']){
+    assert.ok(login.includes('id="'+id+'"'),`Missing login control ${id}`);
+  }
+  assert.ok(admin.includes('id="admin-root"'));
+  assert.ok(code.includes('PASSWORD_RECOVERY'));
+  assert.ok(code.includes("resetPasswordForEmail"));
+  assert.ok(code.includes('signInWithPassword'));
+  assert.ok(code.includes('updateUser({password:pw})'));
+});
+
+test('mobile manifest and icon paths are valid',()=>{
+  const m=JSON.parse(read('manifest.webmanifest'));
+  assert.equal(m.start_url,'/InvestorBlueprint/');
+  assert.ok(m.icons.length>=2);
+  for(const icon of m.icons) assert.ok(existsSync(icon.src), `Missing app icon ${icon.src}`);
+  const deploy=read('.github/workflows/deploy-pages.yml');
+  assert.ok(deploy.includes('manifest.webmanifest public-site/'), 'Pages build must publish manifest');
+  assert.ok(deploy.includes('test -f public-site/manifest.webmanifest'));
+});
+
+test('public pages reference files present in the repository',()=>{
+  const pages=['index.html','login.html','admin.html','pricing.html','privacy.html',
+    ...tools.map(x=>x.url.endsWith('/')?x.url+'index.html':x.url)];
+  for(const page of pages){
+    for(const match of read(page).matchAll(/(?:src|href)\s*=\s*["']([^"'#]+)["']/gi)){
+      let target=match[1].split(/[?#]/)[0];
+      if(!target||/^(https?:|mailto:|tel:|data:|javascript:|\/\/)/i.test(target))continue;
+      const resolved=path.normalize(path.join(path.dirname(page),target));
+      const valid=existsSync(resolved)||(existsSync(path.join(resolved,'index.html')));
+      assert.ok(valid, `Broken local reference ${page}: ${target}`);
+    }
+  }
+});
+
+test('navigation and publication do not expose fake legacy authentication',()=>{
+  const deploy=read('.github/workflows/deploy-pages.yml');
+  assert.ok(!read('index.html').includes('src="auth.js"'));
+  assert.ok(!read('login.html').includes('src="auth.js"'));
+  assert.ok(deploy.includes('test ! -e public-site/auth.js'));
+  assert.ok(deploy.includes('test ! -e public-site/workers'));
+  const config=read('assets/js/member-auth-config.js');
+  assert.ok(config.includes('sb_publishable_'));
+  assert.ok(!/sb_secret_|eyJ[A-Za-z0-9_]+\./.test(config));
+});
+
+test('public sitemap does not advertise protected calculators',()=>{
+  const sitemap=read('sitemap.xml'),robots=read('robots.txt');
+  assert.ok(!sitemap.includes('/tools/'));
+  assert.ok(!sitemap.includes('/calculadora-venta/'));
+  assert.ok(robots.includes('Disallow: /InvestorBlueprint/tools/'));
+});
