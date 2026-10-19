@@ -23,6 +23,11 @@
   line-height: 1.5;
 }
 
+.cookie-banner p,
+.cookie-banner .cookie-option {
+  color: #f8fafc !important;
+}
+
 .cookie-banner a {
   color: #93c5fd;
 }
