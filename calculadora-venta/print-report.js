@@ -59,6 +59,8 @@
   const company=setting('ib_company_name','').trim();
   const userNotes=$('ib-report-notes')?.value?.trim()||'';
   const notesBlock=userNotes?'<section class="pr-section"><h2>'+L('Notas del análisis','Analysis notes')+'</h2><p class="pr-note" style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(userNotes)+'</p></section>':'';
+  const userNotesGuidance=userNotes&&setting('ib_notes_detail','detailed')==='detailed'?
+    '<section class="pr-section"><h2>'+L('Comprobaciones de las notas','Notes verification checklist')+'</h2><p class="pr-note">'+L('Contrasta estas notas con contrato, inspección, balances de payoff, estimado de la compañía de título y estado real de la propiedad.','Compare these notes against the contract, inspection, payoff balances, title company estimate and actual property condition.')+'</p></section>':'';
   const methodBlock=detailed()?'<section class="pr-section"><h2>'+L('Cómo se calcula el neto','How net proceeds are calculated')+'</h2><p class="pr-note">'+L('Neto estimado = precio de venta menos payoff de deudas menos gastos de venta. No es una determinación de impuestos sobre ganancias.','Estimated net = sale price minus debt payoffs minus selling costs. This is not a capital gains tax calculation.')+'</p></section>':'';
   const statusNote=pending?
     L('El impuesto estatal de transferencia está pendiente de confirmación: el neto mostrado es parcial.','State transfer tax is not confirmed: net proceeds shown are partial.'):
@@ -91,7 +93,7 @@
     '<section class="pr-section pr-sources"><h2>04 · '+L('Base legal y fuentes oficiales','Legal basis and official sources')+'</h2>'+
       (sourceRows||'<p class="pr-note">'+L('La fórmula de este estado todavía no está verificada; consulte la autoridad oficial.','The tax formula is not yet verified for this state; consult the official authority.')+'</p>')+
       '<p class="pr-note">'+L('El listado de condados no implica que sus impuestos locales estén verificados.','County selection does not mean local taxes have been verified.')+'</p></section>'):'')+
-    methodBlock+notesBlock+
+    methodBlock+notesBlock+userNotesGuidance+
     '<div class="pr-disclaimer">'+L('Estimación informativa, no es un Closing Disclosure ni un ALTA Settlement Statement. Los saldos reales de payoff, prorrateos, impuestos, exenciones, cargos y distribución contractual de gastos deben confirmarse con la compañía de título. El neto recibido no equivale a la ganancia fiscal.','Informational estimate, not a Closing Disclosure or ALTA Settlement Statement. Actual payoffs, prorations, taxes, exemptions, fees, and contractual cost allocation must be confirmed by the title company. Net proceeds are not taxable capital gains.')+'</div>'+
     '<div class="pr-footer">InvestorBlueprint · '+L('Calculadora de Venta','Seller Net Calculator')+' · '+esc(date)+'</div>';
  }
