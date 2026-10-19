@@ -1,4 +1,7 @@
 User-agent: *
-Allow: /
+Disallow: /InvestorBlueprint/admin.html
+Disallow: /InvestorBlueprint/tools/
+Disallow: /InvestorBlueprint/calculadora-venta/
+Disallow: /InvestorBlueprint/preview-
 
 Sitemap: https://jecaaudio.github.io/InvestorBlueprint/sitemap.xml
