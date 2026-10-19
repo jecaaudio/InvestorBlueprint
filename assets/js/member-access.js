@@ -46,7 +46,8 @@
       }
     }
     const entryParams=new URLSearchParams(window.location.search);
-    if(entryParams.has('returnTo')||entryParams.get('reason')==='login') showPanel('login');
+    if(entryParams.get('recover')==='1') showPanel('recover');
+    else if(entryParams.has('returnTo')||entryParams.get('reason')==='login') showPanel('login');
     async function updateAccount(){
       try{
         const profile=await readProfile();
@@ -115,7 +116,7 @@
       try{
         const {error}=await client.auth.resetPasswordForEmail($('recover-email').value.trim().toLowerCase(),{redirectTo:new URL('login.html',location.href).href});
         if(error)throw error;
-        say('portal-message',t('Si existe una cuenta, recibirás instrucciones por correo.','If an account exists, recovery instructions will be sent.'),'success');
+        say('portal-message',t('Solicitud recibida. Revisa tu correo y la carpeta de spam. Si el enlace te envía a localhost, será necesario configurar la URL de redirección en Supabase.','Request received. Check your email and spam. If the link leads to localhost, configure the redirect URL in Supabase.'),'success');
       }catch(err){say('portal-message',err.message,'error')}
       finally{setBusy(recovery,false)}
     });
