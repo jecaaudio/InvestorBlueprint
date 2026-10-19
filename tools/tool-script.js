@@ -34,6 +34,30 @@
   };
   if(typeof window!=='undefined')window.IBCalculateFlipFinance=calculateFlipFinance;
 
+  // Simplified tools are deterministic and explicitly exclude unmodeled costs.
+  const rentalModel=(monthlyRent,vacancyRate,expenses)=>{
+    const monthly=monthlyRent*(1-vacancyRate/100)-expenses.reduce((a,b)=>a+b,0);
+    return {monthlyCashFlow:monthly,annualCashFlow:monthly*12};
+  };
+  const rentModel=(value,annualExpenses,targetGrossYield,occupancy)=>{
+    const grossRent=value>0&&occupancy>0?value*targetGrossYield/100/(12*occupancy/100):0;
+    const collected=grossRent*12*occupancy/100;
+    return {suggestedMonthlyRent:grossRent,annualIncome:collected,
+      grossYield:value>0?collected/value*100:0,netAfterExpenses:collected-annualExpenses};
+  };
+  const arvModel=(comps,repairs)=>{
+    const average=comps.reduce((sum,x)=>sum+x,0)/comps.length;
+    return {average,maxOffer:average*.70-repairs};
+  };
+  const hardMoneyModel=(loan,rate,points,months)=>{
+    const interestCost=loan*rate/100*months/12;
+    return {interestCost,totalCost:loan*points/100+interestCost,
+      monthlyInterest:months>0?interestCost/months:0};
+  };
+  if(typeof window!=='undefined'){
+    window.IBSimpleFinanceModels={rentalModel,rentModel,arvModel,hardMoneyModel};
+  }
+
   const onDomReady = (callback) => {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', callback, { once: true });
@@ -443,13 +467,13 @@
       const vacancyRate = num('vacancyRate');
       const expenses = ['taxes', 'insurance', 'maintenance', 'management'].map(num);
 
-      const cashFlow = monthlyRent * (1 - vacancyRate / 100) - expenses.reduce((sum, value) => sum + value, 0);
+      const cashFlow = rentalModel(monthlyRent,vacancyRate,expenses).monthlyCashFlow;
       setCards([
         { label: messages.monthlyCashFlow, value: money(cashFlow) },
         { label: messages.annualCashFlow, value: money(cashFlow * 12) },
         { label: t('vacancyRateLabel', 'Vacancy Rate'), value: pct(vacancyRate) }
       ]);
-      output.textContent = t('cashFlowCalculated', 'Cash flow calculated.');
+      output.textContent = t('cashFlowCalculated', 'Cash flow calculated.')+' '+t('rentalAssumptions','Excludes mortgage debt service, vacancy expenses beyond the rate and capital reserves.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'cash_flow' });
       }
@@ -470,10 +494,7 @@
       const targetYield = num('targetYield') / 100;
       const occupancy = num('occupancy') / 100;
 
-      const suggestedMonthlyRent = propertyValue > 0 && occupancy > 0 ? (propertyValue * targetYield) / (12 * occupancy) : 0;
-      const annualIncome = suggestedMonthlyRent * 12 * occupancy;
-      const grossYield = propertyValue > 0 ? (annualIncome / propertyValue) * 100 : 0;
-      const netAfterExpenses = annualIncome - annualExpenses;
+      const {suggestedMonthlyRent,annualIncome,grossYield,netAfterExpenses}=rentModel(propertyValue,annualExpenses,targetYield*100,occupancy*100);
 
       setCards([
         { label: messages.rentSuggestedMonthly, value: money(suggestedMonthlyRent) },
@@ -481,7 +502,7 @@
         { label: messages.rentGrossYield, value: pct(grossYield) },
         { label: messages.rentNetAfterExpenses, value: money(netAfterExpenses) }
       ]);
-      output.textContent = t('rentProjectionCalculated', 'Rent projection calculated.');
+      output.textContent = t('rentProjectionCalculated', 'Rent projection calculated.')+' '+t('rentAssumptions','Target yield is GROSS; annual expenses are only deducted from the displayed net income.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'rent_projection' });
       }
@@ -496,13 +517,12 @@
         { name: 'repairs', required: true, min: 0 }
       ], messages)) return;
 
-      const average = (num('comp1') + num('comp2') + num('comp3')) / 3;
-      const maxOffer = average * 0.7 - num('repairs');
+      const {average,maxOffer}=arvModel([num('comp1'),num('comp2'),num('comp3')],num('repairs'));
       setCards([
         { label: messages.estimatedArv, value: money(average) },
         { label: messages.maxOffer, value: money(maxOffer) }
       ]);
-      output.textContent = t('arvEstimateCalculated', 'ARV estimate calculated.');
+      output.textContent = t('arvEstimateCalculated', 'ARV estimate calculated.')+' '+t('arvAssumptions','Simple average of 3 sales; no adjustments for condition, date, size or location.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'arv_estimate' });
       }
@@ -518,13 +538,12 @@
       ], messages)) return;
 
       const loan = num('loanAmount');
-      const interestCost = loan * (num('interestRate') / 100) * (num('months') / 12);
-      const totalCost = loan * (num('points') / 100) + interestCost;
+      const {interestCost,totalCost,monthlyInterest}=hardMoneyModel(loan,num('interestRate'),num('points'),num('months'));
       setCards([
         { label: messages.totalFinancingCost, value: money(totalCost) },
-        { label: messages.monthlyInterestCarry, value: money(interestCost / Math.max(num('months'), 1)) }
+        { label: messages.monthlyInterestCarry, value: money(monthlyInterest) }
       ]);
-      output.textContent = t('financingEstimateCalculated', 'Financing estimate calculated.');
+      output.textContent = t('financingEstimateCalculated', 'Financing estimate calculated.')+' '+t('hardMoneyAssumptions','Simple interest plus points only; excludes lender closing fees, draw schedules and compounding.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'financing_estimate' });
       }
