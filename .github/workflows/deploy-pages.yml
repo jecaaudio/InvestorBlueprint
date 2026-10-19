@@ -27,10 +27,34 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
+      - name: Assemble public website only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public-site/tools/arv public-site/calculadora-venta
+          cp index.html login.html admin.html pricing.html privacy.html style.css lang.js script.js robots.txt sitemap.xml public-site/
+          cp -R assets public-site/assets
+          # Do not deploy deprecated front-end authentication or unused gating scripts.
+          rm -f public-site/assets/js/login.js public-site/assets/js/tool-access-guard.js
+          cp tools/*.html tools/*.css tools/tool-script.js tools/tool-access-feedback.js public-site/tools/
+          cp tools/arv/index.html tools/arv/arv.css tools/arv/arv.js public-site/tools/arv/
+          cp calculadora-venta/index.html calculadora-venta/print-report.css calculadora-venta/print-report.js public-site/calculadora-venta/
+          touch public-site/.nojekyll
+          # Fail deployment if a calculator is accidentally embedded into a public entry page.
+          if grep -q "const STATE_JURISDICTIONS\|function calculateFlip" public-site/calculadora-venta/index.html public-site/tools/flip-calculator.html; then
+            echo "::error::A tool entry file includes calculator implementation."
+            exit 1
+          fi
+          test -f public-site/assets/js/secure-tool-loader.js
+          test -f public-site/assets/js/member-access.js
+          test ! -e public-site/auth.js
+          test ! -e public-site/workers
+          test ! -e public-site/preview-login.html
+
       - name: Upload static artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: public-site
 
       - name: Deploy to GitHub Pages
         id: deployment
