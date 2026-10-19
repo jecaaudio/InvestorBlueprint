@@ -36,3 +36,41 @@
 .admin-controls{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:15px 0}
 .admin-controls select{min-height:40px;padding:8px;border-radius:8px}
 @media(max-width:780px){.access-grid{grid-template-columns:minmax(0,1fr)}.access-hero{padding:20px}.access-card{padding:18px!important}.member-row{align-items:stretch}.member-actions{width:100%}.member-actions select{flex:1}}
+
+/* Member profile and accessible mobile settings */
+.account-settings-card{margin:20px 0 35px}
+.account-settings-card h2{margin-top:0}
+.account-fields-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+.account-fields-grid label{display:grid;gap:7px;min-width:0}
+.account-fields-grid input,.account-fields-grid select{max-width:100%;min-height:45px;border:1px solid var(--site-border,var(--border));border-radius:9px;padding:9px 12px;background:var(--site-input,var(--panel));color:var(--text);font:inherit}
+.account-shortcuts{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+@media(max-width:650px){.account-fields-grid{grid-template-columns:1fr}.account-shortcuts .btn{width:100%}}
+[hidden]{display:none!important}
+
+/* The legacy mobile menu hides nav on pages without a hamburger control.
+   Profile, login and admin use always-visible wrapped navigation instead. */
+@media(max-width:840px){
+  body.ib-membership-page .navbar nav{
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+    justify-content:flex-start!important;
+    align-items:center!important;
+    max-height:none!important;
+    overflow:visible!important;
+    opacity:1!important;
+    gap:10px!important;
+    width:100%!important;
+    order:5!important;
+    padding:8px 0!important;
+  }
+  body.ib-membership-page .navbar nav a{
+    display:inline-flex;
+    align-items:center;
+    padding:7px 10px;
+    min-height:40px;
+    border-radius:8px;
+    border:1px solid var(--site-border,var(--border));
+    background:var(--panel);
+  }
+}
