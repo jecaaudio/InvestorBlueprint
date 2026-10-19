@@ -1,0 +1,29 @@
+name: Member profile and export regression tests
+
+on:
+  push:
+    branches:
+      - feature/member-account-preferences-20261019
+  pull_request:
+    paths:
+      - 'account.html'
+      - 'admin.html'
+      - 'login.html'
+      - 'assets/js/account-settings.js'
+      - 'assets/js/member-access.js'
+      - 'calculadora-venta/print-report.js'
+      - 'tools/arv/arv.js'
+      - 'scripts/member-profile.test.mjs'
+      - '.github/workflows/member-profile-test.yml'
+  workflow_dispatch:
+
+jobs:
+  profile-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check profile, navigation, reporting, ARV demo and script syntax
+        run: node --test scripts/member-profile.test.mjs
