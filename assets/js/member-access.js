@@ -1,6 +1,14 @@
 /* InvestorBlueprint member portal. Requires Supabase configuration + SQL migration. */
 (function(){
   'use strict';
+  // Preserve recovery URL state before the auth client consumes URL hash tokens.
+  // On a fast mobile browser, PASSWORD_RECOVERY can fire before DOMContentLoaded.
+  const initialHash=new URLSearchParams(window.location.hash.slice(1));
+  const initialQuery=new URLSearchParams(window.location.search);
+  const recoveryLinkIntent=initialHash.get('type')==='recovery' ||
+    (initialQuery.get('type')==='recovery' && initialQuery.has('code'));
+  const recoveryRedirectError=initialHash.get('error_description') ||
+    initialQuery.get('error_description') || '';
   const cfg=window.IB_AUTH_CONFIG||{};
   const valid=typeof cfg.supabaseUrl==='string'&&/^https:\/\//i.test(cfg.supabaseUrl)&&typeof cfg.supabaseAnonKey==='string'&&cfg.supabaseAnonKey.length>25;
   const client=valid&&window.supabase?.createClient?window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
@@ -39,14 +47,35 @@
     $('tab-register')?.addEventListener('click',()=>showPanel('registration'));
     $('tab-login')?.addEventListener('click',()=>showPanel('login'));
     $('tab-recover')?.addEventListener('click',()=>showPanel('recover'));
+    $('toggle-signin-password')?.addEventListener('click',()=>{
+      const input=$('signin-password'),button=$('toggle-signin-password');
+      if(!input||!button)return;
+      const reveal=input.type==='password';
+      input.type=reveal?'text':'password';
+      button.setAttribute('aria-pressed',String(reveal));
+      button.textContent=reveal?t('Ocultar contraseña','Hide password'):t('Mostrar contraseña','Show password');
+    });
+    let canSetRecoveredPassword=false;
     function showPanel(name){
       for(const [panel,form] of [['registration',registration],['login',login],['recover',recovery]]){
         if(form)form.hidden=panel!==name;
         $('tab-'+(panel==='registration'?'register':panel))?.setAttribute('aria-selected',String(panel===name));
       }
+      if(newPassword && name!=='new-password')newPassword.hidden=true;
+    }
+    function showRecoveryPasswordForm(){
+      canSetRecoveredPassword=true;
+      showPanel('new-password');
+      newPassword.hidden=false;
+      say('portal-message',t('Enlace de recuperación verificado. Introduce una contraseña nueva para InvestorBlueprint.','Recovery link verified. Enter a new InvestorBlueprint password.'),'success');
     }
     const entryParams=new URLSearchParams(window.location.search);
-    if(entryParams.has('returnTo')||entryParams.get('reason')==='login') showPanel('login');
+    if(entryParams.get('recover')==='1') showPanel('recover');
+    else if(entryParams.has('returnTo')||entryParams.get('reason')==='login') showPanel('login');
+    if(recoveryRedirectError){
+      showPanel('recover');
+      say('portal-message',t('El enlace de recuperación es inválido o venció. Solicita otro correo y abre solo el enlace más reciente.','Your reset link is invalid or expired. Request another message and open only the newest link.'),'error');
+    }
     async function updateAccount(){
       try{
         const profile=await readProfile();
@@ -66,8 +95,18 @@
       }catch(e){say('portal-message',e.message,'error');return null}
     }
     client.auth.onAuthStateChange((ev)=>{
-      if(ev==='PASSWORD_RECOVERY'){$('new-password-form').hidden=false;showPanel('login')}
+      if(ev==='PASSWORD_RECOVERY')showRecoveryPasswordForm();
     });
+    // Supabase may already have processed the recovery hash before the event
+    // listener was attached (especially Safari on iPhone).
+    if(recoveryLinkIntent&&!recoveryRedirectError){
+      const {data,error}=await client.auth.getSession();
+      if(!error&&data?.session?.user)showRecoveryPasswordForm();
+      else {
+        showPanel('recover');
+        say('portal-message',t('No se pudo validar el enlace de recuperación. Solicita uno nuevo.','Could not validate the recovery link. Request another one.'),'error');
+      }
+    }
     registration?.addEventListener('submit',async e=>{
       e.preventDefault();setBusy(registration,true);
       const email=$('signup-email').value.trim().toLowerCase(),password=$('signup-password').value;
@@ -102,7 +141,12 @@
             window.location.assign('index.html#tools');
           }
         }
-      }catch(err){say('portal-message',err.message,'error')}
+      }catch(err){
+        const invalid=err?.code==='invalid_credentials'||/invalid login credentials/i.test(err?.message||'');
+        say('portal-message',invalid
+          ?t('Correo o contraseña incorrectos. Comprueba la contraseña creada en Supabase. Si no la recuerdas, selecciona «Recuperar contraseña».','Incorrect email or password. Check the password you created in Supabase, or select “Reset password”.')
+          :t('No fue posible iniciar sesión: ','Could not sign in: ')+(err?.message||t('Error desconocido.','Unknown error.')),'error');
+      }
       finally{setBusy(login,false)}
     });
     recovery?.addEventListener('submit',async e=>{
@@ -110,18 +154,29 @@
       try{
         const {error}=await client.auth.resetPasswordForEmail($('recover-email').value.trim().toLowerCase(),{redirectTo:new URL('login.html',location.href).href});
         if(error)throw error;
-        say('portal-message',t('Si existe una cuenta, recibirás instrucciones por correo.','If an account exists, recovery instructions will be sent.'),'success');
-      }catch(err){say('portal-message',err.message,'error')}
+        say('portal-message',t('Solicitud recibida. Revisa tu correo y la carpeta de spam. Si el enlace te envía a localhost, será necesario configurar la URL de redirección en Supabase.','Request received. Check your email and spam. If the link leads to localhost, configure the redirect URL in Supabase.'),'success');
+      }catch(err){
+        const rateLimited=err?.status===429||err?.code==='over_email_send_rate_limit'||err?.code==='over_email_send_limit';
+        say('portal-message',rateLimited
+          ?t('Se solicitaron correos de recuperación demasiado rápido. Espera al menos un minuto antes de volver a intentarlo.','Too many recovery emails were requested. Wait at least one minute before retrying.')
+          :t('No se pudo solicitar la recuperación: ','Could not request recovery: ')+(err?.message||''),'error');
+      }
       finally{setBusy(recovery,false)}
     });
     newPassword?.addEventListener('submit',async e=>{
       e.preventDefault();setBusy(newPassword,true);
       try{
+        if(!canSetRecoveredPassword)throw Error(t('Abre primero el enlace de recuperación recibido por correo.','Open the password recovery link from your email first.'));
         const pw=$('new-password').value;
         if(pw.length<12)throw Error(t('La contraseña debe tener 12 caracteres como mínimo.','Password must have at least 12 characters.'));
+        const {data,error:sessionError}=await client.auth.getSession();
+        if(sessionError||!data?.session)throw Error(t('Tu enlace venció. Solicita uno nuevo.','Your reset link has expired. Request a new one.'));
         const {error}=await client.auth.updateUser({password:pw});if(error)throw error;
-        say('portal-message',t('Contraseña actualizada.','Password updated.'),'success');
-        newPassword.hidden=true;
+        canSetRecoveredPassword=false;
+        newPassword.reset();
+        await client.auth.signOut();
+        showPanel('login');
+        say('portal-message',t('Contraseña actualizada. Ahora inicia sesión con tu nueva contraseña de InvestorBlueprint.','Password updated. Now sign in with your new InvestorBlueprint password.'),'success');
       }catch(err){say('portal-message',err.message,'error')}
       finally{setBusy(newPassword,false)}
     });
