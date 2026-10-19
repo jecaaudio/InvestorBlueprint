@@ -28,6 +28,10 @@ for (const pagePath of pages) {
     console.error(`\n[axe] ${url} -> ${results.violations.length} violations`);
     for (const violation of results.violations) {
       console.error(`- ${violation.id}: ${violation.help}`);
+      for(const node of violation.nodes.slice(0,5)){
+        console.error(`    selector: ${node.target.join(', ')}`);
+        console.error(`    summary: ${node.failureSummary || 'none'}`);
+      }
     }
   } else {
     console.log(`[axe] ${url} -> 0 violations`);
