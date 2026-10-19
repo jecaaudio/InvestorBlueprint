@@ -32,6 +32,18 @@
     return false;
   };
   window.IBMemberAuth={client,readProfile,statusLabel,t,say,configured:!!client};
+  // Capture the one-time recovery event immediately: the SDK may emit it
+  // before DOMContentLoaded on fast mobile browsers or embedded email views.
+  let recoveryEventSeen=false;
+  let recoveryEventCallback=null;
+  if(client){
+    client.auth.onAuthStateChange((event)=>{
+      if(event==='PASSWORD_RECOVERY'){
+        recoveryEventSeen=true;
+        if(recoveryEventCallback)recoveryEventCallback();
+      }
+    });
+  }
   document.addEventListener('DOMContentLoaded',async()=>{
     if(!$('member-login')&&!$('admin-root'))return;
     if($('member-login')) await initPortal();
@@ -64,11 +76,14 @@
       if(newPassword && name!=='new-password')newPassword.hidden=true;
     }
     function showRecoveryPasswordForm(){
+      if(recoveryRedirectError)return;
       canSetRecoveredPassword=true;
       showPanel('new-password');
       newPassword.hidden=false;
-      say('portal-message',t('Enlace de recuperación verificado. Introduce una contraseña nueva para InvestorBlueprint.','Recovery link verified. Enter a new InvestorBlueprint password.'),'success');
+      say('portal-message',t('Enlace verificado. Puedes establecer tu nueva contraseña; la página comprobará y renovará tu sesión al guardar.','Recovery link verified. Your session will be checked and refreshed when saving the new password.'),'success');
     }
+    recoveryEventCallback=showRecoveryPasswordForm;
+    if(recoveryEventSeen)showRecoveryPasswordForm();
     const entryParams=new URLSearchParams(window.location.search);
     if(entryParams.get('recover')==='1') showPanel('recover');
     else if(entryParams.has('returnTo')||entryParams.get('reason')==='login') showPanel('login');
@@ -94,11 +109,8 @@
         return profile;
       }catch(e){say('portal-message',e.message,'error');return null}
     }
-    client.auth.onAuthStateChange((ev)=>{
-      if(ev==='PASSWORD_RECOVERY')showRecoveryPasswordForm();
-    });
-    // Supabase may already have processed the recovery hash before the event
-    // listener was attached (especially Safari on iPhone).
+    // If the SDK finished parsing the recovery URL before the portal loaded,
+    // validate the resulting session before offering the password form.
     if(recoveryLinkIntent&&!recoveryRedirectError){
       const {data,error}=await client.auth.getSession();
       if(!error&&data?.session?.user)showRecoveryPasswordForm();
@@ -169,15 +181,39 @@
         if(!canSetRecoveredPassword)throw Error(t('Abre primero el enlace de recuperación recibido por correo.','Open the password recovery link from your email first.'));
         const pw=$('new-password').value;
         if(pw.length<12)throw Error(t('La contraseña debe tener 12 caracteres como mínimo.','Password must have at least 12 characters.'));
-        const {data,error:sessionError}=await client.auth.getSession();
-        if(sessionError||!data?.session)throw Error(t('Tu enlace venció. Solicita uno nuevo.','Your reset link has expired. Request a new one.'));
-        const {error}=await client.auth.updateUser({password:pw});if(error)throw error;
+        // The email token has already been redeemed. At this point what matters
+        // is a valid Supabase session, not the remaining lifetime of the email link.
+        const {data:sessionData,error:sessionError}=await client.auth.getSession();
+        if(sessionError||!sessionData?.session)throw Error(t('La sesión de recuperación ya no está disponible. Solicita un enlace nuevo y ábrelo en Safari.','Your recovery session is no longer available. Request a new link and open it in Safari.'));
+        const current=sessionData.session;
+        const now=Math.floor(Date.now()/1000);
+        if(current.expires_at&&current.expires_at-now<180){
+          const {data:refreshed,error:refreshError}=await client.auth.refreshSession();
+          if(refreshError||!refreshed?.session)throw Error(t('La sesión no pudo renovarse. Solicita un enlace de recuperación nuevo.','The session could not be refreshed. Request another password recovery link.'));
+        }
+        const {data:verified,error:verifyError}=await client.auth.getUser();
+        if(verifyError||!verified?.user)throw Error(t('No pudimos verificar tu sesión. Solicita otro enlace y ábrelo en el mismo navegador donde cambiarás la contraseña.','We could not verify the session. Request another link and open it in the same browser where you will change the password.'));
+        let result=await client.auth.updateUser({password:pw});
+        if(result.error&&(/jwt.*expir|token.*expir|session.*expir/i.test(result.error.message||'')||result.error.status===401)){
+          const {error:refreshError}=await client.auth.refreshSession();
+          if(!refreshError)result=await client.auth.updateUser({password:pw});
+        }
+        if(result.error)throw result.error;
         canSetRecoveredPassword=false;
         newPassword.reset();
         await client.auth.signOut();
         showPanel('login');
         say('portal-message',t('Contraseña actualizada. Ahora inicia sesión con tu nueva contraseña de InvestorBlueprint.','Password updated. Now sign in with your new InvestorBlueprint password.'),'success');
-      }catch(err){say('portal-message',err.message,'error')}
+      }catch(err){
+        const expired=err?.code==='otp_expired'||err?.code==='session_not_found'||/expired|expirado|caducado|no está disponible|no pudo renovarse|no pudimos verificar|no longer available|could not be refreshed|could not verify/i.test(err?.message||'');
+        if(expired) {
+          canSetRecoveredPassword=false;
+          showPanel('recover');
+          say('portal-message',t('El enlace o la sesión ya no son válidos. Solicita un nuevo correo y ábrelo en Safari. El enlace se utiliza una sola vez.','The link or session is no longer valid. Request a new email and open it in Safari. Recovery links can only be used once.'),'error');
+        }else{
+          say('portal-message',t('No se pudo actualizar la contraseña: ','Could not update your password: ')+(err?.message||t('Inténtalo otra vez.','Please try again.')),'error');
+        }
+      }
       finally{setBusy(newPassword,false)}
     });
     $('signout-button')?.addEventListener('click',async()=>{
