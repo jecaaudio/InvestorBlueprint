@@ -36,6 +36,24 @@
     if(response.status===401){await client.auth.signOut();window.location.replace(loginURL.href);return;}
     if(response.status===403){fail('Tu cuenta necesita aprobación antes de abrir esta calculadora.');return;}
     if(!response.ok)throw Error('Server returned '+response.status);
+    // Refresh document preferences under the currently authenticated member.
+    // Never reuse a previous account's exported author name or language.
+    try{
+      const {data:prefs,error:prefsError}=await client.from('member_preferences')
+        .select('display_name,company_name,interface_language,document_language,report_detail,notes_detail')
+        .eq('user_id',session.user.id).maybeSingle();
+      if(!prefsError){
+        const p=prefs||{display_name:'',company_name:'',interface_language:'es',
+          document_language:'es',report_detail:'detailed',notes_detail:'detailed'};
+        const settings={
+          ib_display_name:p.display_name||'',ib_company_name:p.company_name||'',
+          ib_document_language:p.document_language==='en'?'en':'es',
+          ib_report_detail:p.report_detail==='summary'?'summary':'detailed',
+          ib_notes_detail:p.notes_detail==='summary'?'summary':'detailed'
+        };
+        for(const [key,value] of Object.entries(settings))localStorage.setItem(key,value);
+      }
+    }catch(error){console.warn('Member report preferences could not be synced',error)}
     let markup=await response.text();
     if(!/^<!doctype html>/i.test(markup.trim())||markup.length<1200)throw Error('Unexpected protected page');
     if(assetBase){
