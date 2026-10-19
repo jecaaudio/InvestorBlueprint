@@ -205,7 +205,7 @@
         showPanel('login');
         say('portal-message',t('Contraseña actualizada. Ahora inicia sesión con tu nueva contraseña de InvestorBlueprint.','Password updated. Now sign in with your new InvestorBlueprint password.'),'success');
       }catch(err){
-        const expired=err?.code==='otp_expired'||err?.code==='session_not_found'||/expired|expirado|caducado/i.test(err?.message||'');
+        const expired=err?.code==='otp_expired'||err?.code==='session_not_found'||/expired|expirado|caducado|no está disponible|no pudo renovarse|no pudimos verificar|no longer available|could not be refreshed|could not verify/i.test(err?.message||'');
         if(expired) {
           canSetRecoveredPassword=false;
           showPanel('recover');
