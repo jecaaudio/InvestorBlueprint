@@ -21,6 +21,7 @@ const demoBanner = document.getElementById("demo-banner");
 const currentOriginEl = document.getElementById("current-origin");
 
 let latestReport = null;
+let latestReportIsDemo = false;
 
 function getWorkerUrl() {
   return localStorage.getItem(WORKER_URL_STORAGE_KEY) || DEFAULT_WORKER_URL;
@@ -36,7 +37,7 @@ function isWorkerUrlConfigured(url = getWorkerUrl()) {
 
 function updateWorkerStateUi(url = getWorkerUrl()) {
   const configured = isWorkerUrlConfigured(url);
-  calculateBtn.title = configured ? "" : "Live ARV is not configured. Use the Demo button for sample data.";
+  calculateBtn.title = configured ? "" : "Real ARV unavailable: set up the valuation worker. Demo is a separate button.";
   calculateBtn.disabled = !configured;
 
   if (demoBanner) {
@@ -44,7 +45,7 @@ function updateWorkerStateUi(url = getWorkerUrl()) {
   }
 
   if (!configured) {
-    setStatus("Beta: usando DEMO data");
+    setStatus("Real ARV is not configured. Use the explicitly labeled demo button to explore a sample report.");
   }
 }
 
@@ -147,8 +148,9 @@ function renderComps(comps) {
   });
 }
 
-function render(payload) {
+function render(payload, isDemo = false) {
   latestReport = payload;
+  latestReportIsDemo = isDemo;
   const { subject, comps, arv, meta } = payload;
 
   renderKeyValueRows(subjectFields, [
@@ -173,9 +175,9 @@ function render(payload) {
   renderComps(comps);
 
   if (meta?.warnings?.length) {
-    setStatus(`Done with warnings: ${meta.warnings.join(" | ")}`);
+    setStatus(`${isDemo ? "DEMO — sample data. " : ""}Done with warnings: ${meta.warnings.join(" | ")}`);
   } else {
-    setStatus("Done.");
+    setStatus(isDemo ? "DEMO — sample property only, not a valuation of your address." : "Done.");
   }
 
   resultsEl.hidden = false;
@@ -183,26 +185,55 @@ function render(payload) {
   actionRow.hidden = false;
 }
 
+function pref(key, fallback){
+  try{return localStorage.getItem(key)||fallback}catch(error){return fallback}
+}
+function docEnglish(){return pref('ib_document_language','es')==='en'}
+function R(es,en){return docEnglish()?en:es}
+function reportNotes(){return document.getElementById('arv-analyst-notes')?.value?.trim()||''}
 function reportText(payload) {
-  const { subject, comps, arv, meta } = payload;
-  return [
-    "ARV REPORT",
-    `Generated: ${meta.generatedAt}`,
-    `Provider: ${meta.provider}`,
-    "",
-    `Subject: ${subject.address}`,
-    `Beds/Baths: ${subject.beds}/${subject.baths}`,
-    `Sqft: ${subject.sqft}`,
-    `Type: ${subject.propertyType}`,
-    `Year: ${subject.yearBuilt}`,
-    "",
-    `ARV Estimate: ${money(arv.estimate)}`,
-    `Range: ${money(arv.low)} - ${money(arv.high)}`,
-    `Confidence: ${arv.confidence}%`,
-    "",
-    "Comps:",
-    ...comps.map((comp, index) => `${index + 1}. ${comp.address} | ${money(comp.soldPrice)} | ${comp.sqft} sqft | score ${number(comp.score, 3)}`)
-  ].join("\n");
+  const {subject, comps, arv, meta}=payload;
+  const detailed=pref('ib_report_detail','detailed')!=='summary';
+  const notes=reportNotes();
+  const parts=[
+    R('INFORME DE ARV','ARV REPORT')+(latestReportIsDemo?' — DEMO':''),
+    R('Generado','Generated')+': '+(meta?.generatedAt||new Date().toISOString()),
+    R('Proveedor','Provider')+': '+(meta?.provider||R('No informado','Not supplied')),
+    R('Preparado por','Prepared by')+': '+(pref('ib_display_name','')||'—'),
+    '',
+    R('Propiedad analizada','Subject')+': '+(subject?.address||'—'),
+    R('Habitaciones/Baños','Beds/Baths')+': '+(subject?.beds??'—')+'/'+(subject?.baths??'—'),
+    R('Superficie','Area')+': '+(subject?.sqft??'—')+' sqft',
+    R('Tipo','Type')+': '+(subject?.propertyType||'—'),
+    R('Año','Year')+': '+(subject?.yearBuilt||'—'),
+    '',
+    R('ARV estimado','Estimated ARV')+': '+money(arv?.estimate),
+    R('Rango','Range')+': '+money(arv?.low)+' – '+money(arv?.high),
+    R('Confianza','Confidence')+': '+(arv?.confidence??'—')+'%',
+    R('Método','Method')+': '+(arv?.method||'—')
+  ];
+  if(detailed){
+    parts.push(R('Precio ponderado por pie²','Weighted price per sqft')+': '+money(arv?.ppsfWeighted));
+    parts.push('',R('Comparables','Comparable properties')+':');
+    for(const [index,comp] of (comps||[]).entries()){
+      parts.push((index+1)+'. '+(comp.address||'—')+
+        ' | '+R('Venta','Sale')+': '+money(comp.soldPrice)+
+        ' | '+(comp.sqft||0)+' sqft'+
+        ' | '+R('Distancia','Distance')+': '+(comp.distanceMiles??'—')+' mi'+
+        ' | '+R('Fecha','Date')+': '+(comp.soldDate||'—')+
+        ' | '+R('Puntuación','Score')+': '+number(comp.score,3));
+    }
+  }
+  if(meta?.warnings?.length)parts.push('',R('Advertencias','Warnings')+':',...meta.warnings.map(w=>'- '+w));
+  if(notes)parts.push('',R('Notas del analista','Analyst notes')+':',notes);
+  if(notes&&pref('ib_notes_detail','detailed')==='detailed'){
+    parts.push(R('Comprobación de notas','Notes verification')+': '+
+      R('Contrastar con documentación, estado de la propiedad y comparables recientes.','Cross-check against documents, property condition and recent comparable sales.'));
+  }
+  parts.push('',latestReportIsDemo
+    ?R('DEMO: contiene datos ficticios; NO es un valor de mercado real.','DEMO: sample data, NOT a real market valuation.')
+    :R('Estimación informativa. Comprueba fuentes, fechas, condición de la propiedad y comparables antes de invertir.','Informational estimate. Verify sources, dates, property condition and comparables before investing.'));
+  return parts.join("\n");
 }
 
 async function fetchArv(address) {
@@ -233,18 +264,12 @@ async function fetchArv(address) {
 }
 
 async function loadDemoReport() {
-  // A bundled illustrative report prevents deployment-file omissions.
-  // These figures are fictitious and must never be represented as a market valuation.
-  return {
-    subject:{address:"123 EXAMPLE St, Sample City, FL",beds:3,baths:2,sqft:1580,propertyType:"Single Family",yearBuilt:1997,lotSqft:5200},
-    comps:[
-      {address:"110 EXAMPLE Ave",distanceMiles:0.24,soldDate:"2026-01-18",soldPrice:515000,beds:3,baths:2,sqft:1540,pricePerSqft:334,score:0.941},
-      {address:"78 SAMPLE Rd",distanceMiles:0.37,soldDate:"2025-12-05",soldPrice:528000,beds:3,baths:2,sqft:1625,pricePerSqft:325,score:0.913},
-      {address:"250 DEMO Ct",distanceMiles:0.51,soldDate:"2025-11-21",soldPrice:499000,beds:3,baths:2,sqft:1498,pricePerSqft:333,score:0.894}
-    ],
-    arv:{estimate:522000,low:506000,high:538000,confidence:82,method:"DEMO weighted-comps",ppsfWeighted:331},
-    meta:{generatedAt:new Date().toISOString(),provider:"DEMO - FABRICATED DATA",warnings:["DEMO ONLY: fictional properties and sample numbers, not a real appraisal or market value."]}
-  };
+  const response = await fetch(DEMO_DATA_PATH);
+  if (!response.ok) {
+    throw new Error("Unable to load demo data.");
+  }
+
+  return response.json();
 }
 
 saveWorkerBtn.addEventListener("click", () => {
@@ -267,8 +292,8 @@ demoBtn.addEventListener("click", async () => {
 
   try {
     const payload = await loadDemoReport();
-    render(payload);
-    setStatus("Demo data loaded.");
+    render(payload, true);
+    setStatus("DEMO — example only; not a valuation of the entered address.");
   } catch (error) {
     setStatus("Failed.");
     setError(error.message);
@@ -291,7 +316,7 @@ form.addEventListener("submit", async (event) => {
   }
 
   if(!isWorkerUrlConfigured()){
-    setError("Real valuation is unavailable. Configure a valuation provider, or use the Demo button for example data.");
+    setError("Real ARV unavailable. Configure a valuation worker, or press Run with demo data to inspect a sample report.");
     return;
   }
 
@@ -303,7 +328,7 @@ form.addEventListener("submit", async (event) => {
 
   try {
     const payload = await fetchArv(address);
-    render(payload);
+    render(payload, false);
     if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === "function") {
       window.IBAnalytics.trackCalcSuccess("arv", { result: "arv_estimate" });
     }
@@ -327,7 +352,14 @@ copyBtn.addEventListener("click", async () => {
 
 exportBtn.addEventListener("click", () => {
   if (!latestReport) return;
-  const blob = new Blob([JSON.stringify(latestReport, null, 2)], { type: "application/json" });
+  const exported={...latestReport,exportMetadata:{
+    demo:latestReportIsDemo,
+    documentLanguage:docEnglish()?'en':'es',
+    reportDetail:pref('ib_report_detail','detailed'),
+    analystNotes:reportNotes(),
+    exportedAt:new Date().toISOString()
+  }};
+  const blob = new Blob([JSON.stringify(exported, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -335,4 +367,31 @@ exportBtn.addEventListener("click", () => {
   link.click();
   URL.revokeObjectURL(url);
   setStatus("JSON exported.");
+});
+
+document.addEventListener("DOMContentLoaded",()=>{
+  if(!actionRow)return;
+  const panel=document.createElement('div');
+  panel.className='arv-notes-panel';
+  panel.style.cssText='margin:14px 0;padding:12px;border:1px solid #dce5ef;border-radius:10px';
+  const label=document.createElement('label');
+  label.htmlFor='arv-analyst-notes';
+  label.textContent='Analysis notes / Notas del análisis';
+  label.style.cssText='display:block;font-weight:700;margin-bottom:7px';
+  const notes=document.createElement('textarea');
+  notes.id='arv-analyst-notes';notes.maxLength=3000;notes.rows=4;
+  notes.style.cssText='width:100%;box-sizing:border-box;padding:10px;border-radius:8px';
+  notes.placeholder='Assumptions, property condition, comp adjustments, risks / Supuestos, ajustes y riesgos';
+  panel.append(label,notes);actionRow.parentElement?.insertBefore(panel,actionRow);
+  const textButton=document.createElement('button');
+  textButton.type='button';textButton.className='btn';
+  textButton.textContent='Exportar informe TXT / Export TXT report';
+  textButton.addEventListener('click',()=>{
+    if(!latestReport)return;
+    const blob=new Blob([reportText(latestReport)],{type:'text/plain;charset=utf-8'});
+    const url=URL.createObjectURL(blob),link=document.createElement('a');
+    link.href=url;link.download='arv-report-'+Date.now()+'.txt';
+    link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+  actionRow.append(textButton);
 });
