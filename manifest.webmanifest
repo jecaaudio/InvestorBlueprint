@@ -1,0 +1,31 @@
+{
+  "id": "/InvestorBlueprint/",
+  "name": "InvestorBlueprint",
+  "short_name": "InvestorBlueprint",
+  "description": "Herramientas para analizar inversiones inmobiliarias.",
+  "start_url": "/InvestorBlueprint/",
+  "scope": "/InvestorBlueprint/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "assets/brand/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/brand/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/brand/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

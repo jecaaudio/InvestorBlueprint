@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="t"><title id="t">InvestorBlueprint</title>
+<g fill="none" stroke="#1689ef" stroke-width="1.3" opacity=".72"><path stroke-dasharray="4 4" d="M20 34V143 M129 35V143 M11 119H147 M11 76H42 M42 49H108"/><path d="M10 124H145 M25 29V146 M139 67V134 M11 137H143"/><path d="M15 29h11m-5-5v11 M136 122h10m-5-5v11"/></g>
+<path d="M114 32H130V66H114Z" fill="#0b78d7"/>
+<path d="M30 78V126H129V82" fill="none" stroke="#083d78" stroke-width="9" stroke-linecap="square" stroke-linejoin="miter"/>
+<rect x="45" y="99" width="18" height="23" rx="1.1" fill="#27baff"/><rect x="65" y="86" width="18" height="36" rx="1.1" fill="#10a4f5"/><rect x="85" y="73" width="18" height="49" rx="1.1" fill="#058df1"/><rect x="105" y="60" width="18" height="62" rx="1.1" fill="#0878d3"/>
+<path d="M16 73L78 19L78 38L24 84Z" fill="#0b4b99"/><path d="M78 19L143 76L133 85L78 38Z" fill="#098afb"/>
+<path d="M37 127H133" stroke="#082f62" stroke-width="5"/>
+</svg>
