@@ -226,6 +226,10 @@ function reportText(payload) {
   }
   if(meta?.warnings?.length)parts.push('',R('Advertencias','Warnings')+':',...meta.warnings.map(w=>'- '+w));
   if(notes)parts.push('',R('Notas del analista','Analyst notes')+':',notes);
+  if(notes&&pref('ib_notes_detail','detailed')==='detailed'){
+    parts.push(R('Comprobación de notas','Notes verification')+': '+
+      R('Contrastar con documentación, estado de la propiedad y comparables recientes.','Cross-check against documents, property condition and recent comparable sales.'));
+  }
   parts.push('',latestReportIsDemo
     ?R('DEMO: contiene datos ficticios; NO es un valor de mercado real.','DEMO: sample data, NOT a real market valuation.')
     :R('Estimación informativa. Comprueba fuentes, fechas, condición de la propiedad y comparables antes de invertir.','Informational estimate. Verify sources, dates, property condition and comparables before investing.'));
