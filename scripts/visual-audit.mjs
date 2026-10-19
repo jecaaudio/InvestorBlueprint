@@ -10,7 +10,7 @@ const pages=[
   {name:'precios',path:'pricing.html'}
 ];
 const widths=[320,375,390,430,768,1024,1440];
-const mock=String.raw\`
+const mock=String.raw`
 try {localStorage.setItem('seller-net-ui-theme','light');localStorage.setItem('preferredLanguage','es')}catch(e){}
 (function(){
  const user={id:'d64791d8-603a-4e42-be3c-f612711ad7c4',email:'sample-admin@example.test'};
@@ -27,7 +27,7 @@ try {localStorage.setItem('seller-net-ui-theme','light');localStorage.setItem('p
  };
  window.supabase={createClient:()=>client};
 })();
-\`;
+`;
 mkdirSync('visual-audit-artifacts',{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
 const report=[];
