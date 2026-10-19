@@ -55,13 +55,18 @@
     return '<div class="pr-source"><strong>'+esc(name)+'</strong>'+(href?' — <a href="'+esc(href)+'">'+L('Fuente oficial','Official source')+'</a>':'')+'</div>';
   }).join('');
   const date=new Intl.DateTimeFormat(en()?'en-US':'es-US',{year:'numeric',month:'long',day:'numeric'}).format(new Date());
+  const analyst=pref('ib_display_name','').trim(),company=pref('ib_company_name','').trim();
+  const notes=$('ib-report-notes')?.value?.trim()||'';
+  const notesSection=notes?'<section class="pr-section"><h2>'+L('Notas del análisis','Analysis notes')+'</h2><p class="pr-note" style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(notes)+'</p></section>':'';
+  const methodSection=detailed()?'<section class="pr-section"><h2>'+L('Método y supuestos','Method and assumptions')+'</h2><p class="pr-note">'+L('Neto estimado = precio de venta menos saldos pendientes y gastos de venta. Este cálculo no determina el impuesto sobre ganancias de capital.','Estimated proceeds = sale price minus debt payoffs and selling costs. This is not a capital gains tax calculation.')+'</p></section>':'';
+  const notesDisclaimer=notes&&pref('ib_notes_detail','detailed')==='detailed'?'<p class="pr-note">'+L('Notas proporcionadas por el usuario: verificar contra contrato, payoff e información de cierre.','User-provided notes: verify against contract, payoff statements and closing documents.')+'</p>':'';
   const statusNote=pending?
     L('El impuesto estatal de transferencia está pendiente de confirmación: el neto mostrado es parcial.','State transfer tax is not confirmed: net proceeds shown are partial.'):
     L('Los impuestos locales, exenciones y cargos finales deben verificarse para la jurisdicción y contrato.','Local taxes, exemptions, and final charges must be confirmed for the jurisdiction and contract.');
   return '<div class="pr-header">'+
     '<div><div class="pr-brand">InvestorBlueprint · Seller Net</div><h1>'+L('Estimación de venta inmobiliaria','Real estate sale estimate')+'</h1>'+
     '<div class="pr-subhead">'+L('Estado de liquidación estimado para el vendedor · USD','Estimated seller settlement statement · USD')+'</div></div>'+
-    '<div class="pr-meta"><strong>'+L('Preparado','Prepared')+'</strong><div>'+esc(date)+'</div><div>'+L('Documento informativo','Informational estimate')+'</div></div></div>'+
+    '<div class="pr-meta"><strong>'+L('Preparado','Prepared')+'</strong><div>'+esc(date)+'</div><div>'+L('Documento informativo','Informational estimate')+'</div>'+(analyst?'<div>'+esc(analyst)+'</div>':'')+(company?'<div>'+esc(company)+'</div>':'')+'</div></div>'+
     '<div class="pr-property">'+
       '<div><span>'+L('Estado','State')+'</span><strong>'+esc(stateName)+'</strong></div>'+
       '<div><span>'+L('Condado / jurisdicción','County / jurisdiction')+'</span><strong>'+esc(countyName)+'</strong></div>'+
@@ -83,6 +88,7 @@
     '<section class="pr-section pr-sources"><h2>04 · '+L('Base legal y fuentes oficiales','Legal basis and official sources')+'</h2>'+
       (sourceRows||'<p class="pr-note">'+L('La fórmula de este estado todavía no está verificada; consulte la autoridad oficial.','The tax formula is not yet verified for this state; consult the official authority.')+'</p>')+
       '<p class="pr-note">'+L('El listado de condados no implica que sus impuestos locales estén verificados.','County selection does not mean local taxes have been verified.')+'</p></section>'+
+    methodSection+notesSection+notesDisclaimer+
     '<div class="pr-disclaimer">'+L('Estimación informativa, no es un Closing Disclosure ni un ALTA Settlement Statement. Los saldos reales de payoff, prorrateos, impuestos, exenciones, cargos y distribución contractual de gastos deben confirmarse con la compañía de título. El neto recibido no equivale a la ganancia fiscal.','Informational estimate, not a Closing Disclosure or ALTA Settlement Statement. Actual payoffs, prorations, taxes, exemptions, fees, and contractual cost allocation must be confirmed by the title company. Net proceeds are not taxable capital gains.')+'</div>'+
     '<div class="pr-footer">InvestorBlueprint · '+L('Calculadora de Venta','Seller Net Calculator')+' · '+esc(date)+'</div>';
  }
