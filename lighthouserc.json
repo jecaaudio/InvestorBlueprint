@@ -11,7 +11,8 @@
       "startServerReadyPattern": "Serving HTTP on",
       "numberOfRuns": 1,
       "settings": {
-        "preset": "desktop"
+        "preset": "desktop",
+        "chromeFlags": "--headless --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage"
       }
     },
     "assert": {
