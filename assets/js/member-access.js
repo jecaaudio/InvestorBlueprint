@@ -108,7 +108,7 @@
         $('member-status').textContent=statusLabel(profile.access_status);
         $('member-status').dataset.state=profile.access_status;
         $('member-detail').textContent=profile.access_status==='approved'
-          ?t('Tu acceso está aprobado. Las herramientas pasarán al área protegida cuando se complete el despliegue seguro.','Your access is approved. Tools will move into the protected area after secure deployment is completed.')
+          ?t('Tu acceso está aprobado. Puedes usar las calculadoras desde Mi perfil.','Your access is approved. Open the calculators from My profile.')
           :profile.access_status==='pending'
           ?t('Solicitud recibida. El administrador revisará tu cuenta antes de autorizar las herramientas.','Request received. The administrator must approve your account before you can use the tools.')
           :t('Para obtener más información, contacta al administrador.','Contact the administrator for more information.');
@@ -150,16 +150,12 @@
         const profile=await updateAccount();
         if(profile?.access_status==='approved'){
           const raw=new URLSearchParams(window.location.search).get('returnTo')||'';
-          const ok=raw.startsWith('/InvestorBlueprint/tools/')||raw.startsWith('/InvestorBlueprint/calculadora-venta/');
+          const ok=raw.startsWith('/InvestorBlueprint/tools/')||raw.startsWith('/InvestorBlueprint/calculadora-venta/')||raw==='/InvestorBlueprint/account.html';
           if(ok && !raw.startsWith('//') && !raw.includes('\\')) {
             const target=new URL(raw,window.location.origin);
             if(target.origin===window.location.origin){window.location.assign(target.href);return}
           }
-          if(profile.role==='admin'){
-            window.location.assign(window.location.pathname.endsWith('/preview-login.html')?'preview-admin.html':'admin.html');
-          }else{
-            window.location.assign('index.html#tools');
-          }
+          window.location.assign('account.html');
         }
       }catch(err){
         const invalid=err?.code==='invalid_credentials'||/invalid login credentials/i.test(err?.message||'');
