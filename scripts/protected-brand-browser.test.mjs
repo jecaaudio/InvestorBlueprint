@@ -28,11 +28,15 @@ try {
     await page.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
       route=>route.fulfill({status:200,contentType:'application/javascript',body:'/* SDK mocked in CI */'}));
     await page.route('**/functions/v1/ib-protected-tools?tool=*',route=>{
+      const cors={'access-control-allow-origin':'*',
+        'access-control-allow-headers':'authorization, apikey, content-type, x-client-info',
+        'access-control-allow-methods':'GET, OPTIONS'};
+      if(route.request().method()==='OPTIONS')return route.fulfill({status:204,headers:cors,body:''});
       const html='<!doctype html><html lang="es"><head><title>Mock protected tool</title></head>'+
         '<body><a class="tool-logo" href="../index.html">InvestorBlueprint</a>'+
         '<header class="top"><div><p>Seller Net</p></div></header>'+
         '<main>'+('Private fixture content only. '.repeat(80))+'</main></body></html>';
-      return route.fulfill({status:200,contentType:'text/html',headers:{'access-control-allow-origin':'*'},body:html});
+      return route.fulfill({status:200,contentType:'text/html',headers:cors,body:html});
     });
     await page.goto(base+item.path,{waitUntil:'networkidle'});
     const mark=page.locator(item.selector);
