@@ -75,3 +75,42 @@ test('hard money principal, points and simple annual interest',()=>{
  near(r.totalCost,22312.5,'interest plus points');
  near(r.monthlyInterest,2012.5,'monthly interest');
 });
+
+test('zero cash deal has finite costs and no undefined equity ROI',()=>{
+ const zero={...basic};for(const [key,value] of Object.entries(zero))if(typeof value==='number')zero[key]=0;
+ const r=calc(zero);assert.equal(r.netProfit,0);assert.equal(r.totalCosts,0);assert.equal(r.roi,null);
+});
+test('malformed, negative and nonfinite inputs are rejected at model boundary',()=>{
+ for(const bad of [NaN,Infinity,-1,undefined,'200000'])assert.throws(()=>calc({...basic,purchase:bad}),/Invalid financial/);
+ assert.throws(()=>calc({...basic,taxRate:101}),/Invalid financial/);
+ assert.throws(()=>calc({...basic,purchase:1e308,rehabTotal:1e308}),/numeric limits/);
+});
+test('losses are not charged hypothetical profit tax and scenario profit stays consistent',()=>{
+ const r=calc({...basic,sale:200000,taxRate:30});assert.ok(r.netProfit<0);assert.equal(r.taxAmount,0);near(r.scenarioBase,r.netProfit,'loss scenario');
+ const p=calc({...basic,taxRate:25});near(p.taxAmount,35600*.25,'hypothetical tax');near(p.netProfit,26700,'after hypothetical tax');
+});
+test('rental full vacancy still incurs explicit expenses; invalid vacancy is rejected',()=>{
+ const m=window.IBSimpleFinanceModels.rentalModel;const r=m(2400,100,[200,100]);
+ assert.equal(r.monthlyCashFlow,-300);assert.equal(r.annualCashFlow,-3600);
+ for(const v of [-1,101,NaN])assert.throws(()=>m(2400,v,[]));
+ assert.throws(()=>m(2400,5,[undefined]));
+});
+test('zero occupancy has no computable asking rent instead of suggesting free rent',()=>{
+ const r=window.IBSimpleFinanceModels.rentModel(200000,1200,8,0);
+ assert.equal(r.suggestedMonthlyRent,null);assert.equal(r.annualIncome,0);assert.equal(r.netAfterExpenses,-1200);
+});
+test('empty, zero and invalid comparables cannot yield a fabricated ARV',()=>{
+ const m=window.IBSimpleFinanceModels.arvModel;
+ for(const comps of [[],[0],[200000,NaN],[200000,undefined]])assert.throws(()=>m(comps,0));
+ assert.ok(m([100000,100000,100000],80000).maxOffer<0);
+});
+test('hard money zero duration includes points but no accrued interest',()=>{
+ const m=window.IBSimpleFinanceModels.hardMoneyModel;const r=m(100000,12,2,0);
+ assert.equal(r.totalCost,2000);assert.equal(r.interestCost,0);assert.equal(r.monthlyInterest,0);
+ assert.throws(()=>m(100000,12,2,-1));
+});
+test('USD parsing preserves cents and rejects garbage rather than silently returning zero',()=>{
+ const parse=window.IBParseFinanceNumber;
+ assert.equal(parse('$1,234.56'),1234.56);assert.equal(parse('0'),0);assert.equal(parse(''),0);assert.equal(parse('.50'),.5);
+ for(const value of ['abc','1,2,3','$12oops','Infinity','1e999'])assert.ok(Number.isNaN(parse(value)),value);
+});
