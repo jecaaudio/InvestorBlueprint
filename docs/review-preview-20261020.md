@@ -41,3 +41,7 @@ The reviewed Seller patch also separates retained consideration from actual cash
 ## Immutable URLs after refresh
 
 Review output now derives its directory from the pinned SHA: `review-3bfec6b/`. Reusing the original review directory let a previously opened browser retain older financial scripts from its cache, even though deployment metadata had changed. Distinct revision paths prevent mixing old and new report/engine scripts. Candidate 3bfec6b passed all four exact-head checks, including the native reversed-listener regression. Root business assets remain unchanged.
+
+## Final Flip document-language review
+
+Pin `a93ebd940ddd8937b45256a1e5c864109d9b50af`, served at `review-a93ebd9/`. The real owner print test confirmed the enabled button and exposed legacy input labels missing translation keys. The candidate adds explicit report keys for those fields, a translated Flip title/equity metric and accurate draw-schedule notes; disabled reference and hidden plan fields are excluded. Existing arithmetic and protected access are unchanged.
