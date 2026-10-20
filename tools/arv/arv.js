@@ -150,6 +150,7 @@ function renderComps(comps) {
 
 function render(payload, isDemo = false) {
   latestReport = payload;
+  isDemo = isDemo || payload?.meta?.demo === true || payload?.meta?.provider === 'DUMMY';
   latestReportIsDemo = isDemo;
   const { subject, comps, arv, meta } = payload;
 
