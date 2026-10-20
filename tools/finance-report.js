@@ -45,7 +45,7 @@
    const style=document.createElement('style');style.textContent='.ib-finance-report-controls{margin:20px 0;display:grid;gap:12px}.ib-finance-report-controls textarea{width:100%;box-sizing:border-box}'+
      '@media print{body>:not(#ib-finance-report){display:none!important}#ib-finance-report{display:block!important;color:#172b3d;background:white;font:12px Arial;line-height:1.5}#ib-finance-report header{border-bottom:2px solid #146d82}#ib-finance-report table{width:100%;border-collapse:collapse;margin-bottom:20px}#ib-finance-report td,#ib-finance-report th{padding:7px;text-align:left;border-bottom:1px solid #ddd}#ib-finance-report tr{break-inside:avoid}#ib-finance-report .detail{white-space:pre-wrap;overflow-wrap:anywhere}#ib-finance-report footer{margin-top:24px}#ib-finance-report .flag{font-weight:bold}}';document.head.append(style);
    form.addEventListener('input',invalidate);form.addEventListener('change',invalidate);form.addEventListener('reset',invalidate);
-   form.addEventListener('submit',()=>queueMicrotask(()=>{
+   form.addEventListener('ib:calculation-complete',()=>{
      const validation=document.getElementById('tool-validation');
      if((validation&&!validation.hidden)||!cards.children.length||!form.checkValidity()){invalidate();return;}
      const messages=window.IBI18n?.getCurrentMessages?.()||{};
@@ -60,7 +60,7 @@
        metrics:[...cards.children].map(el=>{const label=el.querySelector('strong')?.textContent||'';return {key:keyFor(label),label,value:el.querySelector('span')?.textContent||''}}),
        details:(document.getElementById('result-detail')||document.getElementById('result'))?.innerText||'',demo:type==='roi_search'};
      button.disabled=false;status.textContent='';
-   }));
+   });
    button.addEventListener('click',async()=>{
      if(button.disabled||!snapshot)return;
      const prefs={...(window.IB_REPORT_PREFERENCES||{})};

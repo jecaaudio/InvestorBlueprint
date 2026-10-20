@@ -719,6 +719,9 @@
       const message=t('outOfRange','Revisa los números y los rangos / Check numbers and allowed ranges.');
       showValidationError(message);
       if(output)output.textContent=message;
+    } finally {
+      // Notify only after rendering finishes, regardless of native listener order.
+      form.dispatchEvent(new CustomEvent('ib:calculation-complete'));
     }
   });
   });

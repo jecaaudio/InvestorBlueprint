@@ -67,10 +67,14 @@ test('production Flip markup connects to the tested shared engine instead of the
  Object.defineProperty(d,'currentScript',{configurable:true,value:tag});
  w.eval(fs.readFileSync('assets/js/flip-calculator.js','utf8'));
  Object.defineProperty(d,'currentScript',{configurable:true,value:null});
- w.IBI18n={getCurrentMessages:()=>en};w.eval(source);w.eval(report);await tick();
+ w.IBI18n={getCurrentMessages:()=>en};
+ // Protected Flip loads report controls before its dynamically inserted engine.
+ w.eval(report);await tick();w.eval(source);
  const f=d.getElementById('tool-form');assert.ok(f);assert.ok(d.getElementById('loanDraws'));
  for(const [key,value] of Object.entries({salePrice:320000,purchasePrice:200000,rehabCost:50000,holdingMonths:6,miscMonthly:1000,buyerClosing:5000,stagingCost:1000,realtorPct:7,loanAmount:100000,interestRate:12,pointsPct:2}))f.elements[key].value=value;
- f.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();
+ f.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
+ // Readiness must follow the completed render synchronously, not a listener-order microtask.
+ assert.equal(d.getElementById('ib-finance-print').disabled,false);
  assert.match(d.getElementById('result-cards').textContent,/\$27,600/);
  assert.match(d.getElementById('result-cards').textContent,/16\.3%/);
  assert.equal(d.getElementById('ib-finance-print').disabled,false);
