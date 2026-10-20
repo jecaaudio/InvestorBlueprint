@@ -7,6 +7,7 @@
  const cfg=window.IB_AUTH_CONFIG||{};
  const isLang=value=>value==='en'?'en':'es';
  const isDetail=value=>value==='summary'?'summary':'detailed';
+ const safeStored=key=>{try{return localStorage.getItem(key)}catch(error){return null}};
  const values={
    display:'setting-display-name',company:'setting-company-name',
    interface:'setting-interface-language',document:'setting-document-language',
@@ -25,8 +26,8 @@
  function fill(data){
    $(values.display).value=data?.display_name||'';
    $(values.company).value=data?.company_name||'';
-   $(values.interface).value=isLang(data?.interface_language||localStorage.getItem('preferredLanguage'));
-   $(values.document).value=isLang(data?.document_language||localStorage.getItem('ib_document_language'));
+   $(values.interface).value=isLang(data?.interface_language||safeStored('preferredLanguage'));
+   $(values.document).value=isLang(data?.document_language||safeStored('ib_document_language'));
    $(values.report).value=isDetail(data?.report_detail);
    $(values.notes).value=isDetail(data?.notes_detail);
  }
