@@ -5,9 +5,10 @@ import vm from 'node:vm';
 
 const script=fs.readFileSync('assets/js/secure-tool-loader.js','utf8');
 const validHtml='<!doctype html><html><head><title>Protected</title></head><body>'+
+  '<a class="tool-logo" href="../index.html">InvestorBlueprint</a><header class="top"><div>Sale report</div></header>'+
   '<main>'+('Secure content '.repeat(95))+'</main></body></html>';
 
-async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null}={}){
+async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool='flip'}={}){
   let html='',redirect='',signedOut=0,requests=0;
   let shownMessage='',loginLinkHidden=true,authHeader='';
   const cache=new Map([
@@ -34,7 +35,7 @@ async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null}={})
   const link={hidden:true,href:''};
   const status={textContent:''};
   const document={
-    currentScript:{dataset:{tool:'flip',root:'../',assetBase:'tools/'}},
+    currentScript:{dataset:{tool,root:'../',assetBase:'tools/'}},
     documentElement:{classList:{remove(){}}},
     getElementById(id){return id==='secure-loading-message'?status:id==='secure-login-link'?link:null},
     open(){},
@@ -49,7 +50,7 @@ async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null}={})
     supabase:{createClient:()=>client}};
   const fetch=async (url,opts)=>{
     requests++;authHeader=opts.headers.Authorization;
-    assert.ok(url.endsWith('ib-protected-tools?tool=flip'));
+    assert.ok(url.endsWith('ib-protected-tools?tool='+tool));
     return {
       status:httpStatus,ok:httpStatus===200,
       async text(){return validHtml}
@@ -98,4 +99,19 @@ test('only settings of the currently authenticated member reach reports',async()
   assert.equal(r.cache.get('ib_report_detail'),'summary');
   assert.equal(r.authHeader,'Bearer dummy_access_token');
   assert.ok(r.html.includes('<base href="https://jecaaudio.github.io/InvestorBlueprint/tools/tools/">'));
+});
+
+test('approved protected calculators restore transparent favicon and navigation logo',async()=>{
+  const r=await run();
+  assert.match(r.html,/rel="icon" type="image\/svg\+xml"/);
+  assert.match(r.html,/apple-touch-icon\.png/);
+  assert.match(r.html,/manifest\.webmanifest/);
+  assert.match(r.html,/class="ib-tool-brand-mark"/);
+  assert.match(r.html,/assets\/brand\/favicon\.svg/);
+});
+test('protected seller net receives branding without exposing it to unauthorized members',async()=>{
+  const approved=await run({tool:'seller-net'});
+  assert.match(approved.html,/class="ib-seller-brand"/);
+  const denied=await run({tool:'seller-net',httpStatus:403});
+  assert.equal(denied.html,'');
 });
