@@ -150,6 +150,7 @@ function renderComps(comps) {
 
 function render(payload, isDemo = false) {
   latestReport = payload;
+  isDemo = isDemo || payload?.meta?.demo === true || payload?.meta?.provider === 'DUMMY';
   latestReportIsDemo = isDemo;
   const { subject, comps, arv, meta } = payload;
 
@@ -186,6 +187,7 @@ function render(payload, isDemo = false) {
 }
 
 function pref(key, fallback){
+  if(window.IB_REPORT_PREFERENCES&&Object.hasOwn(window.IB_REPORT_PREFERENCES,key))return window.IB_REPORT_PREFERENCES[key]||fallback;
   try{return localStorage.getItem(key)||fallback}catch(error){return fallback}
 }
 function docEnglish(){return pref('ib_document_language','es')==='en'}

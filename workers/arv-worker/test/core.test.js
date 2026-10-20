@@ -5,11 +5,11 @@ import { computeCompScore, confidenceFromComps } from "../src/core/scoring.js";
 import { rankAndFilterComps } from "../src/core/comps.js";
 import { calculateArv } from "../src/core/arv.js";
 
-test("normalizeSubject fills sane defaults and falls back to the given address", () => {
+test("normalizeSubject preserves unknown attributes and falls back to the given address", () => {
   const subject = normalizeSubject({}, "123 Main St");
   assert.equal(subject.address, "123 Main St");
-  assert.equal(subject.beds, 3);
-  assert.equal(subject.sqft, 1600);
+  assert.equal(subject.beds, null);
+  assert.equal(subject.sqft, null);
 });
 
 test("normalizeComp discards invalid sqft/price by zeroing them out", () => {
@@ -46,9 +46,9 @@ test("rankAndFilterComps drops invalid comps, ranks by score, and caps to maxCom
   const subject = normalizeSubject({ beds: 3, baths: 2, sqft: 1600 }, "subject");
   const comps = rankAndFilterComps(subject, [
     { soldPrice: 0, sqft: 1600 }, // invalid: no price
-    { soldPrice: 300000, sqft: 1600, beds: 3, baths: 2, distanceMiles: 0 }, // best match
+    { address:'Synthetic comp',soldPrice: 300000, sqft: 1600, beds: 3, baths: 2, distanceMiles: 0, soldDate:'2026-09-20' }, // best match
     { soldPrice: 250000, sqft: 900, beds: 1, baths: 1, distanceMiles: 8 } // worse match
-  ], options);
+  ], options,new Date('2026-10-20T12:00:00Z'));
 
   assert.equal(comps.length, 1);
   assert.equal(comps[0].soldPrice, 300000);

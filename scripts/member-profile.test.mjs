@@ -22,6 +22,8 @@ test('all approved members including admin return to normal member profile with 
  assert.ok(read('admin.html').includes('href="account.html"'));
  assert.ok(read('index.html').includes('href="account.html"'));
  assert.ok(read('index.html').includes('id="index-admin-link"'));
+ assert.ok(read('index.html').includes('id="primary-admin-link"'));
+ assert.ok(read('assets/js/member-navigation.js').includes("profile?.role==='admin'&&profile.access_status==='approved'"));
 });
 
 test('preferences migration never permits anonymous access or writes to another member',()=>{

@@ -3,7 +3,7 @@
 ## Infrastructure (JECA, Supabase Free)
 - Supabase project ref: `ppeyoovykxomxinumibk`, region `us-east-2`.
 - Auth: Supabase email/password; `member_profiles` and audit/subscription tables protected by PostgreSQL RLS.
-- Administrator registered and approved: `Jansel2913@gmail.com`. Do not put passwords in the repo.
+- The sole administrator was verified privately against Auth and the profile. Do not put owner identifiers or passwords in public documentation.
 - Auth interface: `login.html` and `admin.html`.
 - Latest JS browser SDK script: `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2`, following official docs. Earlier `dist/umd/supabase.js` was not the recommended entrypoint.
 - Recovery flow in `login.html?recover=1`; **URL configuration in Supabase Dashboard and outgoing email delivery must be verified.**

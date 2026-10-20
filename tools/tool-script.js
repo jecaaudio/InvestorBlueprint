@@ -1,6 +1,28 @@
 (function () {
+  const checkNumber=(name,value,max=Infinity,allowNegative=false)=>{
+    if(typeof value!=='number'||!Number.isFinite(value)||(!allowNegative&&value<0)||value>max)throw new RangeError('Invalid financial input: '+name);
+  };
+  const checkedResult=result=>{
+    for(const value of Object.values(result))if(typeof value==='number'&&!Number.isFinite(value))throw new RangeError('Financial result exceeds numeric limits');
+    return result;
+  };
+  const parseFinanceNumber=value=>{
+    if(typeof value==='number')return Number.isFinite(value)?value:NaN;
+    let clean=String(value??'').trim();if(!clean)return 0;
+    clean=clean.replace(/^([+-]?)\$/,'$1');
+    if(clean.includes(',')){
+      if(!/^[+-]?\d{1,3}(,\d{3})+(\.\d+)?$/.test(clean))return NaN;
+      clean=clean.replace(/,/g,'');
+    }
+    if(!/^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(clean))return NaN;
+    const parsed=Number(clean);return Number.isFinite(parsed)?parsed:NaN;
+  };
+  if(typeof window!=='undefined')window.IBParseFinanceNumber=parseFinanceNumber;
   // Pure flip model; full-draw interest is a conservative simplified estimate.
   const calculateFlipFinance = (x) => {
+    for(const key of ['purchase','sale','rehabTotal','buyerClosing','titleFees','inspectionCost','monthlyHolding','holdingMonths','stagingCost','transferTax','loanAmount','drawFee','drawInspectionFee','drawCount','originationFees','loanClosingCosts','prepayPenalty'])checkNumber(key,x[key]);
+    checkNumber('prorations',x.prorations,Infinity,true);
+    for(const key of ['realtorPct','concessionPct','sellerClosingPct','loanPurchasePct','loanRehabPct','pointsPct','interestRate','taxRate'])checkNumber(key,x[key],100);
     const acquisition=x.purchase+x.buyerClosing+x.titleFees+x.prorations+x.inspectionCost;
     const holdingTotal=x.monthlyHolding*x.holdingMonths;
     const sellingRate=(x.realtorPct+x.concessionPct+x.sellerClosingPct)/100;
@@ -20,7 +42,7 @@
     }
     const base=profitAtSale(x.sale);
     const cashCommitted=acquisition+x.rehabTotal+holdingTotal+financeCosts-fundedPrincipal;
-    return {
+    return checkedResult({
       acquisition,holdingTotal,rehabTotal:x.rehabTotal,financedAmount:fundedPrincipal,
       financingTotal:financeCosts,sellingTotal:base.sellingTotal,
       taxAmount:base.tax,totalCosts:x.sale-base.profit,netProfit:base.profit,
@@ -30,29 +52,38 @@
       scenarioLow:profitAtSale(x.sale*0.95).profit,
       scenarioBase:base.profit,
       scenarioHigh:profitAtSale(x.sale*1.05).profit
-    };
+    });
   };
   if(typeof window!=='undefined')window.IBCalculateFlipFinance=calculateFlipFinance;
 
   // Simplified tools are deterministic and explicitly exclude unmodeled costs.
   const rentalModel=(monthlyRent,vacancyRate,expenses)=>{
+    checkNumber('monthlyRent',monthlyRent);checkNumber('vacancyRate',vacancyRate,100);
+    if(!Array.isArray(expenses))throw new RangeError('Expenses must be an array');
+    expenses.forEach(value=>checkNumber('expense',value));
     const monthly=monthlyRent*(1-vacancyRate/100)-expenses.reduce((a,b)=>a+b,0);
-    return {monthlyCashFlow:monthly,annualCashFlow:monthly*12};
+    return checkedResult({monthlyCashFlow:monthly,annualCashFlow:monthly*12});
   };
   const rentModel=(value,annualExpenses,targetGrossYield,occupancy)=>{
-    const grossRent=value>0&&occupancy>0?value*targetGrossYield/100/(12*occupancy/100):0;
-    const collected=grossRent*12*occupancy/100;
-    return {suggestedMonthlyRent:grossRent,annualIncome:collected,
-      grossYield:value>0?collected/value*100:0,netAfterExpenses:collected-annualExpenses};
+    checkNumber('value',value);checkNumber('annualExpenses',annualExpenses);
+    checkNumber('targetGrossYield',targetGrossYield,100);checkNumber('occupancy',occupancy,100);
+    const grossRent=value>0&&occupancy>0?value*targetGrossYield/100/(12*occupancy/100):null;
+    const collected=grossRent===null?0:grossRent*12*occupancy/100;
+    return checkedResult({suggestedMonthlyRent:grossRent,annualIncome:collected,
+      grossYield:value>0?collected/value*100:null,netAfterExpenses:collected-annualExpenses});
   };
   const arvModel=(comps,repairs)=>{
-    const average=comps.reduce((sum,x)=>sum+x,0)/comps.length;
-    return {average,maxOffer:average*.70-repairs};
+    if(!Array.isArray(comps)||!comps.length)throw new RangeError('Comparable sales required');
+    comps.forEach(value=>{checkNumber('comparable',value);if(value===0)throw new RangeError('Comparable price must be positive')});
+    checkNumber('repairs',repairs);
+    const average=comps.reduce((sum,x)=>sum+x/comps.length,0);
+    return checkedResult({average,maxOffer:average*.70-repairs});
   };
   const hardMoneyModel=(loan,rate,points,months)=>{
+    checkNumber('loan',loan);checkNumber('rate',rate,100);checkNumber('points',points,100);checkNumber('months',months);
     const interestCost=loan*rate/100*months/12;
-    return {interestCost,totalCost:loan*points/100+interestCost,
-      monthlyInterest:months>0?interestCost/months:0};
+    return checkedResult({interestCost,totalCost:loan*points/100+interestCost,
+      monthlyInterest:months>0?interestCost/months:0});
   };
   if(typeof window!=='undefined'){
     window.IBSimpleFinanceModels={rentalModel,rentModel,arvModel,hardMoneyModel};
@@ -80,12 +111,7 @@
     window.IBAnalytics.trackToolOpen(type);
   }
 
-  const parseNumeric = (value) => {
-    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
-    const clean = String(value ?? '').replace(/[^0-9.-]/g, '');
-    const parsed = Number(clean);
-    return Number.isFinite(parsed) ? parsed : 0;
-  };
+  const parseNumeric = parseFinanceNumber;
 
   const money = (value) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value) || 0);
@@ -101,17 +127,17 @@
 
       input.addEventListener('focus', () => {
         const value = parseNumeric(input.value);
-        input.value = value ? String(value) : '';
+        if(Number.isFinite(value))input.value = value ? String(value) : '';
       });
 
       input.addEventListener('blur', () => {
         const value = parseNumeric(input.value);
-        input.value = input.value.trim() ? money(value) : '';
+        if(Number.isFinite(value))input.value = input.value.trim() ? money(value) : '';
       });
 
       if (input.value) {
         const value = parseNumeric(input.value);
-        input.value = money(value);
+        if(Number.isFinite(value))input.value = money(value);
       }
     });
   };
@@ -217,13 +243,15 @@
       if (!input.value) {
         input.setCustomValidity(messages.requiredField);
         valid = false;
-      } else if (Number(input.value) < 0) {
+      } else if (!Number.isFinite(parseNumeric(input.value))) {
+        input.setCustomValidity(messages.outOfRange||'Enter a valid number.');
+        valid = false;
+      } else if (parseNumeric(input.value) < 0) {
         input.setCustomValidity(messages.cannotBeNegative);
         valid = false;
       }
     });
-    form.reportValidity();
-    return valid;
+    return form.reportValidity() && valid;
   };
 
   if (type === 'flip') {
@@ -387,7 +415,7 @@
     }
     const values = Object.fromEntries(new FormData(form).entries());
     const num = (name) => parseNumeric(values[name]);
-
+    try {
     if (type === 'flip') {
       if (!validateFlip(messages)) return;
 
@@ -497,7 +525,7 @@
       const {suggestedMonthlyRent,annualIncome,grossYield,netAfterExpenses}=rentModel(propertyValue,annualExpenses,targetYield*100,occupancy*100);
 
       setCards([
-        { label: messages.rentSuggestedMonthly, value: money(suggestedMonthlyRent) },
+        { label: messages.rentSuggestedMonthly, value: suggestedMonthlyRent===null?'N/A':money(suggestedMonthlyRent) },
         { label: messages.rentAnnualIncome, value: money(annualIncome) },
         { label: messages.rentGrossYield, value: pct(grossYield) },
         { label: messages.rentNetAfterExpenses, value: money(netAfterExpenses) }
@@ -551,6 +579,7 @@
     }
 
     if (type === 'roi_search') {
+      if(!validateFields([{name:'desiredReturn',required:true,min:0,max:100}],messages))return;
       const desiredReturn = num('desiredReturn');
       const rawLocation = String(values.location || '').trim().toLowerCase();
       const propertyType = String(values.propertyType || '').trim();
@@ -580,6 +609,12 @@
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: filteredRows.length ? 'matches_found' : 'no_matches' });
       }
+    }
+    } catch(error) {
+      setCards([]);
+      const message=t('outOfRange','Revisa los números y los rangos / Check numbers and allowed ranges.');
+      showValidationError(message);
+      if(output)output.textContent=message;
     }
   });
   });
