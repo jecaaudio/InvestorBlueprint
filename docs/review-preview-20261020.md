@@ -31,3 +31,7 @@ Rollback: revert this infrastructure commit and let the gated Pages deployment
 remove the review path. Stop using the preview function; preserve production user
 preferences and all original server source. Do not treat preview publication as a
 release or a completion claim for the eight calculators/integrations.
+
+## Authenticated-browser follow-up
+
+The owner successfully reached the review calculator through the guarded endpoint. Native submit listener ordering exposed a disabled export button on protected Flip despite valid results. Candidate `9af8dfa0336456eff6c22663a54114fa6d33d181` fixes this with an explicit renderer completion event and a reversed-loading-order regression. The existing review URL now pins that commit; the production root remains unchanged.

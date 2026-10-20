@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
-export const REVIEW_SHA='291a7888dd9e902c28379e0c579a3389bad9d783';
+export const REVIEW_SHA='9af8dfa0336456eff6c22663a54114fa6d33d181';
 export const REVIEW_DIRECTORY='review-291a788';
 const rootFiles=['index.html','login.html','admin.html','account.html','pricing.html','privacy.html','style.css','lang.js','script.js','manifest.webmanifest'];
 const toolFiles=['flip-calculator.html','rental-cash-flow.html','rent-calculator.html','arv-estimator.html','hard-money-analyzer.html','roi-search.html'];
