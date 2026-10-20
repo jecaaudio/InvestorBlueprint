@@ -21,6 +21,12 @@ jobs:
       - name: Verify live protected endpoint refuses missing and forged credentials
         run: node scripts/live-tool-denial.test.mjs
 
+      - name: Install locked DOM test dependencies
+        run: npm ci
+
+      - name: Verify expanded financial forms, seller patch and bilingual reports
+        run: node --test scripts/finance-dom.test.mjs scripts/seller-tax.test.mjs
+
   quality-gates:
     runs-on: ubuntu-latest
 

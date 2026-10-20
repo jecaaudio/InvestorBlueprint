@@ -59,7 +59,7 @@ jobs:
           cp -R assets public-site/assets
           # Do not deploy deprecated front-end authentication or unused gating scripts.
           rm -f public-site/assets/js/login.js public-site/assets/js/tool-access-guard.js
-          cp tools/*.html tools/*.css tools/tool-script.js tools/tool-access-feedback.js public-site/tools/
+          cp tools/*.html tools/*.css tools/tool-script.js tools/tool-access-feedback.js tools/finance-report.js public-site/tools/
           cp tools/arv/index.html tools/arv/arv.css tools/arv/arv.js public-site/tools/arv/
           cp -R tools/arv/fixtures public-site/tools/arv/fixtures
           cp calculadora-venta/index.html calculadora-venta/print-report.css calculadora-venta/print-report.js public-site/calculadora-venta/

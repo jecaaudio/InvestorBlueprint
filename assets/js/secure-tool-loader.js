@@ -29,6 +29,9 @@
     const icon='<img class="ib-tool-brand-mark" src="'+mark+'" alt="" aria-hidden="true"> ';
     const sellerBrand='<div class="ib-seller-brand"><img src="'+mark+'" alt="" aria-hidden="true">InvestorBlueprint</div>';
     html=html.replace(/<\/head>/i,head+'</head>');
+    if(!['seller-net','automated-arv'].includes(tool)){
+      html=html.replace(/<\/head>/i,'<script defer src="'+root+'tools/finance-report.js?v=20261020"></script></head>');
+    }
     html=html.replace(/(<a\b[^>]*class=["'][^"']*\btool-logo\b[^"']*["'][^>]*>)\s*InvestorBlueprint(\s*<\/a>)/i,
       (all,opening,closing)=>opening+icon+'InvestorBlueprint'+closing);
     if(tool==='seller-net'){

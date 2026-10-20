@@ -11,7 +11,7 @@ const start=html.indexOf('function getTransfer(price){'),end=html.indexOf('funct
 if(start<0||end<0)throw Error('Snapshot contract changed; review before auditing');
 const source=html.slice(start,end);
 function calc({state='KY',price=200000,...patch}={}){
- const fields={county:'Jefferson',propertyType:'single',assumed:0,mortgage1:100000,mortgage2:20000,hasSecondMortgage:false,
+ const fields={county:'Jefferson',propertyType:'single',assumed:0,ilRetainedMortgage:0,mortgage1:100000,mortgage2:20000,hasSecondMortgage:false,
   otherDebt:0,listingPct:3,buyerAgentPct:2,creditPct:1,creditDollar:1000,settlement:500,admin:100,propertyTax:200,
   recording:50,misc:150,localTax:20,stateTaxOverride:'',isExempt:false,sellerShare:100,...patch};
  const ctx={state:{value:state},$:(id)=>({value:String(fields[id]??''),checked:!!fields[id]}),n:id=>Math.max(0,Number(fields[id]??0))};
@@ -34,5 +34,17 @@ near(calc({state:'FL',county:'Miami-Dade'}).tax.sellerTax,1200);
 near(calc({state:'FL',county:'Miami-Dade',propertyType:'multi'}).tax.sellerTax,2100);
 near(calc({state:'TX'}).tax.sellerTax,0);
 near(calc({state:'IL'}).tax.sellerTax,200);
+if(html.includes('id="ilRetainedMortgage"')){
+ near(calc({state:'IL',ilRetainedMortgage:150000}).tax.basis,50000);
+ near(calc({state:'IL',ilRetainedMortgage:150000}).tax.sellerTax,50);
+ near(calc({state:'IL',ilRetainedMortgage:200000}).tax.sellerTax,0);
+ near(calc({state:'IL',assumed:100000,ilRetainedMortgage:100000}).tax.sellerTax,200);
+ assert.equal(calc({state:'IL',ilRetainedMortgage:200001}).tax.known,false);
+ assert.equal(calc({state:'IL',ilRetainedMortgage:200001}).tax.sellerTax,null);
+ near(calc({state:'IL',ilRetainedMortgage:200001,stateTaxOverride:180}).tax.sellerTax,180);
+ near(calc({ilRetainedMortgage:150000}).tax.sellerTax,200);
+ near(calc({state:'IL',ilRetainedMortgage:150000,mortgage1:0}).debt,0);
+ console.log('PASS: 9 retained-mortgage assertions: equity basis, zero equity, included consideration, invalid basis pending, override, state isolation and payoff separation.');
+}
 console.log('PASS: Seller Net snapshot: 14 scenarios covering proceeds, optional second mortgage, losses, zero, rounding, override, share, exemption, unknown tax and four state formulas.');
 console.log('Snapshot SHA-256: '+createHash('sha256').update(html).digest('hex'));

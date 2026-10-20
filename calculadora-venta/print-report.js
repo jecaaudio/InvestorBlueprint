@@ -65,6 +65,12 @@
   const userNotesGuidance=userNotes&&setting('ib_notes_detail','detailed')==='detailed'?
     '<section class="pr-section"><h2>'+L('Comprobaciones de las notas','Notes verification checklist')+'</h2><p class="pr-note">'+L('Contrasta estas notas con contrato, inspección, balances de payoff, estimado de la compañía de título y estado real de la propiedad.','Compare these notes against the contract, inspection, payoff balances, title company estimate and actual property condition.')+'</p></section>':'';
   const methodBlock=detailed()?'<section class="pr-section"><h2>'+L('Cómo se calcula el neto','How net proceeds are calculated')+'</h2><p class="pr-note">'+L('Neto estimado = precio de venta menos payoff de deudas menos gastos de venta. No es una determinación de impuestos sobre ganancias.','Estimated net = sale price minus debt payoffs minus selling costs. This is not a capital gains tax calculation.')+'</p></section>':'';
+  const illinoisBasis=state?.value==='IL'&&$('ilRetainedMortgage')?
+    '<section class="pr-section"><h2>'+L('Base imponible de Illinois','Illinois taxable basis')+'</h2><table class="pr-table"><tbody>'+
+    cell(L('Valor total: precio más deuda no incluida','Total consideration: price plus excluded assumed debt'),money(price+num('assumed')))+
+    cell(L('Hipoteca retenida calificada declarada por usuario','User-declared qualifying retained mortgage'),money(num('ilRetainedMortgage')))+
+    cell(L('Base declarada para el impuesto estatal','Declared state tax basis'),price+num('assumed')>=num('ilRetainedMortgage')?money(price+num('assumed')-num('ilRetainedMortgage')):L('PENDIENTE: base inválida','PENDING: invalid basis'))+
+    '</tbody></table><p class="pr-note">'+L('La reducción requiere que la hipoteca permanezca sobre la propiedad y figure en la escritura. Confirmar con PTAX-203 y título. Los payoffs se introducen por separado.','The reduction requires the mortgage to remain on the property and be stated on the deed. Confirm against PTAX-203 and the title company. Payoffs are entered separately.')+'</p></section>':'';
   const statusNote=pending?
     L('El impuesto estatal de transferencia está pendiente de confirmación: el neto mostrado es parcial.','State transfer tax is not confirmed: net proceeds shown are partial.'):
     L('Los impuestos locales, exenciones y cargos finales deben verificarse para la jurisdicción y contrato.','Local taxes, exemptions, and final charges must be confirmed for the jurisdiction and contract.');
@@ -96,7 +102,7 @@
     '<section class="pr-section pr-sources"><h2>04 · '+L('Base legal y fuentes oficiales','Legal basis and official sources')+'</h2>'+
       (sourceRows||'<p class="pr-note">'+L('La fórmula de este estado todavía no está verificada; consulte la autoridad oficial.','The tax formula is not yet verified for this state; consult the official authority.')+'</p>')+
       '<p class="pr-note">'+L('El listado de condados no implica que sus impuestos locales estén verificados.','County selection does not mean local taxes have been verified.')+'</p></section>'):'')+
-    methodBlock+notesBlock+userNotesGuidance+
+    illinoisBasis+methodBlock+notesBlock+userNotesGuidance+
     '<div class="pr-disclaimer">'+L('Estimación informativa, no es un Closing Disclosure ni un ALTA Settlement Statement. Los saldos reales de payoff, prorrateos, impuestos, exenciones, cargos y distribución contractual de gastos deben confirmarse con la compañía de título. El neto recibido no equivale a la ganancia fiscal.','Informational estimate, not a Closing Disclosure or ALTA Settlement Statement. Actual payoffs, prorations, taxes, exemptions, fees, and contractual cost allocation must be confirmed by the title company. Net proceeds are not taxable capital gains.')+'</div>'+
     '<div class="pr-footer">InvestorBlueprint · '+L('Calculadora de Venta','Seller Net Calculator')+' · '+esc(date)+'</div>';
  }

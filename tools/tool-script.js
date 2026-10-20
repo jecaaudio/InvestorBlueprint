@@ -30,10 +30,11 @@
     const isFinanced=x.isPro&&x.financingType!=='cash';
     const derivedLoan=x.purchase*x.loanPurchasePct/100+x.rehabTotal*x.loanRehabPct/100;
     const fundedPrincipal=isFinanced?(x.loanAmount>0?x.loanAmount:derivedLoan):0;
-    const financeCosts=isFinanced?fundedPrincipal*x.pointsPct/100+
-      fundedPrincipal*x.interestRate/100*x.holdingMonths/12+
-      (x.drawFee+x.drawInspectionFee)*x.drawCount+
-      x.originationFees+x.loanClosingCosts+x.prepayPenalty:0;
+    const financing=isFinanced?hardMoneyModel(fundedPrincipal,x.interestRate,x.pointsPct,x.holdingMonths,{
+      draws:x.draws,interestMethod:x.interestMethod||'simple',
+      fees:(x.drawFee+x.drawInspectionFee)*x.drawCount+x.originationFees+x.loanClosingCosts+x.prepayPenalty
+    }):{totalCost:0,drawnPrincipal:0};
+    const financeCosts=financing.totalCost;
     const fixedCosts=acquisition+x.rehabTotal+holdingTotal+sellingFixed+financeCosts;
     function profitAtSale(gross){
       const beforeTax=gross-fixedCosts-gross*sellingRate;
@@ -41,9 +42,9 @@
       return {profit:beforeTax-provisionalTax,sellingTotal:sellingFixed+gross*sellingRate,tax:provisionalTax};
     }
     const base=profitAtSale(x.sale);
-    const cashCommitted=acquisition+x.rehabTotal+holdingTotal+financeCosts-fundedPrincipal;
+    const cashCommitted=acquisition+x.rehabTotal+holdingTotal+financeCosts-financing.drawnPrincipal;
     return checkedResult({
-      acquisition,holdingTotal,rehabTotal:x.rehabTotal,financedAmount:fundedPrincipal,
+      acquisition,holdingTotal,rehabTotal:x.rehabTotal,financedAmount:financing.drawnPrincipal,committedLoan:fundedPrincipal,
       financingTotal:financeCosts,sellingTotal:base.sellingTotal,
       taxAmount:base.tax,totalCosts:x.sale-base.profit,netProfit:base.profit,
       cashCommitted,roi:cashCommitted>0?base.profit/cashCommitted*100:null,
@@ -57,12 +58,21 @@
   if(typeof window!=='undefined')window.IBCalculateFlipFinance=calculateFlipFinance;
 
   // Simplified tools are deterministic and explicitly exclude unmodeled costs.
-  const rentalModel=(monthlyRent,vacancyRate,expenses)=>{
+  const rentalModel=(monthlyRent,vacancyRate,expenses,options={})=>{
     checkNumber('monthlyRent',monthlyRent);checkNumber('vacancyRate',vacancyRate,100);
     if(!Array.isArray(expenses))throw new RangeError('Expenses must be an array');
     expenses.forEach(value=>checkNumber('expense',value));
-    const monthly=monthlyRent*(1-vacancyRate/100)-expenses.reduce((a,b)=>a+b,0);
-    return checkedResult({monthlyCashFlow:monthly,annualCashFlow:monthly*12});
+    const extra={debtService:0,capitalReserve:0,hoa:0,utilities:0,otherExpenses:0,cashInvested:0,totalBasis:0,...options};
+    for(const [key,value] of Object.entries(extra))checkNumber(key,value);
+    const effectiveIncome=monthlyRent*(1-vacancyRate/100);
+    const operatingExpenses=expenses.reduce((a,b)=>a+b,0)+extra.hoa+extra.utilities+extra.otherExpenses;
+    const monthlyNoi=effectiveIncome-operatingExpenses;
+    const monthly=monthlyNoi-extra.debtService-extra.capitalReserve;
+    return checkedResult({effectiveIncome,operatingExpenses,monthlyNoi,annualNoi:monthlyNoi*12,
+      monthlyCashFlow:monthly,annualCashFlow:monthly*12,
+      annualDebtService:extra.debtService*12,annualReserve:extra.capitalReserve*12,
+      cashOnCash:extra.cashInvested>0?monthly*12/extra.cashInvested*100:null,
+      capRate:extra.totalBasis>0?monthlyNoi*12/extra.totalBasis*100:null});
   };
   const rentModel=(value,annualExpenses,targetGrossYield,occupancy)=>{
     checkNumber('value',value);checkNumber('annualExpenses',annualExpenses);
@@ -72,17 +82,39 @@
     return checkedResult({suggestedMonthlyRent:grossRent,annualIncome:collected,
       grossYield:value>0?collected/value*100:null,netAfterExpenses:collected-annualExpenses});
   };
-  const arvModel=(comps,repairs)=>{
+  const arvModel=(comps,repairs,adjustments=comps?.map(()=>0))=>{
     if(!Array.isArray(comps)||!comps.length)throw new RangeError('Comparable sales required');
     comps.forEach(value=>{checkNumber('comparable',value);if(value===0)throw new RangeError('Comparable price must be positive')});
     checkNumber('repairs',repairs);
-    const average=comps.reduce((sum,x)=>sum+x/comps.length,0);
-    return checkedResult({average,maxOffer:average*.70-repairs});
+    if(!Array.isArray(adjustments)||adjustments.length!==comps.length)throw new RangeError('One signed adjustment per comparable required');
+    const adjusted=comps.map((value,i)=>{
+      checkNumber('comparable adjustment',adjustments[i],Infinity,true);
+      const result=value+adjustments[i];checkNumber('adjusted comparable',result);
+      if(result===0)throw new RangeError('Adjusted price must be positive');return result;
+    });
+    const average=adjusted.reduce((sum,x)=>sum+x/adjusted.length,0);
+    return checkedResult({average,maxOffer:average*.70-repairs,minimum:Math.min(...adjusted),maximum:Math.max(...adjusted)});
   };
-  const hardMoneyModel=(loan,rate,points,months)=>{
+  const hardMoneyModel=(loan,rate,points,months,options={})=>{
     checkNumber('loan',loan);checkNumber('rate',rate,100);checkNumber('points',points,100);checkNumber('months',months);
-    const interestCost=loan*rate/100*months/12;
-    return checkedResult({interestCost,totalCost:loan*points/100+interestCost,
+    const fees=options.fees??0;checkNumber('fees',fees);
+    const method=options.interestMethod??'simple';
+    if(!['simple','monthly-compound'].includes(method))throw new RangeError('Invalid interest method');
+    const draws=options.draws===undefined?[{month:0,amount:loan}]:options.draws;
+    if(!Array.isArray(draws)||!draws.length)throw new RangeError('Loan draw schedule required');
+    let drawnPrincipal=0,interestCost=0;
+    for(const draw of draws){
+      checkNumber('draw month',draw?.month,months);checkNumber('draw amount',draw?.amount);
+      drawnPrincipal+=draw.amount;
+      if(drawnPrincipal>loan)throw new RangeError('Draws exceed committed loan amount');
+      const duration=months-draw.month,monthlyRate=rate/1200;
+      const growth=method==='simple'?monthlyRate*duration:
+        Math.pow(1+monthlyRate,Math.floor(duration))*(1+monthlyRate*(duration%1))-1;
+      interestCost+=draw.amount*growth;
+    }
+    const pointsCost=loan*points/100;
+    return checkedResult({interestCost,pointsCost,fees,drawnPrincipal,
+      totalCost:pointsCost+interestCost+fees,
       monthlyInterest:months>0?interestCost/months:0});
   };
   if(typeof window!=='undefined'){
@@ -114,11 +146,65 @@
   const parseNumeric = parseFinanceNumber;
 
   const money = (value) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value) || 0);
+    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits:0,maximumFractionDigits: 2 }).format(Number(value) || 0);
   const pct = (value) => `${(Number(value) || 0).toFixed(1)}%`;
 
   const getMessages = () => window.IBI18n?.getCurrentMessages?.() || {};
   const t = (key, fallback = '') => getMessages()[key] || fallback;
+
+  // Optional lender/ownership costs are explicit inputs, never inferred market rates.
+  if(type==='rental'){
+    const fields=[['debtService','rentalDebtService'],['capitalReserve','rentalCapitalReserve'],
+      ['hoa','rentalHoa'],['utilities','rentalUtilities'],['otherExpenses','rentalOtherExpenses'],
+      ['cashInvested','rentalCashInvested'],['totalBasis','rentalTotalBasis']];
+    const section=document.createElement('fieldset');
+    const legend=document.createElement('legend');legend.dataset.i18n='rentalOwnershipCosts';
+    legend.textContent=t('rentalOwnershipCosts','Financing, reserves and invested capital');section.append(legend);
+    for(const [id,key] of fields){
+      const group=document.createElement('div');group.className='form-group';
+      const label=document.createElement('label');label.htmlFor=id;label.dataset.i18n=key;label.textContent=t(key,id);
+      const input=document.createElement('input');Object.assign(input,{id,name:id,type:'number',min:'0',step:'0.01',value:'0'});
+      input.inputMode='decimal';input.setAttribute('aria-describedby',id+'-error');
+      const error=document.createElement('p');error.id=id+'-error';error.className='field-error';error.hidden=true;error.setAttribute('role','alert');
+      group.append(label,input,error);section.append(group);
+    }
+    form.insertBefore(section,form.querySelector('.tool-actions'));
+  }
+  if(type==='hard-money'||type==='flip'){
+    const section=document.createElement('fieldset');
+    if(type==='flip')section.className='pro-only is-hidden';
+    section.innerHTML='<legend data-i18n="loanScheduleTitle">Loan draw schedule and interest method</legend>'+
+      '<label for="interestMethod" data-i18n="loanInterestMethod">Interest method</label>'+
+      '<select id="interestMethod" name="interestMethod"><option value="simple" data-i18n="loanSimple">Simple interest</option><option value="monthly-compound" data-i18n="loanCompound">Monthly capitalized interest</option></select>'+
+      '<label for="loanDraws" data-i18n="loanDraws">Draws: month:amount, one per line (optional)</label>'+
+      '<textarea id="loanDraws" name="loanDraws" rows="4" maxlength="10000" placeholder="0:100000&#10;3:25000" aria-describedby="loanDrawHelp"></textarea>'+
+      '<p id="loanDrawHelp" data-i18n="loanDrawHelp">Blank means the full committed loan is funded at month zero. Enter actual draws only. Points apply to the committed loan. Monthly compounding assumes unpaid interest is capitalized, with simple accrual for the final partial month.</p>';
+    if(type==='hard-money')section.innerHTML+='<label for="lenderFees" data-i18n="loanLenderFees">Total lender fees, draw/inspection fees and penalties (USD)</label><input id="lenderFees" name="lenderFees" type="number" min="0" step="0.01" value="0"><p id="lenderFees-error" class="field-error" role="alert" hidden></p>';
+    form.insertBefore(section,form.querySelector('.tool-actions'));
+  }
+  if(type==='arv'){
+    const section=document.createElement('fieldset');
+    section.innerHTML='<legend data-i18n="arvAdjustmentsTitle">Documented comparable adjustments</legend><p data-i18n="arvAdjustmentsHelp">Enter signed dollar adjustments supported by condition, size, date or location evidence. Positive adds to the comparable; negative subtracts. Zero means no adjustment. The tool does not verify that a sale closed.</p>';
+    for(let i=1;i<=3;i++){
+      const group=document.createElement('div');
+      group.innerHTML='<label for="comp'+i+'Adjustment"><span data-i18n="arvCompAdjustment">Signed adjustment (USD)</span> '+i+'</label><input id="comp'+i+'Adjustment" name="comp'+i+'Adjustment" type="number" step="0.01" value="0"><p id="comp'+i+'Adjustment-error" class="field-error" hidden></p>'+
+        '<label for="comp'+i+'Evidence"><span data-i18n="arvCompEvidence">Sale date, source and adjustment evidence</span> '+i+'</label><textarea id="comp'+i+'Evidence" name="comp'+i+'Evidence" maxlength="1500" rows="3"></textarea>';
+      section.append(group);
+    }
+    form.insertBefore(section,form.querySelector('.tool-actions'));
+  }
+  const readLoanSchedule=()=>{
+    const raw=form.elements.loanDraws?.value.trim();
+    if(!raw)return undefined;
+    return raw.split(/\r?\n/).filter(line=>line.trim()).map(line=>{
+      const parts=line.split(':');
+      if(parts.length!==2||parts.some(value=>!value.trim()))throw new RangeError('Invalid draw schedule');
+      return {month:parseFinanceNumber(parts[0]),amount:parseFinanceNumber(parts[1])};
+    });
+  };
+  form.querySelectorAll('[data-i18n]').forEach(node=>{
+    const value=getMessages()[node.dataset.i18n];if(value)node.textContent=value;
+  });
 
   const setupCurrencyInputs = () => {
     form.querySelectorAll('input[data-format="currency"]').forEach((input) => {
@@ -409,6 +495,8 @@
     event.preventDefault();
     const messages = getMessages();
     clearValidationError();
+    setCards([]);
+    if(output)output.textContent='';
 
     if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcRun === 'function') {
       window.IBAnalytics.trackCalcRun(type);
@@ -430,7 +518,8 @@
         loanAmount:num('loanAmount'),loanPurchasePct:num('loanPurchasePct'),loanRehabPct:num('loanRehabPct'),
         pointsPct:num('pointsPct'),interestRate:num('interestRate'),drawFee:num('drawFee'),
         drawInspectionFee:num('drawInspectionFee'),drawCount:num('drawCount'),originationFees:num('originationFees'),
-        loanClosingCosts:num('loanClosingCosts'),prepayPenalty:num('prepayPenalty'),taxRate:num('taxRate')
+        loanClosingCosts:num('loanClosingCosts'),prepayPenalty:num('prepayPenalty'),taxRate:num('taxRate'),
+        draws:readLoanSchedule(),interestMethod:values.interestMethod
       });
       const {acquisition,rehabTotal,holdingTotal,sellingTotal,financingTotal,totalCosts,netProfit,
         cashCommitted,roi,mao70,breakEven,scenarioLow,scenarioBase,scenarioHigh}=model;
@@ -488,6 +577,7 @@
         { name: 'insurance', min: 0 },
         { name: 'maintenance', min: 0 },
         { name: 'management', min: 0 },
+        ...['debtService','capitalReserve','hoa','utilities','otherExpenses','cashInvested','totalBasis'].map(name=>({name,min:0})),
         { name: 'vacancyRate', required: true, min: 0, max: 100 }
       ], messages)) return;
 
@@ -495,13 +585,18 @@
       const vacancyRate = num('vacancyRate');
       const expenses = ['taxes', 'insurance', 'maintenance', 'management'].map(num);
 
-      const cashFlow = rentalModel(monthlyRent,vacancyRate,expenses).monthlyCashFlow;
+      const rentalOptions=Object.fromEntries(['debtService','capitalReserve','hoa','utilities','otherExpenses','cashInvested','totalBasis'].map(key=>[key,num(key)]));
+      const rental=rentalModel(monthlyRent,vacancyRate,expenses,rentalOptions);
+      const cashFlow = rental.monthlyCashFlow;
       setCards([
         { label: messages.monthlyCashFlow, value: money(cashFlow) },
         { label: messages.annualCashFlow, value: money(cashFlow * 12) },
-        { label: t('vacancyRateLabel', 'Vacancy Rate'), value: pct(vacancyRate) }
+        { label: t('vacancyRateLabel', 'Vacancy Rate'), value: pct(vacancyRate) },
+        { label: t('rentalAnnualNoi','Annual NOI'), value:money(rental.annualNoi) },
+        { label: t('rentalCashOnCash','Annual cash-on-cash return'), value:rental.cashOnCash===null?'N/A':pct(rental.cashOnCash) },
+        { label: t('rentalCapRate','Capitalization rate'), value:rental.capRate===null?'N/A':pct(rental.capRate) }
       ]);
-      output.textContent = t('cashFlowCalculated', 'Cash flow calculated.')+' '+t('rentalAssumptions','Excludes mortgage debt service, vacancy expenses beyond the rate and capital reserves.');
+      output.textContent = t('cashFlowCalculated', 'Cash flow calculated.')+' '+t('rentalAssumptions','NOI excludes debt service and capital reserves. Cash flow deducts both. Cash-on-cash uses entered equity; cap rate uses entered total property basis. All costs are user-entered; $0 means omitted.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'cash_flow' });
       }
@@ -543,14 +638,16 @@
         { name: 'comp2', required: true, min: 0.01 },
         { name: 'comp3', required: true, min: 0.01 },
         { name: 'repairs', required: true, min: 0 }
+        ,...['comp1Adjustment','comp2Adjustment','comp3Adjustment'].map(name=>({name,allowNegative:true}))
       ], messages)) return;
 
-      const {average,maxOffer}=arvModel([num('comp1'),num('comp2'),num('comp3')],num('repairs'));
+      const {average,maxOffer,minimum,maximum}=arvModel([num('comp1'),num('comp2'),num('comp3')],num('repairs'),[num('comp1Adjustment'),num('comp2Adjustment'),num('comp3Adjustment')]);
       setCards([
         { label: messages.estimatedArv, value: money(average) },
-        { label: messages.maxOffer, value: money(maxOffer) }
+        { label: messages.maxOffer, value: money(maxOffer) },
+        { label: t('arvAdjustedRange','Adjusted comparable range (not a confidence interval)'),value:money(minimum)+' – '+money(maximum) }
       ]);
-      output.textContent = t('arvEstimateCalculated', 'ARV estimate calculated.')+' '+t('arvAssumptions','Simple average of 3 sales; no adjustments for condition, date, size or location.');
+      output.textContent = t('arvEstimateCalculated', 'ARV estimate calculated.')+' '+t('arvAssumptions','Average of three prices plus user-entered signed adjustments. Sources and adjustments are not independently verified. The 70% offer rule is a screening heuristic; financing, holding and sale costs require a full deal model.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'arv_estimate' });
       }
@@ -562,16 +659,23 @@
         { name: 'loanAmount', required: true, min: 0.01 },
         { name: 'interestRate', required: true, min: 0, max: 100 },
         { name: 'points', required: true, min: 0, max: 20 },
-        { name: 'months', required: true, min: 1 }
+        { name: 'months', required: true, min: 0 },
+        { name: 'lenderFees', min: 0 }
       ], messages)) return;
 
       const loan = num('loanAmount');
-      const {interestCost,totalCost,monthlyInterest}=hardMoneyModel(loan,num('interestRate'),num('points'),num('months'));
+      const {interestCost,totalCost,monthlyInterest,pointsCost,fees,drawnPrincipal}=hardMoneyModel(loan,num('interestRate'),num('points'),num('months'),{
+        fees:num('lenderFees'),draws:readLoanSchedule(),interestMethod:values.interestMethod
+      });
       setCards([
         { label: messages.totalFinancingCost, value: money(totalCost) },
-        { label: messages.monthlyInterestCarry, value: money(monthlyInterest) }
+        { label: t('loanAverageMonthlyInterest','Average monthly interest'), value: money(monthlyInterest) },
+        { label: t('loanAccruedInterest','Accrued interest'), value:money(interestCost) },
+        { label: t('loanPointsCost','Points on committed principal'), value:money(pointsCost) },
+        { label: t('loanFeesCost','Lender fees and penalties'), value:money(fees) },
+        { label: t('loanDrawnPrincipal','Total funded principal'), value:money(drawnPrincipal) }
       ]);
-      output.textContent = t('financingEstimateCalculated', 'Financing estimate calculated.')+' '+t('hardMoneyAssumptions','Simple interest plus points only; excludes lender closing fees, draw schedules and compounding.');
+      output.textContent = t('financingEstimateCalculated', 'Financing estimate calculated.')+' '+t('hardMoneyAssumptions','Costs include entered fees, points on committed principal and interest on each entered draw. Principal repayment is not a financing expense. Confirm the accrual convention and capitalization with the lender.');
       if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'financing_estimate' });
       }
