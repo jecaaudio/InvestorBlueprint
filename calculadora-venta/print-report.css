@@ -3,7 +3,7 @@
 @page {size:letter;margin:0.48in 0.60in 0.48in 0.60in}
 @media print {
  html,body,html[data-theme="dark"],html[data-theme="dark"] body {background:#fff!important;color:#152638!important;color-scheme:light!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
- body>main.container,body>main,body>noscript{display:none!important}
+ body>:not(#printReport){display:none!important}
  #printReport{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;font:9pt/1.35 Arial,Helvetica,sans-serif;color:#152638!important;background:#fff!important}
  #printReport *{box-sizing:border-box}
  #printReport h1,#printReport h2,#printReport h3,#printReport p{margin-top:0}

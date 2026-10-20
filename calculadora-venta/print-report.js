@@ -29,7 +29,7 @@
   const state=$('state'),county=$('county'),kind=$('propertyType');
   const stateName=state?.selectedOptions?.[0]?.textContent?.trim()||state?.value||'—';
   const countyName=county?.selectedOptions?.[0]?.textContent?.trim()||'—';
-  const kindName=kind?.selectedOptions?.[0]?.textContent?.trim()||'—';
+  const kindName=({single:L('Vivienda unifamiliar','Single-family residence'),condo_unit:L('Una unidad residencial de condominio / cooperativa','One residential condominium / cooperative unit'),multi:L('Multifamiliar / varias unidades','Multifamily / multiple units'),commercial:L('Comercial','Commercial')}[kind?.value])||kind?.selectedOptions?.[0]?.textContent?.trim()||'—';
   const pct=n=>new Intl.NumberFormat(en()?'en-US':'es-ES',{maximumFractionDigits:2}).format(n)+'%';
   const fees=[
    [L('Comisión agente del vendedor','Listing agent commission')+' ('+pct(num('listingPct'))+')',price*num('listingPct')/100],

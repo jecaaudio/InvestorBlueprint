@@ -21,6 +21,8 @@ export async function renderSellerPrintFixture(browser,output,lang,detail){
  assert.equal(await page.locator('#printButton').isEnabled(),true);
  assert.match(await page.locator('#printReport').textContent(),/28,231\.16/);
  await page.emulateMedia({media:'print'});
+ assert.equal(await page.locator('.ib-report-notes-panel').isVisible(),false,'print hides the notes editor');
+ assert.match(await page.locator('#printReport').textContent(),lang==='es'?/Vivienda unifamiliar/:/Single-family residence/);
  await page.screenshot({path:path.join(output,'seller-'+lang+'-'+detail+'.png'),fullPage:true});
  await page.pdf({path:path.join(output,'seller-'+lang+'-'+detail+'.pdf'),format:'Letter',printBackground:true});
  if(lang==='es'&&detail==='detailed'){
