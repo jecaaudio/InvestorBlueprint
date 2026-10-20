@@ -26,7 +26,10 @@ try{
   },{prefs,messages,logo});
   await page.emulateMedia({media:'print'});await page.screenshot({path:path.join(output,'finance-'+lang+'-'+detail+'.png'),fullPage:true});
   await page.pdf({path:path.join(output,'finance-'+lang+'-'+detail+'.pdf'),format:'Letter',printBackground:true,margin:{top:'0.6in',bottom:'0.6in',left:'0.6in',right:'0.6in'}});
-  assert.match(await page.locator('#ib-finance-report').textContent(),/QA Analyst/);await page.close();
+  const financialText=await page.locator('#ib-finance-report').textContent();
+  assert.match(financialText,/QA Analyst/);
+  if(lang==='es'){assert.match(financialText,/Flujo mensual/);assert.doesNotMatch(financialText,/Monthly cash flow/);}
+  await page.close();
 
   const arv=await browser.newPage();
   await arv.route('**/*',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html></html>'}));

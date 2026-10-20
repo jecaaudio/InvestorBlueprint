@@ -55,6 +55,7 @@ test('print renderer distinguishes languages, report depth, simulated inventory 
  const snapshot={logo:'https://jecaaudio.github.io/InvestorBlueprint/assets/brand/favicon.svg',title:'Rent',date:'2026-10-20',metrics:[{key:'profit',label:'Profit',value:'$100'}],inputs:[{key:'rentalDebtService',label:'Debt',value:'$900'}],details:'NOI - debt',demo:true,notes:'<img src=x onerror=alert(1)>'};
  const a=render(snapshot,{ib_document_language:'es'},es),b=render(snapshot,{ib_document_language:'en',ib_report_detail:'summary'},en);
  assert.match(a,/Datos utilizados/);assert.match(a,/DEMOSTRACIÓN/);assert.match(a,/&lt;img/);assert.doesNotMatch(a,/<img src=x/);
+ assert.match(a,/Ganancia/);assert.doesNotMatch(a,/>Profit</);
  assert.match(b,/Results/);assert.match(b,/DEMONSTRATION/);assert.doesNotMatch(b,/Inputs used/);assert.doesNotMatch(b,/\$900/);
  dom.window.close();
 });

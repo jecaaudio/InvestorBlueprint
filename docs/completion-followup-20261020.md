@@ -118,3 +118,13 @@ Chromium can launch locally but crashes on page navigation in this host; the
 new native print fixtures run in GitHub Actions. Their results/artifacts must be
 reviewed before checking off visual/PDF gates. Physical iPhone and real-session
 checks remain pending. This follow-up does not authorize merging around them.
+
+Native PDF artifacts from exact head e6eba0b passed generation (8 PDFs, each one
+page). Extracted text and rendered PDF pages were inspected. No clipping was
+observed in those synthetic examples. Review found Spanish financial labels
+falling back to English because the export dictionaries omitted labels supplied
+only by lang.js fallbacks. Both export dictionaries now include those financial
+labels, with DOM and native-browser regression assertions. The corrected head
+must pass CI and regenerate previews; the previous artifact alone does not prove
+that final correction. This fixture review does not close authenticated visual,
+Seller Net production export or physical-device gates.
