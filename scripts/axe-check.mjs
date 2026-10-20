@@ -7,9 +7,17 @@ const pages = [
   '/index.html',
   '/pricing.html',
   '/login.html',
+  '/account.html',
   '/admin.html',
   '/privacy.html',
-  '/tools/flip-calculator.html'
+  '/tools/flip-calculator.html',
+  '/tools/rental-cash-flow.html',
+  '/tools/rent-calculator.html',
+  '/tools/arv-estimator.html',
+  '/tools/hard-money-analyzer.html',
+  '/tools/roi-search.html',
+  '/tools/arv/',
+  '/calculadora-venta/'
 ];
 
 const browser = await chromium.launch({ headless: true });
