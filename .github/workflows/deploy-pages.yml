@@ -85,14 +85,14 @@ jobs:
       - name: Checkout immutable review candidate
         uses: actions/checkout@v4
         with:
-          ref: a93ebd940ddd8937b45256a1e5c864109d9b50af
+          ref: 189b85ec5fce00dc4a72f4654ea16a99df54a5cf
           path: .review-source
 
       - name: Require all review-candidate checks before adding preview
         uses: actions/github-script@v7
         with:
           script: |
-            const sha='a93ebd940ddd8937b45256a1e5c864109d9b50af';
+            const sha='189b85ec5fce00dc4a72f4654ea16a99df54a5cf';
             for(const workflow_id of [239749494,389569613,303749099,390497135]){
               const {data}=await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id,head_sha:sha,per_page:100});
               const runs=data.workflow_runs.filter(run=>run.head_sha===sha&&run.head_repository?.full_name===context.repo.owner+'/'+context.repo.repo).sort((a,b)=>b.id-a.id);
