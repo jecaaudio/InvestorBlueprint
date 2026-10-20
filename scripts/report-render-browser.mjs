@@ -8,6 +8,25 @@ const browser=await chromium.launch({headless:true});
 const demo=JSON.parse(fs.readFileSync('tools/arv/fixtures/demo-report.json','utf8'));
 const logo='data:image/svg+xml;base64,'+fs.readFileSync('assets/brand/favicon.svg').toString('base64');
 try{
+ // Native browser dispatch reaches a microtask checkpoint between submit listeners.
+ // Protected Flip initializes its report listener before the dynamically loaded engine.
+ const flip=await browser.newPage();
+ await flip.route('**/*',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html></html>'}));
+ await flip.goto('http://report-fixture.invalid/');
+ const values={salePrice:320000,purchasePrice:200000,rehabCost:50000,holdingMonths:6,miscMonthly:1000,buyerClosing:5000,stagingCost:1000,realtorPct:7,loanAmount:100000,interestRate:12,pointsPct:2};
+ await flip.setContent('<html><head></head><body data-tool="flip"><h1>Flip</h1><form id="tool-form" novalidate>'+Object.entries(values).map(([id,value])=>'<label for="'+id+'">'+id+'</label><input id="'+id+'" name="'+id+'" value="'+value+'">').join('')+'<input type="radio" name="planMode" value="pro" checked><input type="hidden" name="financingType" value="hard-money"><p id="tool-validation" hidden></p><div class="tool-actions"><button type="submit">Calculate</button></div></form><div id="result-cards"></div><div id="result-detail"></div></body></html>');
+ await flip.evaluate(messages=>{window.IBI18n={getCurrentMessages:()=>messages};window.IB_REPORT_PREFERENCES={ib_document_language:'en'};window.fetch=async()=>({ok:true,json:async()=>messages});window.print=()=>{window.__qaPrinted=true};},JSON.parse(fs.readFileSync('assets/i18n/en.json','utf8')));
+ await flip.addScriptTag({path:'tools/finance-report.js'});
+ await flip.addScriptTag({path:'tools/tool-script.js'});
+ await flip.locator('button[type="submit"]').click();
+ assert.match(await flip.locator('#result-cards').innerText(),/27,600/);
+ assert.equal(await flip.locator('#ib-finance-print').isEnabled(),true);
+ await flip.locator('#ib-finance-print').click();await flip.waitForFunction(()=>window.__qaPrinted===true);
+ assert.match(await flip.locator('#ib-finance-report').textContent(),/27,600/);
+ await flip.locator('#salePrice').fill('invalid');
+ assert.equal(await flip.locator('#ib-finance-print').isEnabled(),false);
+ assert.equal(await flip.locator('#ib-finance-report').textContent(),'');
+ await flip.close();console.log('PASS native reversed-listener Flip export and stale-input invalidation');
  for(const lang of ['es','en'])for(const detail of ['summary','detailed']){
   const messages=JSON.parse(fs.readFileSync('assets/i18n/'+lang+'.json','utf8'));
   const prefs={ib_document_language:lang,ib_report_detail:detail,ib_display_name:'QA Analyst',ib_company_name:'QA Company'};

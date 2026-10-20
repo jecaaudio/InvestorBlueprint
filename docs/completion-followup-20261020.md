@@ -1,5 +1,7 @@
 # Completion follow-up — 20 October 2026
 
+Historical audit log. Later closure evidence and remaining gates are in `review-status-20261020.md`; earlier authentication/PDF pending statements below describe the state at that time.
+
 Tracking #88; extends aggregate candidate #95. This document does not certify release.
 
 ## Reproduced problems and corrections

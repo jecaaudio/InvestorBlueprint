@@ -1,5 +1,7 @@
 # Integrated review candidate — 20 October 2026
 
+Historical initial checklist. See `review-status-20261020.md` for the current verified state and remaining release gates.
+
 Base production: `beb651ed921726880c48c83c413434f1dbd5d32f`.
 Production owner-only database migration and exact-commit Pages gate are applied.
 Published build-info.json verified that SHA after successful gated deployment.

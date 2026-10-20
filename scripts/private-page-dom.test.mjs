@@ -47,12 +47,16 @@ test('actual patched Seller Net HTML persists retained mortgage, rejects invalid
  const change=(id,value)=>{d.getElementById(id).value=value;d.getElementById(id).dispatchEvent(new w.Event('change',{bubbles:true}))};
  change('state','IL');change('price','200000');change('ilRetainedMortgage','150000');change('mortgage1','0');
  assert.equal(d.getElementById('ilRetainedField').hidden,false);assert.match(d.getElementById('rTax').textContent,/50\.00/);
+ assert.match(d.getElementById('netValue').textContent,/28,231\.16/);
+ assert.match(d.getElementById('netDetail').textContent,/150,000\.00/);
  const saved=JSON.parse(w.localStorage.getItem('seller-net-multistate-2026-v1'));assert.equal(saved.ilRetainedMortgage,'150000');
  w.eval(fs.readFileSync('calculadora-venta/print-report.js','utf8'));await tick();
  w.dispatchEvent(new w.Event('beforeprint'));
  assert.match(d.getElementById('printReport').textContent,/Illinois taxable basis/);
  assert.match(d.getElementById('printReport').textContent,/\$50,000\.00/);
+ assert.match(d.getElementById('printReport').textContent,/Retained debt included in price: cash not received/);
  change('ilRetainedMortgage','200001');assert.match(d.getElementById('rTax').textContent,/PENDIENTE|PENDING/);
+ change('stateTaxOverride','180');assert.match(d.getElementById('netValue').textContent,/PENDIENTE|PENDING/);
  change('state','KY');assert.equal(d.getElementById('ilRetainedField').hidden,true);assert.match(d.getElementById('rTax').textContent,/200\.00/);
  dom.window.close();
 });
