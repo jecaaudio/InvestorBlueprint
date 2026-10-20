@@ -12,6 +12,30 @@
   const loginURL=new URL(rootPath+'login.html',window.location.href);
   const here=window.location.pathname+window.location.search;
   loginURL.searchParams.set('returnTo',here);
+  // Reapply site-wide branding after replacing a protected entry wrapper.
+  // Otherwise the remote tool HTML erases the favicon and mobile icon metadata.
+  function brandProtectedHtml(html) {
+    const root=new URL(rootPath,window.location.href).href;
+    const mark=root+'assets/brand/favicon.svg';
+    const head=[
+      '<link rel="icon" type="image/svg+xml" href="'+mark+'?v=20261019">',
+      '<link rel="icon" type="image/png" sizes="32x32" href="'+root+'assets/brand/favicon-32.png?v=20261019">',
+      '<link rel="apple-touch-icon" sizes="180x180" href="'+root+'assets/brand/apple-touch-icon.png?v=20261019">',
+      '<link rel="manifest" href="'+root+'manifest.webmanifest?v=20261019">',
+      '<meta name="apple-mobile-web-app-title" content="InvestorBlueprint">',
+      '<link rel="stylesheet" href="'+root+'assets/css/brand.css?v=20261019">',
+      '<style>.tool-logo{display:inline-flex!important;align-items:center;gap:9px;text-decoration:none}.ib-tool-brand-mark{display:inline-block;width:34px;height:34px;object-fit:contain;flex:none}.ib-seller-brand{display:flex;align-items:center;gap:9px;font:700 15px system-ui,sans-serif;margin-bottom:10px}.ib-seller-brand img{width:32px;height:32px;object-fit:contain}</style>'
+    ].join('');
+    const icon='<img class="ib-tool-brand-mark" src="'+mark+'" alt="" aria-hidden="true"> ';
+    const sellerBrand='<div class="ib-seller-brand"><img src="'+mark+'" alt="" aria-hidden="true">InvestorBlueprint</div>';
+    html=html.replace(/<\/head>/i,head+'</head>');
+    html=html.replace(/(<a\b[^>]*class=["'][^"']*\btool-logo\b[^"']*["'][^>]*>)\s*InvestorBlueprint(\s*<\/a>)/i,
+      (all,opening,closing)=>opening+icon+'InvestorBlueprint'+closing);
+    if(tool==='seller-net'){
+      html=html.replace(/(<header\s+class=["']top["']\s*>\s*<div>)/i,'$1'+sellerBrand);
+    }
+    return html;
+  }
   const say=(message)=>{
     if(status)status.textContent=message;
     document.documentElement.classList.remove('ib-loading');
@@ -69,6 +93,7 @@
       const url=new URL(assetBase,window.location.href);
       markup=markup.replace(/<head(\s[^>]*)?>/i,(match)=>match+'<base href="'+url.href+'">');
     }
+    markup=brandProtectedHtml(markup);
     // This navigation delivers the HTML only AFTER the server authorizes the user.
     document.open();document.write(markup);document.close();
   }catch(err){
