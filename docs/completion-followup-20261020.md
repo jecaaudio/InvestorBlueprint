@@ -100,3 +100,21 @@ Rollback: revert follow-up commits before release or revert the aggregate releas
 after a gated deployment. Private Seller source is deployed separately; restore
 the exported version-2 page bundle if that later deployment needs rollback. Keep
 member preferences and provider consumption counters intact.
+
+## Subsequent print/auth closure attempt
+
+Added Automated ARV print/Save PDF in both report languages and detail levels,
+with company metadata, escaped analyst notes and explicit DEMO disclosure. Input
+changes clear the previously printable report; older in-flight responses cannot
+replace the current address's results. Four new DOM tests cover language/depth,
+identity isolation, notes escaping and stale report invalidation. Quality now
+includes native Chromium PDF/screenshot fixtures for the shared report renderer
+and Automated ARV. Synthetic previews contain no real account data.
+
+The renewed secure browser-auth request timed out; a fresh account-page check
+showed sign-in still required. Do not treat the request as successful or as a
+user refusal. Do not reset credentials or fabricate a session. Native isolated
+Chromium can launch locally but crashes on page navigation in this host; the
+new native print fixtures run in GitHub Actions. Their results/artifacts must be
+reviewed before checking off visual/PDF gates. Physical iPhone and real-session
+checks remain pending. This follow-up does not authorize merging around them.

@@ -22,6 +22,15 @@ const currentOriginEl = document.getElementById("current-origin");
 
 let latestReport = null;
 let latestReportIsDemo = false;
+let reportGeneration = 0;
+function invalidateReport(){
+  reportGeneration++;
+  latestReport=null;latestReportIsDemo=false;
+  resultsEl.hidden=true;compsWrap.hidden=true;actionRow.hidden=true;
+  document.getElementById('arv-printable-report')?.replaceChildren();
+  return reportGeneration;
+}
+form.addEventListener('input',invalidateReport);
 
 function getWorkerUrl() {
   return localStorage.getItem(WORKER_URL_STORAGE_KEY) || DEFAULT_WORKER_URL;
@@ -202,6 +211,7 @@ function reportText(payload) {
     R('Generado','Generated')+': '+(meta?.generatedAt||new Date().toISOString()),
     R('Proveedor','Provider')+': '+(meta?.provider||R('No informado','Not supplied')),
     R('Preparado por','Prepared by')+': '+(pref('ib_display_name','')||'—'),
+    R('Compañía','Company')+': '+(pref('ib_company_name','')||'—'),
     '',
     R('Propiedad analizada','Subject')+': '+(subject?.address||'—'),
     R('Habitaciones/Baños','Beds/Baths')+': '+(subject?.beds??'—')+'/'+(subject?.baths??'—'),
@@ -289,11 +299,13 @@ saveWorkerBtn.addEventListener("click", () => {
 });
 
 demoBtn.addEventListener("click", async () => {
+  const generation=invalidateReport();
   setError("");
   setStatus("Loading demo data...", true);
 
   try {
     const payload = await loadDemoReport();
+    if(generation!==reportGeneration)return;
     render(payload, true);
     setStatus("DEMO — example only; not a valuation of the entered address.");
   } catch (error) {
@@ -307,6 +319,7 @@ demoBtn.addEventListener("click", async () => {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  const generation=invalidateReport();
   if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcRun === "function") {
     window.IBAnalytics.trackCalcRun("arv");
   }
@@ -330,6 +343,7 @@ form.addEventListener("submit", async (event) => {
 
   try {
     const payload = await fetchArv(address);
+    if(generation!==reportGeneration)return;
     render(payload, false);
     if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === "function") {
       window.IBAnalytics.trackCalcSuccess("arv", { result: "arv_estimate" });
@@ -395,5 +409,20 @@ document.addEventListener("DOMContentLoaded",()=>{
     link.href=url;link.download='arv-report-'+Date.now()+'.txt';
     link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
-  actionRow.append(textButton);
+  const printButton=document.createElement('button');printButton.id='arv-print-report';
+  printButton.type='button';printButton.className='btn';
+  printButton.textContent='Imprimir / Guardar PDF · Print / Save PDF';
+  const printable=document.createElement('section');printable.id='arv-printable-report';printable.hidden=true;
+  document.body.append(printable);
+  const printStyle=document.createElement('style');
+  printStyle.textContent='@page{size:letter;margin:0.6in}@media print{body>:not(#arv-printable-report){display:none!important}#arv-printable-report{display:block!important;color:#172b3d;background:#fff;font:11pt/1.5 Arial,sans-serif}#arv-printable-report h1{font-size:19pt;border-bottom:2px solid #146d82;padding-bottom:12px}#arv-printable-report pre{white-space:pre-wrap;overflow-wrap:anywhere;font:10pt/1.5 Arial,sans-serif;margin:0}}';
+  document.head.append(printStyle);
+  printButton.addEventListener('click',()=>{
+    if(!latestReport)return;
+    const heading=document.createElement('h1');heading.textContent='InvestorBlueprint';
+    const body=document.createElement('pre');body.textContent=reportText(latestReport);
+    printable.replaceChildren(heading,body);printable.lang=docEnglish()?'en':'es';
+    window.print();
+  });
+  actionRow.append(textButton,printButton);
 });

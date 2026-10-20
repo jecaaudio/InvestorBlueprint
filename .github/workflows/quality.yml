@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Verify expanded financial forms, seller patch and bilingual reports
-        run: node --test scripts/finance-dom.test.mjs scripts/seller-tax.test.mjs
+        run: node --test scripts/finance-dom.test.mjs scripts/seller-tax.test.mjs scripts/arv-print.test.mjs
 
   quality-gates:
     runs-on: ubuntu-latest
@@ -63,6 +63,17 @@ jobs:
 
       - name: Run Lighthouse CI assertions
         run: npm run qa:lighthouse
+
+      - name: Render bilingual print and PDF fixtures in native Chromium
+        run: node scripts/report-render-browser.mjs
+
+      - name: Preserve synthetic report previews for visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-report-previews
+          path: tmp/report-render-qa/
+          retention-days: 7
 
   mobile-webkit:
     runs-on: ubuntu-latest
