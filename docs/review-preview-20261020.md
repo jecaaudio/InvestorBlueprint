@@ -31,3 +31,13 @@ Rollback: revert this infrastructure commit and let the gated Pages deployment
 remove the review path. Stop using the preview function; preserve production user
 preferences and all original server source. Do not treat preview publication as a
 release or a completion claim for the eight calculators/integrations.
+
+## Authenticated-browser follow-up
+
+The owner successfully reached the review calculator through the guarded endpoint. Native submit listener ordering exposed a disabled export button on protected Flip despite valid results. Candidate `b8c87d722edbcfc38f159df4f562cddef9eca545` fixes this with an explicit renderer completion event and a reversed-loading-order regression. The existing review URL now pins that commit; the production root remains unchanged.
+
+The reviewed Seller patch also separates retained consideration from actual cash proceeds, with included, additional and mixed-debt audit cases. Invalid retained consideration produces a pending net even when a manual tax amount is supplied.
+
+## Immutable URLs after refresh
+
+Review output now derives its directory from the pinned SHA: `review-3bfec6b/`. Reusing the original review directory let a previously opened browser retain older financial scripts from its cache, even though deployment metadata had changed. Distinct revision paths prevent mixing old and new report/engine scripts. Candidate 3bfec6b passed all four exact-head checks, including the native reversed-listener regression. Root business assets remain unchanged.
