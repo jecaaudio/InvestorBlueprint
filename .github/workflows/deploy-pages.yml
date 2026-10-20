@@ -82,6 +82,26 @@ jobs:
         env:
           IB_DEPLOY_SHA: ${{ steps.gate.outputs.sha }}
 
+      - name: Checkout immutable review candidate
+        uses: actions/checkout@v4
+        with:
+          ref: 291a7888dd9e902c28379e0c579a3389bad9d783
+          path: .review-source
+
+      - name: Require all review-candidate checks before adding preview
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha='291a7888dd9e902c28379e0c579a3389bad9d783';
+            for(const workflow_id of [239749494,389569613,303749099,390497135]){
+              const {data}=await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id,head_sha:sha,per_page:100});
+              const runs=data.workflow_runs.filter(run=>run.head_sha===sha&&run.head_repository?.full_name===context.repo.owner+'/'+context.repo.repo).sort((a,b)=>b.id-a.id);
+              if(!runs.length||runs[0].status!=='completed'||runs[0].conclusion!=='success')throw Error('Pinned review candidate has an incomplete or failing workflow: '+workflow_id);
+            }
+
+      - name: Add authenticated review copy to its isolated path
+        run: node scripts/build-review-preview.mjs .review-source public-site
+
       - name: Refuse stale build before publishing
         uses: actions/github-script@v7
         env:
