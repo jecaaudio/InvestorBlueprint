@@ -3,8 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
-export const REVIEW_SHA='b8c87d722edbcfc38f159df4f562cddef9eca545';
-export const REVIEW_DIRECTORY='review-291a788';
+export const REVIEW_SHA='3bfec6b6e434091000a745efcb80c79ec30172cb';
+export const REVIEW_DIRECTORY='review-'+REVIEW_SHA.slice(0,7);
 const rootFiles=['index.html','login.html','admin.html','account.html','pricing.html','privacy.html','style.css','lang.js','script.js','manifest.webmanifest'];
 const toolFiles=['flip-calculator.html','rental-cash-flow.html','rent-calculator.html','arv-estimator.html','hard-money-analyzer.html','roi-search.html'];
 export function buildReview(source,publicRoot,sourceSha){
