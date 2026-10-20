@@ -104,7 +104,7 @@
      });
      $('account-signout').addEventListener('click',async()=>{
        await client.auth.signOut();
-       for(const key of ['ib_document_language','ib_report_detail','ib_notes_detail','ib_display_name','ib_company_name']){
+       for(const key of ['ib_document_language','ib_report_detail','ib_notes_detail','ib_display_name','ib_company_name','preferredLanguage']){
          try{localStorage.removeItem(key)}catch(error){}
        }
        window.location.assign('login.html?reason=login');
