@@ -1,12 +1,15 @@
 name: Deploy static site to GitHub Pages
 
 on:
-  push:
-    branches: ["main"]
+  workflow_run:
+    workflows: ["Quality"]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -16,6 +19,11 @@ concurrency:
 
 jobs:
   deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -23,6 +31,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Require successful exact-commit Quality on current main
+        id: gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {verifyDeployment}=require('./scripts/verify-pages-deploy.cjs');
+            const candidate=context.eventName==='workflow_run'?context.payload.workflow_run.head_sha:context.sha;
+            const {data:main}=await github.rest.git.getRef({...context.repo,ref:'heads/main'});
+            const {data}=await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:'quality.yml',head_sha:candidate,event:'push',per_page:100});
+            const sha=verifyDeployment({eventName:context.eventName,event:context.payload,sha:context.sha,ref:context.ref,
+              repository:context.repo.owner+'/'+context.repo.repo,mainSha:main.object.sha,runs:data.workflow_runs});
+            core.setOutput('sha',sha);
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
@@ -41,6 +64,7 @@ jobs:
           cp -R tools/arv/fixtures public-site/tools/arv/fixtures
           cp calculadora-venta/index.html calculadora-venta/print-report.css calculadora-venta/print-report.js public-site/calculadora-venta/
           touch public-site/.nojekyll
+          node -e 'require("node:fs").writeFileSync("public-site/build-info.json",JSON.stringify({commit:process.env.IB_DEPLOY_SHA,builtAt:new Date().toISOString()}))'
           # Fail deployment if a calculator is accidentally embedded into a public entry page.
           if grep -q "const STATE_JURISDICTIONS\|function calculateFlip" public-site/calculadora-venta/index.html public-site/tools/flip-calculator.html; then
             echo "::error::A tool entry file includes calculator implementation."
@@ -55,6 +79,17 @@ jobs:
           test ! -e public-site/auth.js
           test ! -e public-site/workers
           test ! -e public-site/preview-login.html
+        env:
+          IB_DEPLOY_SHA: ${{ steps.gate.outputs.sha }}
+
+      - name: Refuse stale build before publishing
+        uses: actions/github-script@v7
+        env:
+          IB_DEPLOY_SHA: ${{ steps.gate.outputs.sha }}
+        with:
+          script: |
+            const {data}=await github.rest.git.getRef({...context.repo,ref:'heads/main'});
+            if(data.object.sha!==process.env.IB_DEPLOY_SHA)core.setFailed('Main advanced during build; wait for its successful Quality run.');
 
       - name: Upload static artifact
         uses: actions/upload-pages-artifact@v3
