@@ -18,6 +18,9 @@ jobs:
       - name: Test public routes, member forms and PWA assets
         run: node --test scripts/site-smoke.test.mjs scripts/member-recovery.test.mjs scripts/flip-finance.test.mjs scripts/member-profile.test.mjs scripts/secure-tool-loader.test.mjs scripts/member-resilience.test.mjs scripts/admin-navigation.test.mjs
 
+      - name: Verify live protected endpoint refuses missing and forged credentials
+        run: node scripts/live-tool-denial.test.mjs
+
   quality-gates:
     runs-on: ubuntu-latest
 
