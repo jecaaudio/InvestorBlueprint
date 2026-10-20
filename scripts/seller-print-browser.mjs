@@ -24,8 +24,10 @@ export async function renderSellerPrintFixture(browser,output,lang,detail){
  await page.screenshot({path:path.join(output,'seller-'+lang+'-'+detail+'.png'),fullPage:true});
  await page.pdf({path:path.join(output,'seller-'+lang+'-'+detail+'.pdf'),format:'Letter',printBackground:true});
  if(lang==='es'&&detail==='detailed'){
+  await page.emulateMedia({media:'screen'});
   await page.locator('#mortgage1').fill('abc');assert.equal(await page.locator('#printButton').isEnabled(),false);
   assert.doesNotMatch(await page.locator('#printReport').textContent(),/28,231\.16/);
+  await page.emulateMedia({media:'print'});
   await page.pdf({path:path.join(output,'seller-invalid-blocked.pdf'),format:'Letter',printBackground:true});
  }
  await page.close();console.log('PASS native Seller print, retained cash and invalid-input guard: '+lang+' '+detail);
