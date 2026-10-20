@@ -7,6 +7,7 @@
  const cfg=window.IB_AUTH_CONFIG||{};
  const isLang=value=>value==='en'?'en':'es';
  const isDetail=value=>value==='summary'?'summary':'detailed';
+ const safeStored=key=>{try{return localStorage.getItem(key)}catch(error){return null}};
  const values={
    display:'setting-display-name',company:'setting-company-name',
    interface:'setting-interface-language',document:'setting-document-language',
@@ -25,8 +26,8 @@
  function fill(data){
    $(values.display).value=data?.display_name||'';
    $(values.company).value=data?.company_name||'';
-   $(values.interface).value=isLang(data?.interface_language||localStorage.getItem('preferredLanguage'));
-   $(values.document).value=isLang(data?.document_language||localStorage.getItem('ib_document_language'));
+   $(values.interface).value=isLang(data?.interface_language||safeStored('preferredLanguage'));
+   $(values.document).value=isLang(data?.document_language||safeStored('ib_document_language'));
    $(values.report).value=isDetail(data?.report_detail);
    $(values.notes).value=isDetail(data?.notes_detail);
  }
@@ -103,7 +104,7 @@
      });
      $('account-signout').addEventListener('click',async()=>{
        await client.auth.signOut();
-       for(const key of ['ib_document_language','ib_report_detail','ib_notes_detail','ib_display_name','ib_company_name']){
+       for(const key of ['ib_document_language','ib_report_detail','ib_notes_detail','ib_display_name','ib_company_name','preferredLanguage']){
          try{localStorage.removeItem(key)}catch(error){}
        }
        window.location.assign('login.html?reason=login');
