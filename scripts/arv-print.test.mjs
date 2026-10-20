@@ -18,6 +18,8 @@ for(const lang of ['es','en'])for(const detail of ['summary','detailed']){
   d.getElementById('arv-print-report').click();
   const report=d.getElementById('arv-printable-report');
   assert.equal(printed,1);assert.equal(report.lang,lang);assert.match(report.textContent,/DEMO/);
+  assert.doesNotMatch(report.textContent,/(?:Confidence|Confianza):\s*\d+%/);
+  assert.match(report.textContent,/not probability|no es probabilidad/);
   assert.match(report.textContent,/Current Analyst/);assert.match(report.textContent,/Current Company/);assert.doesNotMatch(report.textContent,/Other User/);
   assert.equal(report.querySelector('img'),null);
   assert.ok(report.textContent.includes(lang==='en'?'ARV REPORT':'INFORME DE ARV'));

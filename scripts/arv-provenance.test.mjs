@@ -9,7 +9,7 @@ function run(meta,isDemo=false){
     resultsEl:{hidden:true},compsWrap:{hidden:true},actionRow:{hidden:true},
     renderKeyValueRows(){},renderComps(){},number:String,money:String,setStatus(v){ctx.status=v}};
   vm.createContext(ctx);vm.runInContext(render,ctx);
-  ctx.payload={subject:{},comps:[],arv:{},meta};ctx.isDemo=isDemo;
+  ctx.payload={subject:{sqft:1000},comps:[{soldPrice:100000,sqft:1000}],arv:{estimate:100000,low:90000,high:110000},meta};ctx.isDemo=isDemo;
   vm.runInContext('render(payload,isDemo)',ctx);return ctx;
 }
 test('DUMMY backend response is always visibly a demo even through normal Calculate',()=>{

@@ -4,8 +4,8 @@ import worker from '../src/index.js';
 import {normalizeSubject,normalizeComp,normalizeOptions} from '../src/core/normalize.js';
 import {rankAndFilterComps} from '../src/core/comps.js';
 const asOf=new Date('2026-10-20T12:00:00Z');
-const subject={address:'Synthetic subject',sqft:1600,beds:3,baths:2};
-const comp={address:'Synthetic comp',sqft:1600,beds:3,baths:2,soldPrice:320000,soldDate:'2026-09-20',distanceMiles:.5};
+const subject={address:'Synthetic subject',sqft:1600,beds:3,baths:2,propertyType:'single_family'};
+const comp={address:'Synthetic comp',sqft:1600,beds:3,baths:2,soldPrice:320000,soldDate:'2026-09-20',distanceMiles:.5,propertyType:'single_family'};
 const env={PROVIDER:'DUMMY',ALLOWED_ORIGIN:'https://jecaaudio.github.io'};
 const request=body=>new Request('https://fixture.invalid/api/arv',{method:'POST',headers:{Origin:env.ALLOWED_ORIGIN},body:JSON.stringify(body)});
 test('missing subject characteristics stay unknown instead of invented market facts',()=>{

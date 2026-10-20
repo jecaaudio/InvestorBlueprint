@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
+import {renderSellerPrintFixture} from './seller-print-browser.mjs';
 const output=process.env.IB_REPORT_QA_OUTPUT||'tmp/report-render-qa';fs.mkdirSync(output,{recursive:true});
 const browser=await chromium.launch({headless:true});
 const demo=JSON.parse(fs.readFileSync('tools/arv/fixtures/demo-report.json','utf8'));
@@ -28,6 +29,7 @@ try{
  assert.equal(await flip.locator('#ib-finance-report').textContent(),'');
  await flip.close();console.log('PASS native reversed-listener Flip export and stale-input invalidation');
  for(const lang of ['es','en'])for(const detail of ['summary','detailed']){
+  await renderSellerPrintFixture(browser,output,lang,detail);
   const messages=JSON.parse(fs.readFileSync('assets/i18n/'+lang+'.json','utf8'));
   const prefs={ib_document_language:lang,ib_report_detail:detail,ib_display_name:'QA Analyst',ib_company_name:'QA Company'};
   const page=await browser.newPage();

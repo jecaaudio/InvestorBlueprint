@@ -7,9 +7,9 @@ const report=fs.readFileSync('tools/finance-report.js','utf8');
 const en=JSON.parse(fs.readFileSync('assets/i18n/en.json','utf8'));
 const es=JSON.parse(fs.readFileSync('assets/i18n/es.json','utf8'));
 const tick=()=>new Promise(resolve=>setTimeout(resolve,0));
-async function setup(type,fields){
+async function setup(type,fields,extra=''){
  const inputs=Object.entries(fields).map(([id,value])=>`<label for="${id}">${id}</label><input id="${id}" name="${id}" value="${value}"><p id="${id}-error" class="field-error" hidden></p>`).join('');
- const dom=new JSDOM(`<!doctype html><html lang="es"><head></head><body data-tool="${type}"><h1>Fixture</h1><form id="tool-form">${inputs}<p id="tool-validation" hidden></p><div class="tool-actions"><button>Calculate</button></div></form><div id="result-cards"></div><div id="result"></div></body></html>`,{url:'https://jecaaudio.github.io/InvestorBlueprint/tools/fixture.html',runScripts:'outside-only'});
+ const dom=new JSDOM(`<!doctype html><html lang="es"><head></head><body data-tool="${type}"><h1>Fixture</h1><form id="tool-form">${inputs}<p id="tool-validation" hidden></p><div class="tool-actions"><button>Calculate</button></div></form><div id="result-cards"></div><div id="result"></div>${extra}</body></html>`,{url:'https://jecaaudio.github.io/InvestorBlueprint/tools/fixture.html',runScripts:'outside-only'});
  const w=dom.window;
  w.IBI18n={getCurrentMessages:()=>es};
  w.IB_REPORT_PREFERENCES=Object.freeze({ib_document_language:'en',ib_report_detail:'detailed',ib_display_name:'Current user',ib_company_name:'Current company',preferredLanguage:'es'});
@@ -98,5 +98,23 @@ test('manual ARV accepts signed adjustments and retains evidence in detailed rep
  assert.match(d.getElementById('ib-finance-report').textContent,/county record supplied by user/);
  f.elements.comp1Adjustment.value='-999999';f.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();
  assert.equal(d.getElementById('result-cards').children.length,0);assert.equal(d.getElementById('ib-finance-print').disabled,true);
+ dom.window.close();
+});
+
+test('ROI filters one explicit metric, shows both returns, and exports the selected metric',async()=>{
+ const table='<table><thead><tr>'+Array.from({length:7},(_,i)=>'<th>Column '+i+'</th>').join('')+'</tr></thead><tbody id="result-rows"></tbody></table>';
+ const dom=await setup('roi_search',{desiredReturn:8.5,location:'33101',propertyType:'single_family'},table);
+ const w=dom.window,d=w.document,f=d.getElementById('tool-form');
+ const submit=()=>f.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
+ submit();assert.match(d.getElementById('result-rows').textContent,/ROI-101/);
+ assert.equal(d.querySelectorAll('thead th').length,8);assert.match(d.getElementById('result-rows').textContent,/7\.8%/);assert.match(d.getElementById('result-rows').textContent,/9\.1%/);
+ f.elements.returnMetric.value='capRate';f.elements.returnMetric.dispatchEvent(new w.Event('change',{bubbles:true}));
+ assert.equal(d.getElementById('ib-finance-print').disabled,true);
+ submit();assert.doesNotMatch(d.getElementById('result-rows').textContent,/ROI-101/);assert.match(d.getElementById('result-cards').textContent,/N\/A/);
+ f.elements.desiredReturn.value='7';submit();assert.match(d.getElementById('result-rows').textContent,/ROI-101/);
+ d.getElementById('ib-finance-print').click();await tick();
+ assert.match(d.getElementById('ib-finance-report').textContent,/Capitalization rate \(NOI \/ property value\)/);
+ assert.match(d.getElementById('ib-finance-report').textContent,/DEMONSTRATION/);
+ f.elements.returnMetric.value='bad';submit();assert.equal(d.getElementById('ib-finance-print').disabled,true);
  dom.window.close();
 });

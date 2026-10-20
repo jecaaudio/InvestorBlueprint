@@ -22,6 +22,7 @@
  const L=(es,english)=>en()?english:es;
  const cell=(label,value,cls='')=>'<tr'+(cls?' class="'+cls+'"':'')+'><td>'+esc(label)+'</td><td>'+esc(value)+'</td></tr>';
  function createPrintMarkup(){
+  if((window.IBSellerValidation&&!window.IBSellerValidation.check(false))||document.body.dataset.sellerValid==='false')return '<h1>'+L('Informe bloqueado','Report blocked')+'</h1><p>'+L('Corrige los datos señalados en la calculadora antes de exportar.','Correct the marked calculator inputs before exporting.')+'</p>';
   const price=num('price');
   const pending=/PENDIENTE|PENDING/i.test(txt('rTax')+' '+txt('netValue'));
   const retainedInPrice=$('state')?.value==='IL'?Math.max(0,num('ilRetainedMortgage')-num('assumed')):0;
@@ -137,6 +138,11 @@
   }
   $('printButton')?.addEventListener('click',refresh,true);
   window.addEventListener('beforeprint',refresh);
+  document.addEventListener('ib:seller-validity',()=>{
+   // Erase old results immediately, including when native browser print is used.
+   if(document.body.dataset.sellerValid==='false')refresh();
+   else $('printReport')?.replaceChildren();
+  });
   refresh();
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);

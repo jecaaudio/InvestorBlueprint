@@ -139,6 +139,17 @@
 
   if (!form || !type) return;
 
+  if(type==='roi_search'){
+    const group=document.createElement('fieldset');
+    group.innerHTML='<legend data-i18n="roiMetricTitle">Return metric · simulated inventory</legend>'+
+      '<label for="returnMetric" data-i18n="roiMetricLabel">Filter by</label>'+
+      '<select id="returnMetric" name="returnMetric"><option value="cocReturn" data-i18n="roiMetricCash">Annual cash-on-cash return</option><option value="capRate" data-i18n="roiMetricCap">Capitalization rate (NOI / property value)</option></select>'+
+      '<p data-i18n="roiMetricHelp">Choose one metric. Cap rate excludes financing; cash-on-cash uses equity. These fixed examples are simulated, not available listings.</p>';
+    form.insertBefore(group,form.querySelector('.tool-actions'));
+    const header=document.querySelector('#result-rows')?.closest('table')?.querySelector('thead tr');
+    if(header){const cap=header.lastElementChild;cap.dataset.i18n='roiMetricCapShort';cap.textContent='Cap rate';const cash=document.createElement('th');cash.dataset.i18n='roiMetricCashShort';cash.textContent='Cash-on-cash';header.append(cash);}
+  }
+
   if (window.IBAnalytics && typeof window.IBAnalytics.trackToolOpen === 'function') {
     window.IBAnalytics.trackToolOpen(type);
   }
@@ -401,12 +412,13 @@
   const roiHeatmapLayer = document.getElementById('heatmap-layer');
   const roiResultRows = document.getElementById('result-rows');
 
-  const getReturnLabel = (property) => Math.max(property.capRate, property.cocReturn);
+  const selectedReturnMetric=()=>form.elements.returnMetric?form.elements.returnMetric.value:'cocReturn';
+  const getReturnLabel = property=>property[selectedReturnMetric()];
 
   const renderRoiRows = (rows, messages) => {
     if (!roiResultRows) return;
     if (!rows.length) {
-      roiResultRows.innerHTML = `<tr><td colspan="7">${t('roiNoResults', 'No simulated properties matched your filters.')}</td></tr>`;
+      roiResultRows.innerHTML = `<tr><td colspan="8">${t('roiNoResults', 'No simulated properties matched your filters.')}</td></tr>`;
       return;
     }
 
@@ -419,7 +431,8 @@
           <td>${property.neighborhood}</td>
           <td>${({ single_family: messages.roiTypeSingleFamily, duplex: messages.roiTypeDuplex, multifamiliar: messages.roiTypeMultifamiliar }[property.type] || property.type)}</td>
           <td>${money(property.price)}</td>
-          <td>${pct(getReturnLabel(property))}</td>
+          <td>${pct(property.capRate)}</td>
+          <td>${pct(property.cocReturn)}</td>
         </tr>
       `)
       .join('');
@@ -684,6 +697,7 @@
 
     if (type === 'roi_search') {
       if(!validateFields([{name:'desiredReturn',required:true,min:0,max:100}],messages))return;
+      if(!['capRate','cocReturn'].includes(selectedReturnMetric()))throw new RangeError('Choose a return metric');
       const desiredReturn = num('desiredReturn');
       const rawLocation = String(values.location || '').trim().toLowerCase();
       const propertyType = String(values.propertyType || '').trim();
@@ -701,7 +715,7 @@
       setCards([
         { label: t('roiMatches', 'Matching properties'), value: String(filteredRows.length) },
         { label: t('roiDesiredReturn', 'Desired return'), value: pct(desiredReturn) },
-        { label: t('roiAverageReturn', 'Avg. return'), value: pct(filteredRows.reduce((sum, property) => sum + getReturnLabel(property), 0) / Math.max(filteredRows.length, 1)) }
+        { label: selectedReturnMetric()==='capRate'?t('roiAverageCapRate','Average cap rate'):t('roiAverageCashReturn','Average cash-on-cash return'), value: filteredRows.length?pct(filteredRows.reduce((sum, property) => sum + getReturnLabel(property), 0) / filteredRows.length):'N/A' }
       ]);
 
       if (output) {

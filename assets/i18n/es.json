@@ -1,4 +1,13 @@
 {
+  "roiMetricTitle": "Métrica de rentabilidad · inventario simulado",
+  "roiMetricLabel": "Filtrar por",
+  "roiMetricCash": "Retorno anual sobre capital propio (cash-on-cash)",
+  "roiMetricCap": "Tasa de capitalización (NOI / valor de propiedad)",
+  "roiMetricHelp": "Elige una métrica. La capitalización excluye financiamiento; cash-on-cash usa capital propio. Son ejemplos fijos simulados, sin propiedades disponibles verificadas.",
+  "roiMetricCapShort": "Cap rate",
+  "roiMetricCashShort": "Cash-on-cash",
+  "roiAverageCapRate": "Capitalización promedio",
+  "roiAverageCashReturn": "Retorno promedio sobre capital propio",
   "requiredField": "Este campo es obligatorio.",
   "cannotBeNegative": "Este valor no puede ser negativo.",
   "outOfRange": "Ingresa un valor dentro del rango permitido.",

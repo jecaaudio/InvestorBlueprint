@@ -14,7 +14,7 @@
      }
      return text;
    };
-   const rows=list=>list.map(row=>'<tr><th scope="row">'+escape(label(row))+'</th><td>'+escape(row.value)+'</td></tr>').join('');
+   const rows=list=>list.map(row=>'<tr><th scope="row">'+escape(label(row))+'</th><td>'+escape(messages[row.valueKey]||row.value)+'</td></tr>').join('');
    const detailed=prefs.ib_report_detail!=='summary';
    return '<header><img src="'+escape(snapshot.logo)+'" alt="" width="40" height="40"><h1>InvestorBlueprint</h1><h2>'+escape(messages[snapshot.titleKey]||snapshot.title)+'</h2><p>'+escape(snapshot.date)+'</p>'+
      '<p>'+escape(prefs.ib_display_name)+(prefs.ib_company_name?' · '+escape(prefs.ib_company_name):'')+'</p></header>'+
@@ -53,7 +53,7 @@
      const flipInputs={salePrice:'flipInputArv',purchasePrice:'reportFlipPurchase',rehabCost:'reportFlipRehab',holdingMonths:'reportFlipHold',miscMonthly:'reportFlipMonthly',buyerClosing:'reportFlipBuyClosing',stagingCost:'reportFlipSellClosing',realtorPct:'reportFlipCommission',loanAmount:'reportFlipLoan',interestRate:'reportFlipInterest',pointsPct:'reportFlipPoints'};
      const inputs=[...form.elements].filter(el=>el.name&&!el.disabled&&!el.hidden&&!['submit','button','reset','hidden','password'].includes(el.type)&&(!['radio','checkbox'].includes(el.type)||el.checked)).map(el=>{
        const label=el.labels?.[0],translated=label?.querySelector('[data-i18n]')||label;
-       return {key:translated?.dataset.i18n||(type==='flip'?flipInputs[el.name]:'')||'',label:label?.textContent?.trim()||el.name,value:el.tagName==='SELECT'?(el.selectedOptions[0]?.textContent||el.value):el.value};
+       return {key:translated?.dataset.i18n||(type==='flip'?flipInputs[el.name]:'')||'',label:label?.textContent?.trim()||el.name,valueKey:el.tagName==='SELECT'?el.selectedOptions[0]?.dataset.i18n:'',value:el.tagName==='SELECT'?(el.selectedOptions[0]?.textContent||el.value):el.value};
      });
      snapshot={title:document.querySelector('h1')?.textContent?.trim()||type,
        titleKey:type==='flip'?'flipTitle':document.querySelector('h1 [data-i18n],h1[data-i18n]')?.dataset.i18n||'',sourceMessages:{...messages},

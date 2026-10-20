@@ -1,5 +1,5 @@
 import { normalizeOptions, normalizeSubject } from "./core/normalize.js";
-import { rankAndFilterComps } from "./core/comps.js";
+import { selectComparableSales } from "./core/comps.js";
 import { calculateArv } from "./core/arv.js";
 import * as dummyProvider from "./providers/dummy.js";
 import * as attomProvider from "./providers/attom.js";
@@ -129,15 +129,18 @@ export default {
       if(!provider)return errorResponse(allowedOrigin,'NOT_CONFIGURED','Unsupported provider configuration',503);
       const { name, impl } = provider;
       const warnings = name==='DUMMY'?['DEMO: synthetic property and comparable data; not a real valuation.']:[];
-      warnings.push('Confidence is a comparability heuristic, not a statistical probability; valuation range is heuristic, not a calibrated confidence interval.');
+      warnings.push('Quality score is a screening heuristic, not a probability. The range spans the selected comparable prices per sqft, not a confidence interval.');
 
       try {
         const subject = normalizeSubject(await impl.getSubject(address, env), address);
-        if(!(subject.sqft>0))return errorResponse(allowedOrigin,'INCOMPLETE_SUBJECT','Verified living area is required',422);
+        if(!(subject.sqft>0)||!subject.propertyType)return errorResponse(allowedOrigin,'INCOMPLETE_SUBJECT','Living area and a recognized property type are required',422);
         const compsRaw = await impl.getSoldComps(subject, options, env);
-        const comps = rankAndFilterComps(subject, compsRaw, options);
+        const {comps,excludedOutliers}=selectComparableSales(subject, compsRaw, options);
         if(!comps.length)return errorResponse(allowedOrigin,'NO_COMPARABLES','No comparable sales meet the supplied filters',422);
         const arv = calculateArv(subject, comps);
+        if(excludedOutliers)warnings.push(`${excludedOutliers} comparable(s) excluded by the disclosed log-price-per-sqft outlier screen.`);
+        if(arv.quality.sampleSize<3)warnings.push('Insufficient sample: fewer than three comparable sales. This indicative result requires additional evidence.');
+        if(arv.quality.ppsfCv>.2)warnings.push('High dispersion in comparable prices per sqft. Review condition, location and market evidence before relying on this result.');
 
         const response = {
           subject,
@@ -150,6 +153,9 @@ export default {
             statisticalConfidence: false,
             generatedAt: new Date().toISOString(),
             compsUsed: comps.length,
+            excludedOutliers,
+            rangeType:arv.rangeType,
+            legacyConfidenceField:'deprecated_quality_score_not_probability',
             warnings
           }
         };

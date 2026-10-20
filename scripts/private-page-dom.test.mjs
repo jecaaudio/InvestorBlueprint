@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {JSDOM} from 'jsdom';
+import {prepareSellerValidation} from './prepare-seller-validation.mjs';
 const directory=process.env.IB_PRIVATE_PAGES;
 const tick=()=>new Promise(resolve=>setTimeout(resolve,0));
 const messages=JSON.parse(fs.readFileSync('assets/i18n/es.json','utf8'));
@@ -37,7 +38,8 @@ for(const tool of ['flip','rental','rent','arv-estimator','hard-money','roi-sear
  });
 }
 test('actual patched Seller Net HTML persists retained mortgage, rejects invalid tax basis and prints bilingual basis',{skip:!directory},async()=>{
- const html=fs.readFileSync(path.join(directory,'seller-net.html'),'utf8');
+ const raw=fs.readFileSync(path.join(directory,'seller-net.html'),'utf8');
+ const html=raw.includes('function validateSellerInputs(')?raw:prepareSellerValidation(raw);
  const dom=new JSDOM(html,{url:'https://jecaaudio.github.io/InvestorBlueprint/calculadora-venta/',runScripts:'outside-only'});
  const w=dom.window,d=w.document;
  w.matchMedia=()=>({matches:false,addEventListener(){}});w.print=()=>{};
@@ -55,8 +57,17 @@ test('actual patched Seller Net HTML persists retained mortgage, rejects invalid
  assert.match(d.getElementById('printReport').textContent,/Illinois taxable basis/);
  assert.match(d.getElementById('printReport').textContent,/\$50,000\.00/);
  assert.match(d.getElementById('printReport').textContent,/Retained debt included in price: cash not received/);
- change('ilRetainedMortgage','200001');assert.match(d.getElementById('rTax').textContent,/PENDIENTE|PENDING/);
+ change('ilRetainedMortgage','200001');assert.equal(d.body.dataset.sellerValid,'false');assert.equal(d.getElementById('printButton').disabled,true);
  change('stateTaxOverride','180');assert.match(d.getElementById('netValue').textContent,/PENDIENTE|PENDING/);
  change('state','KY');assert.equal(d.getElementById('ilRetainedField').hidden,true);assert.match(d.getElementById('rTax').textContent,/200\.00/);
+ const savedBefore=w.localStorage.getItem('seller-net-multistate-2026-v1');
+ change('mortgage1','abc');assert.equal(d.body.dataset.sellerValid,'false');assert.match(d.getElementById('netValue').textContent,/PENDIENTE|PENDING/);
+ assert.equal(w.localStorage.getItem('seller-net-multistate-2026-v1'),savedBefore,'invalid edits never overwrite last valid saved state');
+ w.dispatchEvent(new w.Event('beforeprint'));assert.match(d.getElementById('printReport').textContent,/Report blocked/);assert.doesNotMatch(d.getElementById('printReport').textContent,/28,231/);
+ change('mortgage1','0');change('state','CA');change('stateTaxOverride','abc');assert.equal(d.getElementById('csvButton').disabled,true);
+ change('stateTaxOverride','50');assert.equal(d.getElementById('csvButton').disabled,false);
+ change('state','FL');change('county','Miami-Dade');change('propertyType','condo_unit');assert.match(d.getElementById('rTax').textContent,/1,200\.00/);
+ change('propertyType','condo');assert.equal(d.body.dataset.sellerValid,'false','ambiguous legacy type requires explicit confirmation');
+ change('propertyType','multi');assert.match(d.getElementById('rTax').textContent,/2,100\.00/);
  dom.window.close();
 });

@@ -1,4 +1,13 @@
 {
+  "roiMetricTitle": "Return metric · simulated inventory",
+  "roiMetricLabel": "Filter by",
+  "roiMetricCash": "Annual cash-on-cash return",
+  "roiMetricCap": "Capitalization rate (NOI / property value)",
+  "roiMetricHelp": "Choose one metric. Cap rate excludes financing; cash-on-cash uses equity. These fixed examples are simulated, not verified available listings.",
+  "roiMetricCapShort": "Cap rate",
+  "roiMetricCashShort": "Cash-on-cash",
+  "roiAverageCapRate": "Average capitalization rate",
+  "roiAverageCashReturn": "Average cash-on-cash return",
   "requiredField": "This field is required.",
   "cannotBeNegative": "This value cannot be negative.",
   "outOfRange": "Please enter a value within the allowed range.",
