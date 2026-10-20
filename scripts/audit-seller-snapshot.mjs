@@ -44,7 +44,12 @@ if(html.includes('id="ilRetainedMortgage"')){
  near(calc({state:'IL',ilRetainedMortgage:200001,stateTaxOverride:180}).tax.sellerTax,180);
  near(calc({ilRetainedMortgage:150000}).tax.sellerTax,200);
  near(calc({state:'IL',ilRetainedMortgage:150000,mortgage1:0}).debt,0);
- console.log('PASS: 9 retained-mortgage assertions: equity basis, zero equity, included consideration, invalid basis pending, override, state isolation and payoff separation.');
+ near(calc({state:'IL',ilRetainedMortgage:150000,mortgage1:0}).net,35930);
+ near(calc({state:'IL',ilRetainedMortgage:150000,mortgage1:0}).cashPrice,50000);
+ near(calc({state:'IL',assumed:150000,ilRetainedMortgage:150000,mortgage1:0}).cashPrice,200000);
+ near(calc({state:'IL',assumed:100000,ilRetainedMortgage:150000,mortgage1:0}).cashPrice,150000);
+ assert.ok(Number.isNaN(calc({state:'IL',ilRetainedMortgage:200001,stateTaxOverride:180}).net));
+ console.log('PASS: 14 retained-mortgage assertions: equity basis, zero equity, included consideration, invalid basis pending, override, state isolation and payoff separation.');
 }
 console.log('PASS: Seller Net snapshot: 14 scenarios covering proceeds, optional second mortgage, losses, zero, rounding, override, share, exemption, unknown tax and four state formulas.');
 console.log('Snapshot SHA-256: '+createHash('sha256').update(html).digest('hex'));

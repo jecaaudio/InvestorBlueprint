@@ -15,7 +15,14 @@ $('stateTaxOverride').value='';$('localTax')
 return {known,rawTax,sellerTax,auto:
 let warning=!known?showLang('falta impuesto','transfer tax is missing. '):'';
 La base puede variar en transferencias sujetas a hipoteca.
-The tax base can vary for transfers subject to mortgage debt.`;
+The tax base can vary for transfers subject to mortgage debt.
+const net=price-debt-fees;
+return {price,tax,debt,commission,concessions,closing,local,fees,net};
+money(res.net)
+money(r.net)+(r.tax.known?
+),r.net],
+[showLang('Hipotecas y saldos','Mortgage and debt payoffs'),r.debt],
+addText($('rPrice'),money(res.price));`;
 test('Seller retained mortgage field participates in saved values, visibility and tax basis',()=>{
  const result=prepareSellerTax(contract);
  assert.match(result,/consideration=price\+n\('assumed'\)/);
