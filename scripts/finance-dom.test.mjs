@@ -67,7 +67,7 @@ test('production Flip markup connects to the tested shared engine instead of the
  Object.defineProperty(d,'currentScript',{configurable:true,value:tag});
  w.eval(fs.readFileSync('assets/js/flip-calculator.js','utf8'));
  Object.defineProperty(d,'currentScript',{configurable:true,value:null});
- w.IBI18n={getCurrentMessages:()=>en};
+ w.IBI18n={getCurrentMessages:()=>en};w.IB_REPORT_PREFERENCES={ib_document_language:'es'};w.fetch=async()=>({ok:true,json:async()=>es});w.print=()=>{};
  // Protected Flip loads report controls before its dynamically inserted engine.
  w.eval(report);await tick();w.eval(source);
  const f=d.getElementById('tool-form');assert.ok(f);assert.ok(d.getElementById('loanDraws'));
@@ -79,6 +79,9 @@ test('production Flip markup connects to the tested shared engine instead of the
  assert.match(d.getElementById('result-cards').textContent,/16\.3%/);
  assert.equal(d.getElementById('ib-finance-print').disabled,false);
  assert.equal(d.getElementById('downPayment').disabled,true);
+ d.getElementById('ib-finance-print').click();await tick();
+ const spanish=d.getElementById('ib-finance-report').textContent;
+ assert.match(spanish,/Calculadora de Flip/);assert.match(spanish,/Capital propio comprometido/);assert.match(spanish,/Precio de compra \(USD\)/);assert.match(spanish,/Préstamo comprometido \(USD\)/);assert.doesNotMatch(spanish,/Net capital committed|Purchase Price|planMode|Down Payment/);
  assert.match(d.head.querySelector('script[src*="tool-script.js"]').src,/\/InvestorBlueprint\/tools\/tool-script.js/);
  f.elements.salePrice.value='invalid';f.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();
  assert.equal(d.getElementById('ib-finance-print').disabled,true);

@@ -317,5 +317,17 @@
   "arvCompAdjustment": "Ajuste firmado (USD)",
   "arvCompEvidence": "Fecha de venta, fuente y evidencia del ajuste",
   "arvAdjustedRange": "Rango de comparables ajustados (no es intervalo de confianza)",
-  "arvAssumptions": "Promedio de tres precios más ajustes introducidos por el usuario. Las fuentes y ajustes no están verificados independientemente. La regla del 70% solo sirve para evaluación inicial; analiza financiamiento, mantenimiento y venta en el modelo completo."
+  "arvAssumptions": "Promedio de tres precios más ajustes introducidos por el usuario. Las fuentes y ajustes no están verificados independientemente. La regla del 70% solo sirve para evaluación inicial; analiza financiamiento, mantenimiento y venta en el modelo completo.",
+  "reportFlipPurchase": "Precio de compra (USD)",
+  "reportFlipRehab": "Rehabilitación (USD)",
+  "reportFlipHold": "Meses de mantenimiento",
+  "reportFlipMonthly": "Mantenimiento mensual (USD)",
+  "reportFlipBuyClosing": "Cierre de compra (USD)",
+  "reportFlipSellClosing": "Cierre de venta (USD)",
+  "reportFlipCommission": "Comisión del agente (%)",
+  "reportFlipLoan": "Préstamo comprometido (USD)",
+  "reportFlipInterest": "Tasa anual de interés (%)",
+  "reportFlipPoints": "Puntos del préstamo (%)",
+  "cashCommittedLabel": "Capital propio comprometido",
+  "flipMathNotes": "El depósito se acredita al precio de compra. El interés usa los desembolsos y el método seleccionados; si no se especifican desembolsos, se financia todo el compromiso desde el mes cero. El capital comprometido no equivale al efectivo requerido al cierre."
 }

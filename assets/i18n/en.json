@@ -317,5 +317,17 @@
   "arvCompAdjustment": "Signed adjustment (USD)",
   "arvCompEvidence": "Sale date, source and adjustment evidence",
   "arvAdjustedRange": "Adjusted comparable range (not a confidence interval)",
-  "arvAssumptions": "Average of three prices plus user-entered adjustments. Sources and adjustments are not independently verified. The 70% rule is an initial screening heuristic; financing, holding and selling costs require the full deal model."
+  "arvAssumptions": "Average of three prices plus user-entered adjustments. Sources and adjustments are not independently verified. The 70% rule is an initial screening heuristic; financing, holding and selling costs require the full deal model.",
+  "reportFlipPurchase": "Purchase price (USD)",
+  "reportFlipRehab": "Rehabilitation (USD)",
+  "reportFlipHold": "Holding months",
+  "reportFlipMonthly": "Monthly holding costs (USD)",
+  "reportFlipBuyClosing": "Purchase closing costs (USD)",
+  "reportFlipSellClosing": "Sale closing costs (USD)",
+  "reportFlipCommission": "Agent commission (%)",
+  "reportFlipLoan": "Committed loan (USD)",
+  "reportFlipInterest": "Annual interest rate (%)",
+  "reportFlipPoints": "Lender points (%)",
+  "cashCommittedLabel": "Net capital committed",
+  "flipMathNotes": "Earnest money credits the purchase price. Interest uses the selected draws and method; without a draw schedule the full commitment is funded at month zero. Net committed capital is not cash due at closing."
 }

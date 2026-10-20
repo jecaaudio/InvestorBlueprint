@@ -50,14 +50,15 @@
      if((validation&&!validation.hidden)||!cards.children.length||!form.checkValidity()){invalidate();return;}
      const messages=window.IBI18n?.getCurrentMessages?.()||{};
      const keyFor=text=>Object.keys(messages).find(key=>messages[key]===text)||'';
-     const inputs=[...form.elements].filter(el=>el.name&&!['submit','button','reset','hidden','password'].includes(el.type)&&(!['radio','checkbox'].includes(el.type)||el.checked)).map(el=>{
+     const flipInputs={salePrice:'flipInputArv',purchasePrice:'reportFlipPurchase',rehabCost:'reportFlipRehab',holdingMonths:'reportFlipHold',miscMonthly:'reportFlipMonthly',buyerClosing:'reportFlipBuyClosing',stagingCost:'reportFlipSellClosing',realtorPct:'reportFlipCommission',loanAmount:'reportFlipLoan',interestRate:'reportFlipInterest',pointsPct:'reportFlipPoints'};
+     const inputs=[...form.elements].filter(el=>el.name&&!el.disabled&&!el.hidden&&!['submit','button','reset','hidden','password'].includes(el.type)&&(!['radio','checkbox'].includes(el.type)||el.checked)).map(el=>{
        const label=el.labels?.[0],translated=label?.querySelector('[data-i18n]')||label;
-       return {key:translated?.dataset.i18n||'',label:label?.textContent?.trim()||el.name,value:el.tagName==='SELECT'?(el.selectedOptions[0]?.textContent||el.value):el.value};
+       return {key:translated?.dataset.i18n||(type==='flip'?flipInputs[el.name]:'')||'',label:label?.textContent?.trim()||el.name,value:el.tagName==='SELECT'?(el.selectedOptions[0]?.textContent||el.value):el.value};
      });
      snapshot={title:document.querySelector('h1')?.textContent?.trim()||type,
-       titleKey:document.querySelector('h1 [data-i18n],h1[data-i18n]')?.dataset.i18n||'',sourceMessages:{...messages},
+       titleKey:type==='flip'?'flipTitle':document.querySelector('h1 [data-i18n],h1[data-i18n]')?.dataset.i18n||'',sourceMessages:{...messages},
        date:new Date().toISOString(),logo:new URL('assets/brand/favicon.svg',reportRoot).href,inputs,
-       metrics:[...cards.children].map(el=>{const label=el.querySelector('strong')?.textContent||'';return {key:keyFor(label),label,value:el.querySelector('span')?.textContent||''}}),
+       metrics:[...cards.children].map((el,index)=>{const label=el.querySelector('strong')?.textContent||'';return {key:type==='flip'&&index===2?'cashCommittedLabel':keyFor(label),label,value:el.querySelector('span')?.textContent||''}}),
        details:(document.getElementById('result-detail')||document.getElementById('result'))?.innerText||'',demo:type==='roi_search'};
      button.disabled=false;status.textContent='';
    });
