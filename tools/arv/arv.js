@@ -255,6 +255,9 @@ function reportText(payload) {
   parts.push('',latestReportIsDemo
     ?R('DEMO: contiene datos ficticios; NO es un valor de mercado real.','DEMO: sample data, NOT a real market valuation.')
     :R('Estimación informativa. Comprueba fuentes, fechas, condición de la propiedad y comparables antes de invertir.','Informational estimate. Verify sources, dates, property condition and comparables before investing.'));
+  // Same notice as under the results (assets/js/disclaimers.js).
+  const notice=window.IBDisclaimer?.text('automated-arv',R('es','en'));
+  if(notice)parts.push(R('Importante: ','Important: ')+notice);
   return parts.join("\n");
 }
 

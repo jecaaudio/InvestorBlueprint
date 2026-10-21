@@ -69,3 +69,8 @@ html[data-theme="dark"] .pr-beta{background:#3a2c0e;color:#f5d48f;border-color:#
 .legal-section h2{margin:0;font-size:1.2rem;color:var(--text)}
 .legal-section p,.legal-section li{color:var(--text);line-height:1.6}
 .legal-section ul{margin:0;padding-left:1.2em;display:grid;gap:8px}
+
+/* Result notice (same wording as assets/js/disclaimers.js) */
+.ib-disclaimer{margin:0;padding:10px 12px;border-left:4px solid #e3a008;border-radius:8px;background:#fdf6e3;color:#4a3a0f;font-size:.84rem;line-height:1.5}
+.ib-disclaimer strong{display:block;margin-bottom:2px}
+html[data-theme="dark"] .ib-disclaimer{background:#2f260d;color:#f3dfa6}

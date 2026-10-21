@@ -25,6 +25,8 @@
       '<meta name="apple-mobile-web-app-title" content="InvestorBlueprint">',
       '<link rel="stylesheet" href="'+root+'assets/css/brand.css?v=20261019">',
       '<script src="'+root+'assets/js/site-config.js?v=20261021"></script>',
+      // Result notice under the numbers; tool is checked against ^[a-z0-9-]+$ above.
+      '<script src="'+root+'assets/js/disclaimers.js?v=20261021" data-tool="'+tool+'"></script>',
       '<style>.tool-logo{display:inline-flex!important;align-items:center;gap:9px;text-decoration:none}.ib-tool-brand-mark{display:inline-block;width:34px;height:34px;object-fit:contain;flex:none}.ib-seller-brand{display:flex;align-items:center;gap:9px;font:700 15px system-ui,sans-serif;margin-bottom:10px}.ib-seller-brand img{width:32px;height:32px;object-fit:contain}</style>'
     ].join('');
     const icon='<img class="ib-tool-brand-mark" src="'+mark+'" alt="" aria-hidden="true"> ';

@@ -45,6 +45,11 @@
    <label><span data-es="Correo electrónico" data-en="Email">Correo electrónico</span><input id="signup-email" type="email" name="email" autocomplete="email" required></label>
    <label><span data-es="Crear contraseña (12 caracteres mínimo)" data-en="Create password (12 characters minimum)">Crear contraseña (12 caracteres mínimo)</span><input id="signup-password" type="password" name="password" autocomplete="new-password" minlength="12" required></label>
    <button id="toggle-signup-password" class="btn password-visibility-toggle" type="button" aria-controls="signup-password" aria-pressed="false" data-es="Mostrar contraseña" data-en="Show password">Mostrar contraseña</button>
+   <label class="access-consent"><input id="signup-terms" type="checkbox" name="terms" required>
+    <span><span data-es="Entiendo que los resultados son estimaciones y no una oferta de préstamo, una tasación ni un precio garantizado, y acepto los" data-en="I understand the results are estimates, not a loan offer, an appraisal or a guaranteed price, and I accept the">Entiendo que los resultados son estimaciones y no una oferta de préstamo, una tasación ni un precio garantizado, y acepto los</span>
+    <a href="terms.html" target="_blank" rel="noopener" data-es="Términos de uso" data-en="Terms of use">Términos de uso</a>
+    <span data-es="y la" data-en="and the">y la</span>
+    <a href="privacy.html" target="_blank" rel="noopener" data-es="Política de privacidad" data-en="Privacy policy">Política de privacidad</a>.</span></label>
    <button class="btn btn-primary" type="submit" data-es="Crear solicitud" data-en="Submit request">Crear solicitud</button>
   </form>
   <form id="login-form" class="access-form" hidden>
@@ -94,7 +99,7 @@
 <script src="assets/js/consent.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js" integrity="sha384-xPW3QHswsICVC2mW6BFNwMbhpLkbZ133fKOhxNx3QGGgAOJfL3O9t8r2aWn1aez6" crossorigin="anonymous"></script>
 <script src="assets/js/member-auth-config.js?v=20261018-access2"></script>
-<script src="assets/js/member-access.js?v=20261021-admin"></script>
+<script src="assets/js/member-access.js?v=20261021-terms"></script>
 <script src="lang.js"></script>
 <script src="assets/js/member-i18n.js"></script>
 <script src="assets/js/site-theme.js?v=20261018"></script>

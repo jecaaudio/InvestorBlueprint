@@ -17,6 +17,10 @@ on:
       - '.github/workflows/member-profile-test.yml'
   workflow_dispatch:
 
+# Tests only read the code; the job token cannot change the repository.
+permissions:
+  contents: read
+
 jobs:
   profile-smoke:
     runs-on: ubuntu-latest

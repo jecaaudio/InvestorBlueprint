@@ -17,7 +17,7 @@ def page(slug, title_es, title_en, desc, body, robots='', base=''):
 <link rel="stylesheet" href="assets/css/cookie-banner.css">
 <link rel="stylesheet" href="assets/css/site-theme.css?v=20261018">
 <link rel="stylesheet" href="assets/css/brand.css?v=20261019">
-<link rel="stylesheet" href="assets/css/landing.css?v=20261021">
+<link rel="stylesheet" href="assets/css/landing.css?v=20261021b">
 <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg?v=1">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/brand/apple-touch-icon.png?v=1">
 <link rel="manifest" href="manifest.webmanifest?v=1">
@@ -108,9 +108,17 @@ terms = '\n'.join([
  section('El servicio', 'The service',
    ('InvestorBlueprint ofrece calculadoras para analizar operaciones inmobiliarias en Estados Unidos: venta, flip, rentas, ARV y préstamos.',
     'InvestorBlueprint provides calculators to analyze real estate deals in the United States: sales, flips, rentals, ARV and loans.')),
- section('No es asesoría profesional', 'Not professional advice',
-   ('Los resultados son estimaciones informativas basadas en los datos que introduces. No son asesoría financiera, legal, fiscal ni un avalúo. Confirma impuestos, cierres, préstamos y valores con tu agente, prestamista, compañía de título, contador o abogado antes de decidir.',
-    'Results are informational estimates based on the data you enter. They are not financial, legal or tax advice, nor an appraisal. Confirm taxes, closings, loans and values with your agent, lender, title company, accountant or attorney before deciding.')),
+ section('Los resultados son estimaciones', 'Results are estimates', [
+   ('Los resultados son estimaciones informativas basadas en los datos que introduces. No son asesoría financiera, legal ni fiscal.',
+    'Results are informational estimates based on the data you enter. They are not financial, legal or tax advice.'),
+   ('Un cálculo de préstamo no es una oferta ni una aprobación de préstamo: la tasa, los puntos y el monto los decide cada prestamista.',
+    'A loan calculation is not a loan offer or approval: each lender sets the rate, points and amount.'),
+   ('Un ARV o valor estimado no es una tasación (appraisal); el valor real lo determina un tasador.',
+    'An ARV or estimated value is not an appraisal; a licensed appraiser determines actual value.'),
+   ('Un neto de venta, una ganancia o un flujo de caja no garantizan el precio de venta, lo que recibirás ni tus ingresos. Los montos finales los confirma la compañía de título en el cierre.',
+    'A seller net, profit or cash flow does not guarantee the sale price, what you will receive or your income. The title company confirms final amounts at closing.'),
+   ('Confirma impuestos, cierres, préstamos y valores con tu agente, prestamista, tasador, compañía de título, contador o abogado antes de decidir. Las decisiones que tomes con estos resultados son tu responsabilidad.',
+    'Confirm taxes, closings, loans and values with your agent, lender, appraiser, title company, accountant or attorney before deciding. Decisions you make with these results are your responsibility.')]),
  section('Tu cuenta', 'Your account', [
    ('Usa datos verdaderos y una cuenta por persona.', 'Use accurate details and one account per person.'),
    ('Cuida tu contraseña; eres responsable de lo que se haga con tu cuenta.', 'Keep your password safe; you are responsible for activity on your account.'),

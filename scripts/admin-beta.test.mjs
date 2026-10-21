@@ -9,7 +9,7 @@ const tick=()=>new Promise(resolve=>setTimeout(resolve,10));
 const owner={id:'owner-id',email:'owner@example.invalid',full_name:'Owner',role:'admin',access_status:'approved',requested_at:'2026-10-01T00:00:00Z'};
 const member={id:'member-id',email:'tester@example.invalid',full_name:'Tester',role:'member',access_status:'approved',requested_at:'2026-10-02T00:00:00Z'};
 
-async function openAdmin({betaColumn=true,betaTester=false,updateError=null,user={id:'owner-id'},profile=owner,profileError=null,feedback=[],feedbackError=null,noClient=false}={}){
+async function openAdmin({betaColumn=true,betaTester=false,updateError=null,user={id:'owner-id'},profile=owner,profileError=null,feedback=[],feedbackError=null,noClient=false,memberExtra={}}={}){
   const updates=[],feedbackOps=[];
   const dom=new JSDOM(page,{url:'https://jecaaudio.github.io/InvestorBlueprint/admin.html',runScripts:'outside-only'});
   const w=dom.window;
@@ -40,7 +40,7 @@ async function openAdmin({betaColumn=true,betaTester=false,updateError=null,user
         eq(){return pending?Promise.resolve({error:updateError}):q},
         single:async()=>profileError?{data:null,error:profileError}:{data:profile,error:null},
         order:async()=>betaColumn||!columns.includes('beta_tester')
-          ?{data:[owner,{...member,...(betaColumn?{beta_tester:betaTester}:{})}],error:null}
+          ?{data:[owner,{...member,...memberExtra,...(betaColumn?{beta_tester:betaTester}:{})}],error:null}
           :{data:null,error:{message:'column member_profiles.beta_tester does not exist'}},
         update(values){pending=values;updates.push(values);return q},
         in:async()=>({data:[owner,member],error:null})
@@ -159,5 +159,19 @@ test('when sign-in cannot start the admin page shows a recovery message, not an 
   assert.equal(d.getElementById('admin-denied').hidden,false);
   assert.equal(d.getElementById('admin-root').hidden,true);
   assert.equal(d.getElementById('admin-hero').hidden,true);
+  dom.window.close();
+});
+
+test('the owner sees whether each member accepted the notice and Terms at signup',async()=>{
+  let {dom}=await openAdmin({memberExtra:{terms_accepted_at:'2026-10-21T15:00:00Z',terms_version:'2026-10-21'}});
+  let rows=dom.window.document.querySelectorAll('#member-list .member-row');
+  assert.equal(rows[0].querySelector('.member-terms'),null,'no line for the owner');
+  assert.match(rows[1].querySelector('.member-terms').textContent,/Aceptó el aviso y los Términos el/);
+  assert.equal(rows[1].querySelector('.member-terms').dataset.accepted,'true');
+  dom.window.close();
+  ({dom}=await openAdmin());
+  const line=dom.window.document.querySelectorAll('#member-list .member-row')[1].querySelector('.member-terms');
+  assert.match(line.textContent,/No aceptó el aviso al registrarse/);
+  assert.equal(line.dataset.accepted,'false');
   dom.window.close();
 });

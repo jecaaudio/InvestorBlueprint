@@ -3,6 +3,15 @@ import html, json, os
 
 SITE = 'https://jecaaudio.github.io/InvestorBlueprint/'
 
+# The result notice comes from assets/js/disclaimers.js so the site, PDFs and these pages agree.
+import re
+_DISCLAIMER_JS = open(os.path.join(os.path.dirname(__file__), '..', 'assets', 'js', 'disclaimers.js'), encoding='utf-8').read()
+def _pair(block):
+    return (re.search(r"es:\s*'([^']*)'", block).group(1), re.search(r"en:\s*'([^']*)'", block).group(1))
+GENERAL = _pair(re.search(r"const GENERAL = \{(.*?)\};", _DISCLAIMER_JS, re.S).group(1))
+DISCLAIMERS = {m.group(1): _pair(m.group(2)) for m in re.finditer(r"'?([a-z-]+)'?: \{(\s*es:.*?en:\s*'[^']*')\s*\}", _DISCLAIMER_JS, re.S)}
+NOTICE_KEY = {'venta': 'seller-net', 'flip': 'flip', 'rentas': 'rental', 'arv': 'arv', 'hard-money': 'hard-money'}
+
 def t(es, en, tag='span', cls='', attrs=''):
     c = f' class="{cls}"' if cls else ''
     return f'<{tag}{c}{attrs} data-es="{html.escape(es, True)}" data-en="{html.escape(en, True)}">{html.escape(es)}</{tag}>'
@@ -127,7 +136,7 @@ HEAD = '''<!DOCTYPE html>
 <link rel="stylesheet" href="../assets/css/cookie-banner.css">
 <link rel="stylesheet" href="../assets/css/site-theme.css?v=20261018">
 <link rel="stylesheet" href="../assets/css/brand.css?v=20261019">
-<link rel="stylesheet" href="../assets/css/landing.css?v=20261021">
+<link rel="stylesheet" href="../assets/css/landing.css?v=20261021b">
 <link rel="icon" type="image/svg+xml" href="../assets/brand/favicon.svg?v=1">
 <link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/favicon-32.png?v=1">
 <link rel="apple-touch-icon" sizes="180x180" href="../assets/brand/apple-touch-icon.png?v=1">
@@ -199,6 +208,9 @@ def page(p):
     out.append(f'<div class="lp-fields">{fields}</div>')
     out.append('<div id="quick-result" class="lp-result" aria-live="polite"></div>')
     out.append(t(*p['note'], tag='p', cls='lp-quick-note'))
+    es, en = DISCLAIMERS[NOTICE_KEY[p['slug']]]
+    out.append('<aside class="ib-disclaimer" role="note">' + t('Importante', 'Important', tag='strong') +
+               t(es + ' ' + GENERAL[0], en + ' ' + GENERAL[1]) + '</aside>')
     out.append('</form>\n</section>')
     out.append('<section class="lp-section">' + t('Lo que resuelve', 'What it solves', tag='h2') + '<div class="lp-grid">' +
                ''.join('<article class="lp-card">' + t(a, b, tag='h3') + t(c, d, tag='p') + '</article>' for a, b, c, d in p['benefits']) + '</div></section>')
