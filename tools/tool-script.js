@@ -6,18 +6,35 @@
     for(const value of Object.values(result))if(typeof value==='number'&&!Number.isFinite(value))throw new RangeError('Financial result exceeds numeric limits');
     return result;
   };
+  // Accepts US (250,000.50) and Spanish (250.000,50) notation. A dot followed by
+  // groups of exactly three digits is a thousands separator, so 250.000 is 250000,
+  // never 250. A comma with one or two trailing digits is a decimal comma.
   const parseFinanceNumber=value=>{
     if(typeof value==='number')return Number.isFinite(value)?value:NaN;
     let clean=String(value??'').trim();if(!clean)return 0;
-    clean=clean.replace(/^([+-]?)\$/,'$1');
-    if(clean.includes(',')){
-      if(!/^[+-]?\d{1,3}(,\d{3})+(\.\d+)?$/.test(clean))return NaN;
-      clean=clean.replace(/,/g,'');
-    }
-    if(!/^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(clean))return NaN;
-    const parsed=Number(clean);return Number.isFinite(parsed)?parsed:NaN;
+    clean=clean.replace(/^([+-]?)\$\s*/,'$1');
+    const sign=/^[+-]/.test(clean)?clean[0]:'';
+    let body=sign?clean.slice(1):clean;
+    if(/^[1-9]\d{0,2}(,\d{3})+(\.\d+)?$/.test(body))body=body.replace(/,/g,'');
+    else if(/^[1-9]\d{0,2}(\.\d{3})+(,\d+)?$/.test(body))body=body.replace(/\./g,'').replace(',','.');
+    else if(/^\d+,\d{1,2}$/.test(body))body=body.replace(',','.');
+    else if(body.includes(','))return NaN;
+    if(!/^(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(body))return NaN;
+    const parsed=Number(sign+body);return Number.isFinite(parsed)?parsed:NaN;
   };
   if(typeof window!=='undefined')window.IBParseFinanceNumber=parseFinanceNumber;
+  // Percentages, months and counts never use thousands separators, so 7.125 stays
+  // 7.125 (a common US rate) and a decimal comma (7,5) is also accepted.
+  const parseRatioNumber=value=>{
+    if(typeof value==='number')return Number.isFinite(value)?value:NaN;
+    let clean=String(value??'').trim().replace(/\s*%$/,'');if(!clean)return 0;
+    if(/^[+-]?\d+,\d+$/.test(clean))clean=clean.replace(',','.');
+    if(!/^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(clean))return NaN;
+    const parsed=Number(clean);return Number.isFinite(parsed)?parsed:NaN;
+  };
+  const isRatioField=name=>/(pct|rate|points|months|count|yield|occupancy|roi|return)$/i.test(String(name||''));
+  const parseFieldNumber=(name,value)=>isRatioField(name)?parseRatioNumber(value):parseFinanceNumber(value);
+  if(typeof window!=='undefined')window.IBParseFieldNumber=parseFieldNumber;
   // Pure flip model; full-draw interest is a conservative simplified estimate.
   const calculateFlipFinance = (x) => {
     for(const key of ['purchase','sale','rehabTotal','buyerClosing','titleFees','inspectionCost','monthlyHolding','holdingMonths','stagingCost','transferTax','loanAmount','drawFee','drawInspectionFee','drawCount','originationFees','loanClosingCosts','prepayPenalty'])checkNumber(key,x[key]);
@@ -241,6 +258,42 @@
 
   setupCurrencyInputs();
 
+  // Native number fields read the Spanish "250.000" as 250 without any warning.
+  // Make every numeric field a decimal text field parsed by parseFinanceNumber,
+  // and show how an entry was read whenever it differs from a plain US reading.
+  const setupLocaleNumbers=()=>{
+    const english=()=>document.documentElement.lang==='en';
+    form.querySelectorAll('input[type="number"]').forEach(input=>{
+      input.type='text';input.inputMode='decimal';input.autocomplete='off';
+    });
+    form.querySelectorAll('input[inputmode="decimal"],input[data-format="currency"]').forEach(input=>{
+      if(input.dataset.ibNumberEcho||!input.id)return;
+      input.dataset.ibNumberEcho='true';
+      const echo=document.createElement('small');
+      echo.id=input.id+'-read-as';echo.className='ib-number-echo';echo.hidden=true;echo.setAttribute('aria-live','polite');
+      const anchor=input.parentElement?.classList.contains('input-control')?input.parentElement:input;
+      anchor.after(echo);
+      input.setAttribute('aria-describedby',[input.getAttribute('aria-describedby'),echo.id].filter(Boolean).join(' '));
+      const update=()=>{
+        const raw=input.value.trim();
+        const plain=Number(raw.replace(/^([+-]?)\$\s*/,'$1').replace(/\s*%$/,'').replace(/,/g,''));
+        const read=parseFieldNumber(input.name||input.id,raw);
+        if(!raw||read===plain){echo.hidden=true;echo.textContent='';return;}
+        echo.hidden=false;
+        echo.textContent=Number.isFinite(read)
+          ?(english()?'Read as ':'Se lee como ')+new Intl.NumberFormat('en-US',{maximumFractionDigits:6}).format(read)
+          :(english()?'Not a valid number. Example: 250,000 or 250.000':'Número no válido. Ejemplo: 250,000 o 250.000');
+      };
+      input.addEventListener('input',update);input.addEventListener('blur',update);update();
+    });
+    if(!document.getElementById('ib-number-echo-style')){
+      const style=document.createElement('style');style.id='ib-number-echo-style';
+      style.textContent='.ib-number-echo{display:block;margin-top:4px;font-size:.82rem;font-weight:600;color:#0a6fd1}.ib-number-echo[hidden]{display:none}';
+      document.head.append(style);
+    }
+  };
+  setupLocaleNumbers();
+
   const syncPlanMode = () => {
     if (type !== 'flip') return;
     const selected = form.querySelector('input[name="planMode"]:checked')?.value || 'free';
@@ -294,7 +347,7 @@
     clearFieldErrors();
     const invalid = [];
     rules.forEach((rule) => {
-      const value = parseNumeric(form.elements[rule.name]?.value);
+      const value = parseFieldNumber(rule.name, form.elements[rule.name]?.value);
       const isBlank = String(form.elements[rule.name]?.value || '').trim() === '';
       if (rule.required && isBlank) {
         setFieldError(rule.name, messages.requiredField);
@@ -515,7 +568,7 @@
       window.IBAnalytics.trackCalcRun(type);
     }
     const values = Object.fromEntries(new FormData(form).entries());
-    const num = (name) => parseNumeric(values[name]);
+    const num = (name) => parseFieldNumber(name, values[name]);
     try {
     if (type === 'flip') {
       if (!validateFlip(messages)) return;

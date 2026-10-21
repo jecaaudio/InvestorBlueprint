@@ -152,3 +152,16 @@ test('USD parsing preserves cents and rejects garbage rather than silently retur
  assert.equal(parse('$1,234.56'),1234.56);assert.equal(parse('0'),0);assert.equal(parse(''),0);assert.equal(parse('.50'),.5);
  for(const value of ['abc','1,2,3','$12oops','Infinity','1e999'])assert.ok(Number.isNaN(parse(value)),value);
 });
+test('Spanish thousands dots and decimal commas are read as typed, never as small numbers',()=>{
+ const parse=window.IBParseFinanceNumber;
+ for(const [text,value] of [['250.000',250000],['1.250.000',1250000],['250.000,50',250000.5],['$250.000',250000],['1.500',1500],['1500,5',1500.5],['1500,50',1500.5],['250,000',250000],['$1,234.56',1234.56],['1.5',1.5],['0.125',0.125],['-2.500',-2500]])
+  assert.equal(parse(text),value,text);
+ for(const text of ['1.2.3','250.00.000','1,5,0','12,345,6','0.000.1'])assert.ok(Number.isNaN(parse(text)),text);
+});
+test('rates, months and counts keep dot decimals and accept decimal commas',()=>{
+ const parse=window.IBParseFieldNumber;
+ for(const [name,text,value] of [['interestRate','7.125',7.125],['interestRate','7,125',7.125],['pointsPct','2.5',2.5],['vacancyRate','5 %',5],['holdingMonths','4,5',4.5],['months','12',12],['occupancy','95',95]])
+  assert.equal(parse(name,text),value,name+' '+text);
+ assert.equal(parse('purchasePrice','250.000'),250000);
+ for(const text of ['1.000.5','7.1.2','abc'])assert.ok(Number.isNaN(parse('interestRate',text)),text);
+});
