@@ -116,3 +116,13 @@ test('every scripts/*.test.mjs runs in npm test or a named special CI step',asyn
     assert.ok(testScript.includes('scripts/'+file),`Test file missing from npm test: ${file}`);
   }
 });
+
+test('every tools/ script that protected pages load is copied by the Pages deploy',()=>{
+  const deploy=read('.github/workflows/deploy-pages.yml');
+  const loaders=read('assets/js/secure-tool-loader.js')+read('assets/js/flip-calculator.js');
+  const scripts=new Set([...loaders.matchAll(/tools\/([a-z0-9-]+\.js)/g)].map(match=>match[1]));
+  assert.ok(scripts.has('finance-report.js')&&scripts.has('tool-script.js'),'expected loader script references');
+  for(const file of scripts){
+    assert.ok(new RegExp('cp [^\\n]*tools/'+file.replace('.','\\.')).test(deploy),`Deploy does not publish tools/${file}`);
+  }
+});
