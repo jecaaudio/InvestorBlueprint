@@ -143,9 +143,9 @@
       try{
         if(password.length<12)throw Error(t('Usa una contraseña de al menos 12 caracteres.','Use a password of at least 12 characters.'));
         if(!$('signup-terms')?.checked)throw Error(t('Para crear la cuenta, acepta el aviso y los Términos de uso.','To create the account, accept the notice and the Terms of use.'));
-        // The acceptance is stored with the account (Supabase user metadata) as a record.
-        const terms={terms_accepted_at:new Date().toISOString(),terms_version:TERMS_VERSION};
-        const {error}=await client.auth.signUp({email,password,options:{data:{full_name:name,...terms},emailRedirectTo:new URL('login.html',location.href).href}});
+        // Only the accepted version is sent; the database records it with the server time
+        // (migration 20261021150000_terms_acceptance.sql) and nobody can change it later.
+        const {error}=await client.auth.signUp({email,password,options:{data:{full_name:name,terms_version:TERMS_VERSION},emailRedirectTo:new URL('login.html',location.href).href}});
         if(error)throw error;
         say('portal-message',t('Solicitud creada. Confirma tu correo y espera la aprobación del administrador.','Request created. Confirm your email and wait for administrator approval.'),'success');
         registration.reset();await updateAccount();
@@ -280,6 +280,13 @@
         ({data,error}=await client.from('member_profiles').select(columns).order('requested_at',{ascending:false}));
       }
       if(error){say('admin-message',error.message,'error');return}
+      // Signup acceptance of the notice and Terms; missing until its migration is applied.
+      let terms=null;
+      try{
+        const {data:accepted,error:termsError}=await client.from('member_profiles')
+          .select('id,terms_accepted_at,terms_version').order('requested_at',{ascending:false});
+        if(!termsError)terms=new Map((accepted||[]).map(x=>[x.id,x]));
+      }catch(termsError){terms=null}
       list.replaceChildren();
       const rows=(data||[]).filter(x=>filter.value==='all'||x.access_status===filter.value);
       $('member-total').textContent=String(rows.length);
@@ -290,7 +297,16 @@
         const email=document.createElement('small');email.textContent=member.email;
         const status=document.createElement('span');status.className='member-status';status.dataset.state=member.access_status;status.textContent=statusLabel(member.access_status);
         const date=document.createElement('small');date.textContent=new Date(member.requested_at).toLocaleDateString(lang()==='en'?'en-US':'es-US');
-        top.append(name,email,status,date);row.append(top);
+        top.append(name,email,status,date);
+        if(terms&&member.id!==profile.id){
+          const record=terms.get(member.id),accepted=document.createElement('small');
+          accepted.className='member-terms';accepted.dataset.accepted=String(Boolean(record?.terms_accepted_at));
+          accepted.textContent=record?.terms_accepted_at
+            ?t('Aceptó el aviso y los Términos el ','Accepted the notice and Terms on ')+new Date(record.terms_accepted_at).toLocaleDateString(lang()==='en'?'en-US':'es-US')
+            :t('No aceptó el aviso al registrarse (cuenta anterior o creada fuera del formulario)','Did not accept the notice at signup (older account or created outside the form)');
+          top.append(accepted);
+        }
+        row.append(top);
         if(member.id!==profile.id){
           const select=document.createElement('select');select.setAttribute('aria-label',t('Estado de acceso','Access status'));
           for(const state of allowed){const o=document.createElement('option');o.value=state;o.textContent=statusLabel(state);select.append(o)}

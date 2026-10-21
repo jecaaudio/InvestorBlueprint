@@ -141,12 +141,12 @@ test('an account cannot be created without accepting the notice and terms',async
   dom.window.close();
 });
 
-test('accepting stores when and which terms version was accepted',async()=>{
+test('accepting sends which terms version was accepted, never a client timestamp',async()=>{
   const {dom,calls}=await openSignup({checked:true});
   assert.equal(calls.length,1);
   const data=calls[0].options.data;
   assert.equal(data.full_name,'Ana');
   assert.equal(data.terms_version,'2026-10-21');
-  assert.ok(!Number.isNaN(Date.parse(data.terms_accepted_at)));
+  assert.equal(data.terms_accepted_at,undefined,'the server sets the time');
   dom.window.close();
 });

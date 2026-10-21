@@ -29,6 +29,7 @@
 .member-row{border:1px solid var(--site-border,var(--border));border-radius:11px;padding:15px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--panel)}
 .member-info{display:grid;gap:4px;min-width:0;flex:1}
 .member-info small{color:var(--muted);overflow-wrap:anywhere}
+.member-terms[data-accepted="false"]{color:#b45309!important;font-weight:600}
 .feedback-text{flex-basis:100%;margin:0;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
 #admin-feedback{margin-top:18px}
 #admin-feedback h2{margin:0;font-size:1.15rem}
