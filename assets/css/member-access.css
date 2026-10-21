@@ -12,6 +12,8 @@
 .access-form label{display:grid;gap:6px;font-size:.87rem;font-weight:650}
 .access-form input{width:100%;min-height:45px;border:1px solid var(--site-border,var(--border));border-radius:9px;padding:10px 12px;font-size:1rem}
 .access-form .btn{margin-top:5px;justify-self:start}
+.access-form .access-consent{display:flex;gap:10px;align-items:flex-start;font-weight:500;line-height:1.45}
+.access-form .access-consent input{width:20px;min-height:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--primary)}
 .access-message{padding:11px 14px;border:1px solid var(--site-border,var(--border));border-radius:10px;background:var(--site-soft,var(--panel));margin:15px 0;color:var(--text)}
 .access-message[data-state="error"]{border-color:#ba5555}
 .access-message[data-state="warning"]{border-color:#b88c42}

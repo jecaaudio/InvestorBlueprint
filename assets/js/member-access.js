@@ -15,6 +15,8 @@
   const $=id=>document.getElementById(id);
   const lang=()=>document.documentElement.lang==='en'?'en':'es';
   const t=(es,en)=>lang()==='en'?en:es;
+  // Change when the Terms or the results notice change, so new acceptances can be told apart.
+  const TERMS_VERSION='2026-10-21';
   const say=(id,msg,type='info')=>{const el=$(id);if(!el)return;el.textContent=msg;el.dataset.state=type;el.hidden=false;};
   // No member's analyst/company metadata should remain after explicit sign-out.
   const clearReportCache=()=>{
@@ -140,7 +142,10 @@
       const name=$('signup-name').value.trim();
       try{
         if(password.length<12)throw Error(t('Usa una contraseña de al menos 12 caracteres.','Use a password of at least 12 characters.'));
-        const {error}=await client.auth.signUp({email,password,options:{data:{full_name:name},emailRedirectTo:new URL('login.html',location.href).href}});
+        if(!$('signup-terms')?.checked)throw Error(t('Para crear la cuenta, acepta el aviso y los Términos de uso.','To create the account, accept the notice and the Terms of use.'));
+        // The acceptance is stored with the account (Supabase user metadata) as a record.
+        const terms={terms_accepted_at:new Date().toISOString(),terms_version:TERMS_VERSION};
+        const {error}=await client.auth.signUp({email,password,options:{data:{full_name:name,...terms},emailRedirectTo:new URL('login.html',location.href).href}});
         if(error)throw error;
         say('portal-message',t('Solicitud creada. Confirma tu correo y espera la aprobación del administrador.','Request created. Confirm your email and wait for administrator approval.'),'success');
         registration.reset();await updateAccount();

@@ -5,6 +5,9 @@
  'use strict';
  const reportRoot=new URL('../',document.currentScript?.src||new URL('/InvestorBlueprint/tools/finance-report.js',document.baseURI));
  const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ // Same wording as the notice under the results (assets/js/disclaimers.js), with a fallback if it did not load.
+ const notice=(tool,english)=>window.IBDisclaimer?.text(tool,english?'en':'es')||
+   (english?'Informational results based on the data entered. Not financial, legal or tax advice.':'Resultados informativos basados en los datos ingresados. No son asesoría financiera, legal ni fiscal.');
  function render(snapshot,prefs={},messages={}){
    const english=prefs.ib_document_language==='en',L=(es,en)=>english?en:es;
    const label=row=>messages[row.key]||row.label;
@@ -30,7 +33,7 @@
      '<h3>'+L('Origen de los datos','Data sources')+'</h3><p>'+L('Datos y supuestos introducidos por el usuario; no verificados contra registros públicos ni cotizaciones de prestamistas.','User-entered data and assumptions; not verified against public records or lender quotes.')+'</p>'+
      (snapshot.demo?'<p class="flag">'+L('DEMOSTRACIÓN: inventario simulado, no son oportunidades verificadas.','DEMONSTRATION: simulated inventory, not verified investment opportunities.')+'</p>':'')+
      (snapshot.notes?'<h3>'+L('Notas del análisis','Analysis notes')+'</h3><p class="detail">'+escape(snapshot.notes)+'</p>':'')+
-     '<footer><p>'+L('Estimación informativa en USD. Comprueba contratos, impuestos, costos y datos comparables antes de tomar decisiones.','Informational estimate in USD. Verify contracts, taxes, costs and comparable data before making decisions.')+'</p></footer>'+
+     '<footer><p class="ib-r-notice"><strong>'+L('Importante:','Important:')+'</strong> '+escape(notice(snapshot.tool,english))+'</p><p>'+L('Estimación informativa en USD. Comprueba contratos, impuestos, costos y datos comparables antes de tomar decisiones.','Informational estimate in USD. Verify contracts, taxes, costs and comparable data before making decisions.')+'</p></footer>'+
      '<div class="ib-r-brand"><img src="'+escape(snapshot.logo)+'" alt="" width="12" height="12">'+L('Preparado con','Prepared with')+' InvestorBlueprint'+(site?' · '+escape(site):'')+'</div>';
  }
  window.IBRenderFinanceReport=render;
@@ -63,7 +66,7 @@
        const label=el.labels?.[0],translated=label?.querySelector('[data-i18n]')||label;
        return {key:translated?.dataset.i18n||(type==='flip'?flipInputs[el.name]:'')||'',label:label?.textContent?.trim()||el.name,valueKey:el.tagName==='SELECT'?el.selectedOptions[0]?.dataset.i18n:'',value:el.tagName==='SELECT'?(el.selectedOptions[0]?.textContent||el.value):el.value};
      });
-     snapshot={title:document.querySelector('h1')?.textContent?.trim()||type,
+     snapshot={tool:type,title:document.querySelector('h1')?.textContent?.trim()||type,
        titleKey:type==='flip'?'flipTitle':document.querySelector('h1 [data-i18n],h1[data-i18n]')?.dataset.i18n||'',sourceMessages:{...messages},
        date:new Date().toISOString(),logo:new URL('assets/brand/favicon.svg',reportRoot).href,inputs,
        metrics:[...cards.children].map((el,index)=>{const label=el.querySelector('strong')?.textContent||'';return {key:type==='flip'&&index===2?'cashCommittedLabel':keyFor(label),label,value:el.querySelector('span')?.textContent||''}}),

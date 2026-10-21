@@ -5,6 +5,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Tests only read the code; the job token cannot change the repository.
+permissions:
+  contents: read
+
 jobs:
   structure-smoke:
     runs-on: ubuntu-latest
