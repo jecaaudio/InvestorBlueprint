@@ -97,11 +97,13 @@
     const messages = getMessages();
     toolGrid.innerHTML = '';
 
-    tools.forEach((tool) => {
+    // Tools marked "listed": false stay reachable by direct link but are not offered.
+    const listed = tools.filter((tool) => tool.listed !== false);
+    listed.forEach((tool) => {
       toolGrid.append(createHomeCard(tool, messages));
     });
 
-    const freeCount = tools.filter((tool) => !getStatusMeta(tool.status).isPro).length;
+    const freeCount = listed.filter((tool) => !getStatusMeta(tool.status).isPro).length;
     const freeFeature = document.getElementById('free-feature-count');
     if (freeFeature) {
       freeFeature.textContent = `${freeCount} ${messages.toolsUnit || 'tools'}`;
@@ -125,7 +127,7 @@
 
     const title = document.querySelector('[data-tool-title]');
     if (title) {
-      title.textContent = `${getLocalizedName(tool)} — ${messages.betaFreeLabel || 'BETA (FREE)'}`;
+      title.textContent = getLocalizedName(tool);
     }
 
     const description = document.querySelector('[data-tool-description]');
