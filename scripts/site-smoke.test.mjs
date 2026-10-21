@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { posix as path } from 'node:path';
 
 const read = file => readFileSync(file, 'utf8');
@@ -127,5 +127,16 @@ test('every tools/ script that protected pages load is copied by the Pages deplo
   assert.ok(scripts.has('finance-report.js')&&scripts.has('tool-script.js'),'expected loader script references');
   for(const file of scripts){
     assert.ok(new RegExp('cp [^\\n]*tools/'+file.replace('.','\\.')).test(deploy),`Deploy does not publish tools/${file}`);
+  }
+});
+
+test('every page with the footer can reopen cookie settings',()=>{
+  const pages=['index.html','login.html','account.html','pricing.html','privacy.html','terms.html','404.html',
+    ...readdirSync('calculadoras').filter(f=>f.endsWith('.html')).map(f=>'calculadoras/'+f)];
+  for(const page of pages){
+    const html=read(page);
+    if(!html.includes('site-footer.js'))continue;
+    assert.match(html,/cookie-banner-component\.js/,page+' must load the cookie banner');
+    assert.match(html,/consent\.js/,page+' must load consent controls');
   }
 });

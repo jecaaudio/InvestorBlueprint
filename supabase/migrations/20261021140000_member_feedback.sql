@@ -38,6 +38,8 @@ create policy member_feedback_owner_delete on public.member_feedback
 create or replace function private.limit_member_feedback()
 returns trigger language plpgsql security definer set search_path = '' as $$
 begin
+  -- One insert per member at a time, so parallel requests cannot all pass the same count.
+  perform pg_advisory_xact_lock(hashtext('ib_member_feedback'), hashtext(new.user_id::text));
   if (select count(*) from public.member_feedback f
       where f.user_id=new.user_id and f.created_at > now() - interval '1 hour') >= 10 then
     raise exception 'Too many comments; try again later' using errcode='54000';

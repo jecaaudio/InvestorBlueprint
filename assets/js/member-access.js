@@ -238,7 +238,11 @@
     await updateAccount();
   }
   async function initAdmin(){
-    if(!client){say('admin-message',t('El backend no está configurado.','Backend not configured.'),'warning');return}
+    if(!client){
+      if($('admin-checking'))$('admin-checking').hidden=true;
+      $('admin-root').hidden=true;$('admin-denied').hidden=false;
+      return;
+    }
     // Nothing about administration is shown until an approved administrator is confirmed.
     let profile=null,readFailed=false;
     try{profile=await readProfile()}catch(error){readFailed=true}

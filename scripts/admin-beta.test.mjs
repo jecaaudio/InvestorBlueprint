@@ -9,7 +9,7 @@ const tick=()=>new Promise(resolve=>setTimeout(resolve,10));
 const owner={id:'owner-id',email:'owner@example.invalid',full_name:'Owner',role:'admin',access_status:'approved',requested_at:'2026-10-01T00:00:00Z'};
 const member={id:'member-id',email:'tester@example.invalid',full_name:'Tester',role:'member',access_status:'approved',requested_at:'2026-10-02T00:00:00Z'};
 
-async function openAdmin({betaColumn=true,betaTester=false,updateError=null,user={id:'owner-id'},profile=owner,profileError=null,feedback=[],feedbackError=null}={}){
+async function openAdmin({betaColumn=true,betaTester=false,updateError=null,user={id:'owner-id'},profile=owner,profileError=null,feedback=[],feedbackError=null,noClient=false}={}){
   const updates=[],feedbackOps=[];
   const dom=new JSDOM(page,{url:'https://jecaaudio.github.io/InvestorBlueprint/admin.html',runScripts:'outside-only'});
   const w=dom.window;
@@ -48,7 +48,7 @@ async function openAdmin({betaColumn=true,betaTester=false,updateError=null,user
       return q;
     }
   };
-  w.supabase={createClient:()=>client};
+  if(!noClient)w.supabase={createClient:()=>client};
   w.confirm=()=>true;
   const visits=[];w.IBNavigate=url=>visits.push(url);
   w.eval(source);
@@ -149,5 +149,15 @@ test('without the feedback migration the panel explains what to apply',async()=>
 test('feedback stays hidden from anyone who is not the confirmed administrator',async()=>{
   const {dom}=await openAdmin({profile:member,user:{id:'member-id'}});
   assert.equal(dom.window.document.getElementById('admin-feedback').hidden,true);
+  dom.window.close();
+});
+
+test('when sign-in cannot start the admin page shows a recovery message, not an endless check',async()=>{
+  const {dom}=await openAdmin({noClient:true});
+  const d=dom.window.document;
+  assert.equal(d.getElementById('admin-checking').hidden,true);
+  assert.equal(d.getElementById('admin-denied').hidden,false);
+  assert.equal(d.getElementById('admin-root').hidden,true);
+  assert.equal(d.getElementById('admin-hero').hidden,true);
   dom.window.close();
 });
