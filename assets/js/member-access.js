@@ -324,5 +324,79 @@
     filter.addEventListener('change',loadMembers);
     reload.addEventListener('click',loadMembers);
     await loadMembers();
+    await initFeedback();
+  }
+  // Member comments from the in-tool feedback form. Only the approved owner can read them (RLS).
+  async function initFeedback(){
+    const section=$('admin-feedback'),list=$('feedback-list'),filter=$('feedback-filter');
+    if(!section||!list||!filter)return;
+    section.hidden=false;
+    const toolNames={'seller-net':['Ganancia neta de venta','Seller net proceeds'],flip:['Flip','Flip'],
+      'arv-estimator':['Estimador de ARV','ARV estimator'],'automated-arv':['ARV automático','Automated ARV'],
+      'hard-money':['Hard money','Hard money'],rent:['Renta','Rent'],rental:['Flujo de caja de alquiler','Rental cash flow'],
+      'roi-search':['Búsqueda de ROI','ROI search'],general:['General','General']};
+    const toolLabel=id=>toolNames[id]?t(...toolNames[id]):id;
+    async function loadFeedback(){
+      say('feedback-message',t('Cargando comentarios…','Loading feedback…'),'info');
+      let query=client.from('member_feedback').select('id,user_id,tool,page,message,language,status,created_at')
+        .order('created_at',{ascending:false}).limit(200);
+      if(filter.value==='new')query=query.eq('status','new');
+      const {data,error}=await query;
+      if(error){
+        const missing=/member_feedback/i.test(error.message||'')||error.code==='42P01'||error.code==='PGRST205';
+        say('feedback-message',missing?t('Para guardar comentarios, aplica la migración 20261021140000_member_feedback.sql en Supabase.','To store feedback, apply migration 20261021140000_member_feedback.sql in Supabase.'):error.message,missing?'warning':'error');
+        return;
+      }
+      const emails=new Map();
+      const ids=[...new Set((data||[]).map(x=>x.user_id))];
+      if(ids.length){
+        const {data:people}=await client.from('member_profiles').select('id,email').in('id',ids);
+        for(const person of people||[])emails.set(person.id,person.email);
+      }
+      list.replaceChildren();
+      $('feedback-total').textContent=String((data||[]).length);
+      for(const item of data||[]){
+        const row=document.createElement('article');row.className='member-row feedback-row';
+        const top=document.createElement('div');top.className='member-info';
+        const tool=document.createElement('strong');tool.textContent=toolLabel(item.tool);
+        const who=document.createElement('small');who.textContent=emails.get(item.user_id)||t('Miembro eliminado','Deleted member');
+        const state=document.createElement('span');state.className='member-status';
+        state.dataset.state=item.status==='new'?'pending':'approved';
+        state.textContent=item.status==='new'?t('Nuevo','New'):t('Revisado','Reviewed');
+        const date=document.createElement('small');
+        date.textContent=new Date(item.created_at).toLocaleString(lang()==='en'?'en-US':'es-US',{dateStyle:'medium',timeStyle:'short'});
+        top.append(tool,who,state,date);
+        const text=document.createElement('p');text.className='feedback-text';text.textContent=item.message;
+        row.append(top,text);
+        const actions=document.createElement('div');actions.className='member-actions';
+        if(item.status==='new'){
+          const done=document.createElement('button');done.type='button';done.className='btn btn-primary';
+          done.textContent=t('Marcar como revisado','Mark as reviewed');
+          done.addEventListener('click',async()=>{
+            done.disabled=true;
+            const {error}=await client.from('member_feedback').update({status:'reviewed'}).eq('id',item.id);
+            done.disabled=false;
+            if(error){say('feedback-message',error.message,'error');return}
+            await loadFeedback();
+          });
+          actions.append(done);
+        }
+        const remove=document.createElement('button');remove.type='button';remove.className='btn';
+        remove.textContent=t('Eliminar','Delete');
+        remove.addEventListener('click',async()=>{
+          if(!confirm(t('¿Eliminar este comentario?','Delete this comment?')))return;
+          remove.disabled=true;
+          const {error}=await client.from('member_feedback').delete().eq('id',item.id);
+          remove.disabled=false;
+          if(error){say('feedback-message',error.message,'error');return}
+          await loadFeedback();
+        });
+        actions.append(remove);row.append(actions);list.append(row);
+      }
+      say('feedback-message',(data||[]).length?t('Comentarios actualizados.','Feedback loaded.'):filter.value==='new'?t('No hay comentarios nuevos.','No new feedback.'):t('Todavía no hay comentarios.','No feedback yet.'),'success');
+    }
+    filter.addEventListener('change',loadFeedback);
+    $('feedback-refresh')?.addEventListener('click',loadFeedback);
+    await loadFeedback();
   }
 })();

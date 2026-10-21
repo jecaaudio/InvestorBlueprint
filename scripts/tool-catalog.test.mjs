@@ -17,10 +17,9 @@ test('beta tools are offered only after beta access is confirmed',async()=>{
   const beta=tools.filter(tool=>tool.access==='beta').map(tool=>tool.id).sort();
   assert.deepEqual(beta,['automated_arv','rent','roi_search']);
   for(const tool of tools)assert.ok(tool.name_es&&tool.name_en,'Missing localized name: '+tool.id);
-  const dom=await render('<main><div class="tool-grid"></div><span id="free-feature-count"></span></main>');
+  const dom=await render('<main><div class="tool-grid"></div></main>');
   const d=dom.window.document,ids=()=>[...d.querySelectorAll('.tool-grid [data-tool-id]')].map(card=>card.dataset.toolId);
   assert.deepEqual(ids(),['flip','rental_cash_flow','arv_estimator','hard_money','seller_net']);
-  assert.match(d.getElementById('free-feature-count').textContent,/^5 /);
   assert.match(d.querySelector('[data-tool-id="flip"] h3').textContent,/Calculadora de Flip/);
   // A forged event without the confirmed flag shows nothing extra.
   d.dispatchEvent(new dom.window.CustomEvent('ib:beta-access',{detail:{allowed:true}}));
@@ -30,7 +29,6 @@ test('beta tools are offered only after beta access is confirmed',async()=>{
   const badge=d.querySelector('[data-tool-id="roi_search"] [data-tool-plan-badge]');
   assert.ok(badge.classList.contains('beta-tester'));
   assert.ok(d.querySelector('[data-tool-id="roi_search"]').classList.contains('is-beta-tool'));
-  assert.match(d.getElementById('free-feature-count').textContent,/^5 /,'beta tools are not counted as offered tools');
   dom.window.close();
 });
 

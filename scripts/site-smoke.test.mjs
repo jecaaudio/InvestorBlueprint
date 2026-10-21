@@ -70,13 +70,16 @@ test('mobile manifest and icon paths are valid',()=>{
 });
 
 test('public pages reference files present in the repository',()=>{
-  const pages=['index.html','login.html','admin.html','pricing.html','privacy.html',
+  const pages=['index.html','login.html','admin.html','pricing.html','privacy.html','terms.html','404.html',
     ...tools.map(x=>x.url.endsWith('/')?x.url+'index.html':x.url)];
   for(const page of pages){
     for(const match of read(page).matchAll(/(?:src|href)\s*=\s*["']([^"'#]+)["']/gi)){
       let target=match[1].split(/[?#]/)[0];
       if(!target||/^(https?:|mailto:|tel:|data:|javascript:|\/\/)/i.test(target))continue;
-      const resolved=path.normalize(path.join(path.dirname(page),target));
+      // Site-absolute paths ("/InvestorBlueprint/x") map to the repository root.
+      const siteRoot=target.startsWith('/InvestorBlueprint/');
+      if(siteRoot)target=target.slice('/InvestorBlueprint/'.length)||'index.html';
+      const resolved=path.normalize(siteRoot?target:path.join(path.dirname(page),target));
       const valid=existsSync(resolved)||(existsSync(path.join(resolved,'index.html')));
       assert.ok(valid, `Broken local reference ${page}: ${target}`);
     }

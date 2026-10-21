@@ -10,6 +10,8 @@ const pages = [
   '/account.html',
   '/admin.html',
   '/privacy.html',
+  '/terms.html',
+  '/404.html',
   '/calculadoras/venta.html',
   '/calculadoras/flip.html',
   '/calculadoras/rentas.html',

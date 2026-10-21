@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Administración de usuarios | InvestorBlueprint</title>
+<title data-es="Administración | InvestorBlueprint" data-en="Administration | InvestorBlueprint">Administración | InvestorBlueprint</title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="assets/css/site-theme.css?v=20261018">
@@ -61,10 +61,30 @@
   <div id="member-list" class="member-list" aria-live="polite"></div>
   <p class="access-note" data-es="Cada calculadora comprueba en el servidor que la cuenta esté aprobada antes de abrirse. Aprobar o suspender una cuenta se aplica en su próxima visita." data-en="Every calculator checks on the server that the account is approved before opening. Approving or suspending an account applies on its next visit.">Cada calculadora comprueba en el servidor que la cuenta esté aprobada antes de abrirse. Aprobar o suspender una cuenta se aplica en su próxima visita.</p>
  </div>
+ <section id="admin-feedback" class="card access-card" hidden aria-labelledby="feedback-heading">
+  <div class="admin-controls">
+   <div>
+    <h2 id="feedback-heading" data-es="Comentarios de los miembros" data-en="Member feedback">Comentarios de los miembros</h2>
+    <p class="access-note" data-es="Lo que envían los miembros con el botón «Enviar comentarios» de las calculadoras." data-en="What members send with the “Send feedback” button in the calculators.">Lo que envían los miembros con el botón «Enviar comentarios» de las calculadoras.</p>
+   </div>
+   <button type="button" class="btn" id="feedback-refresh" data-es="Actualizar" data-en="Refresh">Actualizar</button>
+  </div>
+  <div class="admin-controls">
+   <label><span data-es="Mostrar" data-en="Show">Mostrar</span>
+    <select id="feedback-filter">
+     <option value="new" data-es="Nuevos" data-en="New">Nuevos</option>
+     <option value="all" data-es="Todos" data-en="All">Todos</option>
+    </select>
+   </label>
+   <span><span data-es="Comentarios:" data-en="Comments:">Comentarios:</span> <strong id="feedback-total">0</strong></span>
+  </div>
+  <div id="feedback-message" class="access-message" role="status" hidden></div>
+  <div id="feedback-list" class="member-list" aria-live="polite"></div>
+ </section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js" integrity="sha384-xPW3QHswsICVC2mW6BFNwMbhpLkbZ133fKOhxNx3QGGgAOJfL3O9t8r2aWn1aez6" crossorigin="anonymous"></script>
 <script src="assets/js/member-auth-config.js?v=20261018-access2"></script>
-<script src="assets/js/member-access.js?v=20261019-recovery2"></script>
+<script src="assets/js/member-access.js?v=20261021-admin"></script>
 <script src="lang.js"></script>
 <script src="assets/js/member-i18n.js"></script>
 <script src="assets/js/site-theme.js?v=20261018"></script>

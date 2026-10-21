@@ -110,11 +110,6 @@
       toolGrid.append(createHomeCard(tool, messages));
     });
 
-    const freeCount = listed.filter((tool) => tool.access !== 'beta' && !getStatusMeta(tool.status).isPro).length;
-    const freeFeature = document.getElementById('free-feature-count');
-    if (freeFeature) {
-      freeFeature.textContent = `${freeCount} ${messages.toolsUnit || 'tools'}`;
-    }
   };
 
   const applyToolPage = (toolsById) => {
