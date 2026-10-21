@@ -16,7 +16,16 @@ jobs:
         with:
           node-version: 20
       - name: Test public routes, member forms and PWA assets
-        run: node --test scripts/site-smoke.test.mjs scripts/member-recovery.test.mjs scripts/flip-finance.test.mjs scripts/member-profile.test.mjs scripts/secure-tool-loader.test.mjs scripts/deploy-gate.test.mjs scripts/review-preview.test.mjs
+        run: node --test scripts/site-smoke.test.mjs scripts/member-recovery.test.mjs scripts/flip-finance.test.mjs scripts/member-profile.test.mjs scripts/secure-tool-loader.test.mjs scripts/deploy-gate.test.mjs scripts/member-resilience.test.mjs scripts/admin-navigation.test.mjs scripts/arv-provenance.test.mjs scripts/property-data.test.mjs scripts/review-preview.test.mjs
+
+      - name: Verify live protected endpoint refuses missing and forged credentials
+        run: node scripts/live-tool-denial.test.mjs
+
+      - name: Install locked DOM test dependencies
+        run: npm ci
+
+      - name: Verify expanded financial forms, seller patch and bilingual reports
+        run: node --test scripts/finance-dom.test.mjs scripts/seller-tax.test.mjs scripts/seller-validation.test.mjs scripts/arv-print.test.mjs scripts/arv-resilience.test.mjs
 
   quality-gates:
     runs-on: ubuntu-latest
@@ -50,6 +59,44 @@ jobs:
           done
           curl -fsS http://127.0.0.1:4173/InvestorBlueprint/index.html >/dev/null
           npm run qa:axe
+          node scripts/protected-brand-browser.test.mjs
 
       - name: Run Lighthouse CI assertions
         run: npm run qa:lighthouse
+
+      - name: Render bilingual print and PDF fixtures in native Chromium
+        run: node scripts/report-render-browser.mjs
+
+      - name: Preserve synthetic report previews for visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-report-previews
+          path: tmp/report-render-qa/
+          retention-days: 7
+
+  mobile-webkit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Safari WebKit engine and system dependencies
+        run: npx playwright install --with-deps webkit
+      - name: Verify member profile persistence in mobile WebKit
+        run: |
+          python3 -u -m http.server 4173 --bind 127.0.0.1 --directory .. &
+          SERVER_PID=$!
+          trap "kill $SERVER_PID" EXIT
+          for n in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4173/InvestorBlueprint/account.html >/dev/null; then break; fi
+            sleep 0.5
+          done
+          curl -fsS http://127.0.0.1:4173/InvestorBlueprint/account.html >/dev/null
+          node scripts/member-webkit.test.mjs

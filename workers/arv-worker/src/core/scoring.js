@@ -9,7 +9,19 @@ export function computeCompScore(subject, comp, options) {
 }
 
 export function confidenceFromComps(comps) {
-  if (!comps.length) return 0;
-  const avgScore = comps.reduce((sum, comp) => sum + comp.score, 0) / comps.length;
-  return Math.max(20, Math.min(98, Math.round(avgScore * 100)));
+  // Deprecated numeric field retained for older clients; never a probability.
+  return qualityFromComps(comps).qualityScore;
+}
+
+export function qualityFromComps(comps){
+ const sampleSize=comps.length;
+ if(!sampleSize)return {sampleSize:0,comparabilityScore:0,qualityScore:0,ppsfCv:null,status:'no_comps',statisticalConfidence:false};
+ const prices=comps.map(c=>c.pricePerSqft).filter(v=>Number.isFinite(v)&&v>0);
+ const mean=prices.reduce((sum,p)=>sum+p/Math.max(prices.length,1),0);
+ const relativeVariance=mean>0?prices.reduce((sum,p)=>sum+(p/mean-1)**2/Math.max(prices.length,1),0):null;
+ const cv=relativeVariance===null?null:Math.sqrt(relativeVariance);
+ const average=comps.reduce((sum,c)=>sum+Math.min(1,Math.max(0,Number(c.score)||0)),0)/sampleSize;
+ const comparabilityScore=Math.round(average*100);
+ const qualityScore=cv===null?0:Math.min(98,Math.round(comparabilityScore*Math.min(sampleSize/5,1)*Math.exp(-2.5*cv)));
+ return {sampleSize,comparabilityScore,qualityScore,ppsfCv:cv===null?null:Number(cv.toFixed(4)),status:sampleSize<3?'insufficient_comps':cv===null||cv>.2?'high_dispersion':'screening_only',statisticalConfidence:false};
 }
