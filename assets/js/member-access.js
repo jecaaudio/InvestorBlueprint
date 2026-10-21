@@ -155,6 +155,9 @@
         say('portal-message',t('Sesión iniciada. Consulta el estado de tu solicitud.','Signed in. Your request status is shown below.'),'success');
         login.reset();
         const profile=await updateAccount();
+        // Pending members may go back to pricing to subscribe; paying approves them.
+        if(new URLSearchParams(window.location.search).get('returnTo')==='/InvestorBlueprint/pricing.html'&&
+          ['pending','approved'].includes(profile?.access_status)){window.location.assign('pricing.html');return}
         if(profile?.access_status==='approved'){
           const raw=new URLSearchParams(window.location.search).get('returnTo')||'';
           const ok=raw.startsWith('/InvestorBlueprint/tools/')||raw.startsWith('/InvestorBlueprint/calculadora-venta/')||raw==='/InvestorBlueprint/account.html';

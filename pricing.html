@@ -1,76 +1,107 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pricing | InvestorBlueprint</title>
-    <meta
-      name="description"
-      content="InvestorBlueprint beta access is free. All tools are available during beta."
-    />
-    <link rel="canonical" href="https://jecaaudio.github.io/InvestorBlueprint/pricing.html" />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/css/cookie-banner.css" />
-    <link rel="stylesheet" href="assets/css/site-theme.css?v=20261018" />
-  <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg?v=1">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Precios | InvestorBlueprint</title>
+<meta name="description" content="Planes de InvestorBlueprint: calculadoras rápidas gratis y plan Pro con todas las calculadoras inmobiliarias completas, PDF con tu nombre y 7 días de prueba. En español e inglés.">
+<link rel="canonical" href="https://jecaaudio.github.io/InvestorBlueprint/pricing.html">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="assets/css/cookie-banner.css">
+<link rel="stylesheet" href="assets/css/site-theme.css?v=20261018">
+<link rel="stylesheet" href="assets/css/brand.css?v=20261019">
+<link rel="stylesheet" href="assets/css/landing.css?v=20261021">
+<link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg?v=1">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32.png?v=1">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/brand/apple-touch-icon.png?v=1">
 <link rel="manifest" href="manifest.webmanifest?v=1">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-title" content="InvestorBlueprint">
-<link rel="stylesheet" href="assets/css/brand.css?v=20261019">
 </head>
-  <body>
-    <header class="navbar">
-      <div class="brand-menu has-primary-nav">
-        <a class="logo home-link brand-lockup" href="index.html" aria-label="InvestorBlueprint - inicio"><img class="brand-icon" src="assets/brand/favicon.svg" width="45" height="45" alt="" aria-hidden="true"><span class="brand-name" aria-hidden="true"><span class="brand-name-investor">Investor</span><span class="brand-name-blueprint">Blueprint</span></span></a>
-        <div class="brand-dropdown" role="menu" aria-label="Quick navigation">
-          <a href="index.html#tools">Tools</a>
-          <a href="index.html#learn">Learn</a>
-          <a href="pricing.html" data-cta-click="Pricing">Pricing</a>
-          <a href="login.html">Login</a>
+<body data-page="pricing">
+<header class="navbar">
+  <div class="brand-menu has-primary-nav">
+    <a class="logo home-link brand-lockup" href="index.html" aria-label="InvestorBlueprint"><img class="brand-icon" src="assets/brand/favicon.svg" width="45" height="45" alt="" aria-hidden="true"><span class="brand-name" aria-hidden="true"><span class="brand-name-investor">Investor</span><span class="brand-name-blueprint">Blueprint</span></span></a>
+  </div>
+  <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" data-i18n="menuToggle">☰ Menú</button>
+  <nav id="primary-nav">
+    <a href="index.html#tools" data-i18n="navTools">Herramientas</a>
+    <a href="index.html#learn" data-i18n="navLearn">Aprender</a>
+    <a href="pricing.html" data-i18n="navPricing" aria-current="page">Precios</a>
+    <a href="login.html" data-i18n="navLogin" data-auth-link>Ingresar</a>
+  </nav>
+  <div class="lang-switcher" role="group" aria-label="Language selector">
+    <button type="button" class="lang-option" data-lang="en" aria-label="Switch to English"><img class="flag-emoji" src="assets/flags/us.svg" alt="" aria-hidden="true"> EN</button>
+    <button type="button" class="lang-option" data-lang="es" aria-label="Cambiar a Español"><img class="flag-emoji" src="assets/flags/es.svg" alt="" aria-hidden="true"> ES</button>
+  </div>
+</header>
+
+<main class="lp-main">
+  <section class="lp-section pr-intro">
+    <p class="lp-eyebrow" data-es="Precios" data-en="Pricing">Precios</p>
+    <h1 data-es="Analiza más propiedades por menos de lo que cuesta un error de cálculo." data-en="Analyze more properties for less than one costly miscalculation.">Analiza más propiedades por menos de lo que cuesta un error de cálculo.</h1>
+    <p class="lp-lead" data-es="Usa las calculadoras rápidas gratis, sin cuenta. Cuando quieras el detalle completo y PDF con tu nombre, pasa a Pro." data-en="Use the quick calculators free, no account needed. When you want the full detail and PDFs with your name, move to Pro.">Usa las calculadoras rápidas gratis, sin cuenta. Cuando quieras el detalle completo y PDF con tu nombre, pasa a Pro.</p>
+    <p id="pricing-beta-note" class="pr-beta" data-es="Durante la beta, todas las calculadoras son gratis con una cuenta aprobada. Los planes de pago se activarán pronto." data-en="During the beta, every calculator is free with an approved account. Paid plans will open soon.">Durante la beta, todas las calculadoras son gratis con una cuenta aprobada. Los planes de pago se activarán pronto.</p>
+  </section>
+
+  <section class="pr-plans" aria-label="Planes">
+    <article class="pr-plan">
+      <h2 data-es="Gratis" data-en="Free">Gratis</h2>
+      <p class="pr-price"><strong>$0</strong></p>
+      <ul>
+        <li data-es="Calculadoras rápidas de venta, flip, rentas, ARV y hard money" data-en="Quick seller net, flip, rental, ARV and hard money calculators">Calculadoras rápidas de venta, flip, rentas, ARV y hard money</li>
+        <li data-es="Sin cuenta y sin tarjeta" data-en="No account and no card">Sin cuenta y sin tarjeta</li>
+        <li data-es="En español e inglés" data-en="In Spanish and English">En español e inglés</li>
+      </ul>
+      <a class="btn" href="calculadoras/venta.html" data-es="Probar las calculadoras" data-en="Try the calculators">Probar las calculadoras</a>
+    </article>
+
+    <article class="pr-plan featured">
+      <div class="pr-plan-head">
+        <h2>Pro</h2>
+        <div class="pr-toggle" role="group" aria-label="Facturación">
+          <button type="button" id="billing-monthly" aria-pressed="true" data-es="Mensual" data-en="Monthly">Mensual</button>
+          <button type="button" id="billing-yearly" aria-pressed="false" data-es="Anual" data-en="Yearly">Anual</button>
         </div>
       </div>
-      <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
-        ☰ Menu
-      </button>
-      <nav id="primary-nav">
-        <a href="index.html#tools">Tools</a>
-        <a href="index.html#learn">Learn</a>
-        <a href="pricing.html" data-cta-click="Pricing">Pricing</a>
-        <a href="login.html">Login</a>
-      </nav>
-    </header>
+      <p class="pr-price"><strong id="pro-price">$19</strong> <span id="pro-period" data-es="/ mes" data-en="/ month">/ mes</span></p>
+      <p class="pr-save" id="pro-save" hidden data-es="2 meses gratis al año" data-en="2 months free per year">2 meses gratis al año</p>
+      <ul>
+        <li data-es="Todas las calculadoras completas" data-en="Every full calculator">Todas las calculadoras completas</li>
+        <li data-es="Impuesto de transferencia por estado en la calculadora de venta" data-en="State transfer tax in the seller net calculator">Impuesto de transferencia por estado en la calculadora de venta</li>
+        <li data-es="Préstamos hard money con desembolsos y puntos" data-en="Hard money loans with draws and points">Préstamos hard money con desembolsos y puntos</li>
+        <li data-es="PDF con tu nombre y empresa, en español o inglés" data-en="PDFs with your name and company, in Spanish or English">PDF con tu nombre y empresa, en español o inglés</li>
+        <li data-es="7 días de prueba; cancela cuando quieras" data-en="7-day trial; cancel anytime">7 días de prueba; cancela cuando quieras</li>
+      </ul>
+      <a class="btn btn-primary" id="pro-cta" href="login.html" data-es="Solicitar acceso gratis" data-en="Request free access">Solicitar acceso gratis</a>
+      <p class="pr-fine" id="pro-fine" data-es="El pago lo procesa Stripe. No guardamos los datos de tu tarjeta." data-en="Payments are processed by Stripe. We never store your card details.">El pago lo procesa Stripe. No guardamos los datos de tu tarjeta.</p>
+    </article>
+  </section>
 
-    <main>
-      <section class="section">
-        <div class="section-heading">
-          <h1>Beta access (FREE)</h1>
-          <p>Membership is currently free during beta. A verified login and administrator approval are required to use the tools.</p>
-        </div>
-        <div class="pricing-grid">
-          <article class="price-card featured">
-            <span class="badge free">BETA (FREE)</span>
-            <h2>Access by approval during beta</h2>
-            <p>Request a free account. Your calculator access is enabled after the administrator approves your request.</p>
-            <ul class="article-list">
-              <li>Tools become available after an approved login.</li>
-              <li>No paid plan is required during beta.</li>
-              <li>Request Access creates an account and places it in the approval queue.</li>
-            </ul>
-            <a class="btn btn-primary" href="login.html" data-cta-click="Request Access">Request Access</a>
-          </article>
-        </div>
-      </section>
-    </main>
+  <section class="lp-section">
+    <h2 data-es="Preguntas frecuentes" data-en="Frequently asked questions">Preguntas frecuentes</h2>
+    <div class="lp-faq">
+      <details><summary data-es="¿Puedo cancelar cuando quiera?" data-en="Can I cancel anytime?">¿Puedo cancelar cuando quiera?</summary><p data-es="Sí. Administras o cancelas tu suscripción desde Mi perfil. Conservas el acceso hasta el final del periodo pagado." data-en="Yes. Manage or cancel your subscription from My profile. You keep access until the end of the paid period.">Sí. Administras o cancelas tu suscripción desde Mi perfil. Conservas el acceso hasta el final del periodo pagado.</p></details>
+      <details><summary data-es="¿Qué pasa al terminar la prueba?" data-en="What happens after the trial?">¿Qué pasa al terminar la prueba?</summary><p data-es="Si no cancelas antes del día 7, se cobra el plan que elegiste. Te avisamos por correo antes del cobro." data-en="If you don't cancel before day 7, the plan you chose is charged. We email you before the charge.">Si no cancelas antes del día 7, se cobra el plan que elegiste. Te avisamos por correo antes del cobro.</p></details>
+      <details><summary data-es="¿Los cálculos son confiables?" data-en="Can I trust the math?">¿Los cálculos son confiables?</summary><p data-es="Cada fórmula se comprueba con casos resueltos a mano y pruebas automáticas. Son estimaciones para decidir mejor; los montos finales los confirman tu prestamista y la compañía de título." data-en="Every formula is checked against hand-worked cases and automated tests. They are estimates for better decisions; your lender and title company confirm final amounts.">Cada fórmula se comprueba con casos resueltos a mano y pruebas automáticas. Son estimaciones para decidir mejor; los montos finales los confirman tu prestamista y la compañía de título.</p></details>
+    </div>
+  </section>
+</main>
 
-    <script src="assets/js/config.js"></script>
-    <script src="assets/js/cookie-banner-component.js"></script>
-    <script src="assets/js/consent.js"></script>
-    <script src="assets/js/analytics-ga4.js"></script>
-    <script src="assets/js/meta-pixel.js"></script>
-    <script src="assets/js/analytics.js"></script>
-    <script src="script.js"></script>
-    <script src="assets/js/site-theme.js?v=20261018"></script>
-  </body>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/cookie-banner-component.js"></script>
+<script src="assets/js/consent.js"></script>
+<script src="assets/js/analytics-ga4.js"></script>
+<script src="assets/js/meta-pixel.js"></script>
+<script src="assets/js/analytics.js"></script>
+<script src="assets/js/track-events.js"></script>
+<script src="lang.js"></script>
+<script src="assets/js/member-i18n.js"></script>
+<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js" integrity="sha384-xPW3QHswsICVC2mW6BFNwMbhpLkbZ133fKOhxNx3QGGgAOJfL3O9t8r2aWn1aez6" crossorigin="anonymous"></script>
+<script src="assets/js/member-auth-config.js?v=20261018-access2"></script>
+<script src="assets/js/billing-config.js?v=20261021"></script>
+<script src="assets/js/pricing.js?v=20261021"></script>
+<script src="assets/js/site-theme.js?v=20261018"></script>
+</body>
 </html>

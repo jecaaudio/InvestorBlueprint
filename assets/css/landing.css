@@ -40,3 +40,23 @@
 .lp-related a{border:1px solid var(--site-border);border-radius:999px;padding:6px 12px;text-decoration:none;color:var(--text);background:var(--panel);font-size:.9rem}
 @media(max-width:820px){.lp-hero{grid-template-columns:1fr}.lp-grid{grid-template-columns:1fr}}
 @media(max-width:420px){.lp-fields{grid-template-columns:1fr}}
+
+/* Pricing page */
+.pr-intro h1{margin:0;font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.1;letter-spacing:-.03em;color:var(--text);text-wrap:balance;max-width:22ch}
+.pr-beta{margin:0;padding:10px 14px;border-radius:10px;background:#fdf1d8;color:#6b4500;border:1px solid #f0d49a;font-size:.94rem;max-width:70ch}
+html[data-theme="dark"] .pr-beta{background:#3a2c0e;color:#f5d48f;border-color:#6b5320}
+.pr-plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+.pr-plan{background:var(--panel);border:1px solid var(--site-border);border-radius:18px;padding:22px;display:grid;gap:12px;box-shadow:var(--site-shadow)}
+.pr-plan.featured{border:2px solid var(--primary)}
+.pr-plan h2{margin:0;font-size:1.3rem;color:var(--text)}
+.pr-plan-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.pr-price{margin:0;color:var(--muted)}
+.pr-price strong{font-size:2.3rem;color:var(--text);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.pr-save{margin:0;font-weight:700;color:var(--primary)}
+.pr-plan ul{margin:0;padding-left:1.2em;display:grid;gap:6px;color:var(--text)}
+.pr-plan .btn{justify-self:start}
+.pr-fine{margin:0;font-size:.82rem;color:var(--muted)}
+.pr-toggle{display:inline-flex;border:1px solid var(--site-border);border-radius:9px;overflow:hidden}
+.pr-toggle button{border:0;background:transparent;color:var(--muted);padding:6px 12px;font:inherit;font-size:.86rem;font-weight:700;cursor:pointer}
+.pr-toggle button[aria-pressed="true"]{background:var(--site-soft);color:var(--primary)}
+@media(max-width:760px){.pr-plans{grid-template-columns:1fr}}
