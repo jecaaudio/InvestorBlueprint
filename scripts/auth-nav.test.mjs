@@ -68,3 +68,12 @@ test('the project in site-config matches the login configuration',()=>{
   const auth=/https:\/\/([a-z0-9]+)\.supabase\.co/.exec(fs.readFileSync('assets/js/member-auth-config.js','utf8'))?.[1];
   assert.ok(ref);assert.equal(ref,auth);
 });
+
+test('a menu that already has My profile hides "Ingresar" instead of repeating it',()=>{
+  const {dom}=open('index.html',{saved:session});
+  const menu=dom.window.document.querySelector('.brand-menu');
+  const visible=[...menu.querySelectorAll('a')].filter(a=>!a.hidden).map(a=>a.textContent.trim());
+  assert.equal(visible.filter(text=>text==='Mi perfil').length,1);
+  assert.ok(!visible.includes('Ingresar'));
+  dom.window.close();
+});

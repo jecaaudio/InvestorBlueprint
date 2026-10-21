@@ -1,5 +1,5 @@
 /* Header "Ingresar" link: becomes "Mi perfil" while this browser holds a member session,
- * so a signed-in person can tell they are signed in (and why admin shortcuts may show).
+ * so a signed-in person can tell they are signed in.
  * It only reads the saved Supabase session; pages that need access still check on the server. */
 (function () {
   'use strict';
@@ -23,6 +23,12 @@
     if (!signedIn()) return;
     const english = (document.documentElement.lang || '').toLowerCase().startsWith('en');
     document.querySelectorAll('.navbar a[data-i18n="navLogin"], .navbar a[data-i18n="navAccount"][data-auth-nav]').forEach((link) => {
+      // A menu that already links to My profile just drops "Ingresar" instead of repeating it.
+      if (link.parentElement?.querySelector('a[href$="account.html"]:not([data-auth-nav])')) {
+        link.hidden = true;
+        link.dataset.authNav = 'hidden';
+        return;
+      }
       link.href = link.getAttribute('href').replace(/login\.html.*$/, 'account.html');
       link.dataset.i18n = 'navAccount';
       link.dataset.authNav = 'account';

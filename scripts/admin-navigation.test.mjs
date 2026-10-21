@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
 
 const code=readFileSync('assets/js/member-navigation.js','utf8');
 async function navigation({role='member',status='approved',signedIn=true}={}){
@@ -28,18 +28,22 @@ async function navigation({role='member',status='approved',signedIn=true}={}){
   await new Promise(resolve=>setImmediate(resolve));
   return links;
 }
-test('approved admin sees both menu and main navigation shortcuts',async()=>{
+test('no page menu ever links to administration, not even for the approved owner',async()=>{
   const l=await navigation({role:'admin',status:'approved'});
-  assert.equal(l['index-admin-link'].hidden,false);
-  assert.equal(l['primary-admin-link'].hidden,false);
-});
-test('members and suspended admins cannot see administrative links',async()=>{
-  for(const input of [{role:'member',status:'approved'},{role:'admin',status:'suspended'},
-    {role:'admin',status:'pending'},{role:'admin',status:'approved',signedIn:false}]){
-    const l=await navigation(input);
-    assert.equal(l['index-admin-link'].hidden,true);
-    assert.equal(l['primary-admin-link'].hidden,true);
+  assert.equal(l['index-admin-link'].hidden,true,'menu script never reveals admin links');
+  assert.doesNotMatch(code,/admin-link|admin\.html/);
+  const pages=['index.html','login.html','account.html','pricing.html','privacy.html','terms.html','404.html',
+    ...readdirSync('calculadoras').filter(f=>f.endsWith('.html')).map(f=>'calculadoras/'+f)];
+  for(const page of pages){
+    const html=readFileSync(page,'utf8');
+    const menus=[...html.matchAll(/<header[\s\S]*?<\/header>/gi)].map(m=>m[0]).join('');
+    assert.doesNotMatch(menus,/admin\.html|Administraci[oó]n/,page+' header');
   }
+  // The only way in is the button inside My profile, shown to the approved owner.
+  const account=readFileSync('account.html','utf8');
+  assert.equal((account.match(/href="admin\.html"/g)||[]).length,1);
+  assert.match(account,/id="account-admin-button"[^>]*hidden/);
+  assert.match(readFileSync('assets/js/account-settings.js','utf8'),/isAdmin=profile\.role==='admin'&&profile\.access_status==='approved'/);
 });
 
 async function betaAccess({role='member',status='approved',betaTester=false,betaColumn=true,catalog=true}={}){

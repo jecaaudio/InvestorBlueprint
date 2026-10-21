@@ -7,23 +7,23 @@ const read=path=>readFileSync(path,'utf8');
 
 test('account route is published and connects to authenticated settings',()=>{
  const html=read('account.html'),deploy=read('.github/workflows/deploy-pages.yml');
- for(const id of ['account-content','account-login-needed','account-settings-form','account-admin-button','account-admin-link','setting-display-name','setting-company-name','setting-interface-language','setting-document-language','setting-report-detail','setting-notes-detail','account-signout']){
+ for(const id of ['account-content','account-login-needed','account-settings-form','account-admin-button','setting-display-name','setting-company-name','setting-interface-language','setting-document-language','setting-report-detail','setting-notes-detail','account-signout']){
    assert.ok(html.includes('id="'+id+'"'),id+' missing');
  }
  assert.ok(deploy.includes('admin.html account.html pricing.html'), 'Profile must be present in Pages artifact');
  assert.ok(deploy.includes('test -f public-site/account.html'));
 });
 
-test('all approved members including admin return to normal member profile with admin shortcut',()=>{
+test('all approved members including admin return to normal member profile; admin is reached from it',()=>{
  const code=read('assets/js/member-access.js');
  assert.ok(code.includes("window.location.assign('account.html')"));
  assert.ok(code.includes("raw==='/InvestorBlueprint/account.html'"));
- assert.ok(code.includes("profile.role==='admin'&&profile.access_status==='approved'"));
+ assert.ok(code.includes("profile.role!=='admin'||profile.access_status!=='approved'"),'the admin page itself refuses anyone but the approved owner');
  assert.ok(read('admin.html').includes('href="account.html"'));
  assert.ok(read('index.html').includes('href="account.html"'));
- assert.ok(read('index.html').includes('id="index-admin-link"'));
- assert.ok(read('index.html').includes('id="primary-admin-link"'));
- assert.ok(read('assets/js/member-navigation.js').includes("profile?.role==='admin'&&profile.access_status==='approved'"));
+ assert.ok(!read('index.html').includes('admin.html'),'the home page never links to administration');
+ assert.ok(!read('login.html').includes('admin.html'),'sign-in sends the owner to My profile, not to administration');
+ assert.ok(read('account.html').includes('id="account-admin-button"'));
 });
 
 test('preferences migration never permits anonymous access or writes to another member',()=>{

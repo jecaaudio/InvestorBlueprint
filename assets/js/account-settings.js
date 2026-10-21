@@ -79,7 +79,6 @@
      const status={approved:t('Cuenta aprobada','Account approved'),pending:t('Pendiente de aprobación','Awaiting approval'),rejected:t('Solicitud rechazada','Request declined'),suspended:t('Cuenta suspendida','Account suspended')};
      $('account-status').textContent=status[profile.access_status]||profile.access_status;
      const isAdmin=profile.role==='admin'&&profile.access_status==='approved';
-     $('account-admin-link').hidden=!isAdmin;
      $('account-admin-button').hidden=!isAdmin;
      $('account-loading').hidden=true;
      $('account-content').hidden=false;
