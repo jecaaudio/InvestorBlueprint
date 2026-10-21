@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "test": "node --test scripts/*.test.mjs",
     "qa:axe": "node scripts/axe-check.mjs",
     "qa:lighthouse": "node scripts/run-lighthouse.mjs"
   },

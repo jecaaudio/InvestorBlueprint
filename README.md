@@ -35,16 +35,21 @@ Luego abre:
 - `http://localhost:4173/InvestorBlueprint/` si estas sirviendo desde la carpeta padre.
 - `http://localhost:4173/` si estas sirviendo desde la carpeta del proyecto.
 
-## Quality gates (CI)
+## Pruebas y quality gates (CI)
 
-El workflow `.github/workflows/quality-gates.yml` ejecuta:
+El workflow `.github/workflows/quality.yml` corre en cada push y pull request:
 
-- Pruebas de accesibilidad con `axe` en paginas clave.
-- Auditoria de Lighthouse con minimos de performance, accesibilidad, best-practices y SEO.
+- **Pruebas unitarias y de estructura** (`npm test`): ejecuta todos los archivos `scripts/*.test.mjs` (rutas protegidas, recuperación de contraseña, finanzas del flip, perfiles, despliegue, etc.).
+- **Accesibilidad** con `axe` en páginas clave.
+- **Lighthouse** con mínimos de performance, accesibilidad, best-practices y SEO.
+
+GitHub Pages solo publica un commit si este workflow pasó en ese mismo commit (ver `.github/workflows/deploy-pages.yml`).
 
 Para ejecutarlos localmente:
 
 ```bash
+npm test            # no necesita instalar dependencias
+
 npm install
 npx playwright install chromium
 python -m http.server 4173
@@ -57,6 +62,12 @@ Si estas sirviendo desde la carpeta del proyecto y no desde la carpeta padre, ej
 ```bash
 AXE_SITE_BASE_PATH= npm run qa:axe
 ```
+
+El worker ARV (`workers/arv-worker`) tiene sus propias pruebas: `cd workers/arv-worker && npm test`.
+
+## SDK de Supabase
+
+Todas las páginas cargan la misma versión fija del SDK (`@supabase/supabase-js@2.117.0`) con un hash de integridad (`integrity="sha384-..."`). Si el CDN entrega un archivo distinto, el navegador no lo ejecuta. Para actualizar la versión, cambia la URL y el hash juntos en todas las páginas y en `scripts/site-smoke.test.mjs`; la prueba falla si alguna página queda distinta.
 
 ## Acceso y seguridad (octubre de 2026)
 

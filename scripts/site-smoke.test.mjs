@@ -9,6 +9,10 @@ const knownToolNames = new Set([
   'flip','rental','rent','arv-estimator','automated-arv',
   'hard-money','roi-search','seller-net'
 ]);
+// Exact SDK build plus its Subresource Integrity hash. If the CDN ever serves
+// different bytes, the browser refuses to run it. Update all three together.
+const SUPABASE_SDK_SCRIPT='<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js" integrity="sha384-xPW3QHswsICVC2mW6BFNwMbhpLkbZ133fKOhxNx3QGGgAOJfL3O9t8r2aWn1aez6" crossorigin="anonymous"></script>';
+const SITE_PAGES=['index.html','login.html','account.html','admin.html','calculadora-venta/index.html'];
 function publicPageRef(file) {
   const html=read(file);
   const match=html.match(/data-tool="([^"]+)"/);
@@ -25,12 +29,22 @@ test('all eight calculator routes are wrappers, not embedded calculators',()=>{
     assert.ok(existsSync(file), `Missing tool route ${file}`);
     const {html,tool:serverName}=publicPageRef(file);
     assert.ok(html.includes('secure-tool-loader.js'), `Missing signed-in loader ${file}`);
-    assert.ok(html.includes('supabase-js@2'), `Missing Supabase SDK ${file}`);
+    assert.ok(html.includes(SUPABASE_SDK_SCRIPT), `Missing pinned Supabase SDK ${file}`);
     assert.ok(html.length<6000,`Tool implementation accidentally embedded in ${file}`);
     assert.ok(!html.includes('function calculateFlip')&&!html.includes('STATE_JURISDICTIONS'));
     seen.add(serverName);
   }
   assert.equal(seen.size,8);
+});
+
+test('every page loads the same pinned, integrity-checked Supabase SDK',()=>{
+  const pages=[...SITE_PAGES,...tools.map(t=>t.url.endsWith('/')?t.url+'index.html':t.url)];
+  for(const file of pages){
+    const html=read(file);
+    const sdkTags=html.match(/<script[^>]*supabase-js[^>]*>/g)||[];
+    assert.equal(sdkTags.length,1,`Expected one Supabase SDK tag in ${file}`);
+    assert.ok(html.includes(SUPABASE_SDK_SCRIPT),`Supabase SDK must be pinned with integrity in ${file}`);
+  }
 });
 
 test('password recovery and administrator pages contain required controls',()=>{
