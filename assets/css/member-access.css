@@ -33,6 +33,8 @@
 .member-actions{display:flex;gap:8px;flex-wrap:wrap}
 .member-actions select{padding:9px;border:1px solid var(--site-border,var(--border));border-radius:8px;min-width:165px}
 .member-actions button{align-self:center}
+.member-beta{display:flex;align-items:center;gap:6px;flex-basis:100%;font-size:.9rem;color:var(--muted,#5b6d80);cursor:pointer}
+.member-beta input{width:18px;height:18px;accent-color:#b7791f}
 .admin-controls{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:15px 0}
 .admin-controls select{min-height:40px;padding:8px;border-radius:8px}
 @media(max-width:780px){.access-grid{grid-template-columns:minmax(0,1fr)}.access-hero{padding:20px}.access-card{padding:18px!important}.member-row{align-items:stretch}.member-actions{width:100%}.member-actions select{flex:1}}

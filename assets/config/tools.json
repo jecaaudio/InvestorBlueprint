@@ -26,10 +26,10 @@
     "name_en": "Rent Calculator",
     "url": "tools/rent-calculator.html",
     "status": "beta_free",
-    "listed": false,
-    "hidden_reason": "merge_into_rental",
     "description_es": "Estima renta sugerida, ingreso anual y rendimiento con supuestos de ocupación avanzados.",
-    "description_en": "Estimate suggested rent, annual income, and yield with advanced occupancy assumptions."
+    "description_en": "Estimate suggested rent, annual income, and yield with advanced occupancy assumptions.",
+    "access": "beta",
+    "beta_reason": "merge_into_rental"
   },
   {
     "id": "arv_estimator",
@@ -48,10 +48,10 @@
     "name_en": "Automated ARV Tool",
     "url": "tools/arv/",
     "status": "beta_free",
-    "listed": false,
-    "hidden_reason": "needs_live_data",
     "description_es": "Genera estimación automatizada de ARV con reporte estructurado y análisis de confianza.",
-    "description_en": "Generate an automated ARV estimate with a structured report and confidence analysis."
+    "description_en": "Generate an automated ARV estimate with a structured report and confidence analysis.",
+    "access": "beta",
+    "beta_reason": "needs_live_data"
   },
   {
     "id": "hard_money",
@@ -70,10 +70,10 @@
     "name_en": "ROI Search",
     "url": "tools/roi-search.html",
     "status": "beta_free",
-    "listed": false,
-    "hidden_reason": "simulated_data",
     "description_es": "Filtra propiedades simuladas por retorno objetivo, ubicación y tipo de activo.",
-    "description_en": "Filter simulated properties by target return, location, and asset type."
+    "description_en": "Filter simulated properties by target return, location, and asset type.",
+    "access": "beta",
+    "beta_reason": "simulated_data"
   },
   {
     "id": "seller_net",

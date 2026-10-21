@@ -68,6 +68,15 @@ El worker ARV (`workers/arv-worker`) tiene sus propias pruebas: `cd workers/arv-
 
 Todas las páginas cargan la misma versión fija del SDK (`@supabase/supabase-js@2.117.0`) con un hash de integridad (`integrity="sha384-..."`). Si el CDN entrega un archivo distinto, el navegador no lo ejecuta. Para actualizar la versión, cambia la URL y el hash juntos en todas las páginas y en `scripts/site-smoke.test.mjs`; la prueba falla si alguna página queda distinta.
 
+## Modo beta tester
+
+Tres herramientas siguen en pruebas: **Búsqueda por ROI** (datos simulados), **ARV automático** (sin proveedor de datos real) y **Renta sugerida** (se fusionará con Flujo de renta). En `assets/config/tools.json` tienen `"access": "beta"`.
+
+- Solo las ven y las abren el administrador y los miembros marcados como **beta tester**. Para los demás no aparecen en el catálogo, y si abren el enlace ven un aviso en lugar de la herramienta.
+- El administrador marca o desmarca a cada miembro en `admin.html` con la casilla **Beta tester**.
+- **Paso único en Supabase:** aplicar `supabase/migrations/20261021120000_beta_testers.sql` (SQL Editor o `supabase db push`). Agrega la columna `beta_tester`, que solo el administrador puede cambiar, y la función `private.has_beta_access()`. Hasta aplicarla, el administrador ya tiene acceso beta y la casilla aparece desactivada con un aviso. Reversión: `supabase/rollback/beta_testers.sql`. Pruebas: `supabase/tests/beta-testers.sql`.
+- Para bloquear también desde el servidor, la Edge Function `ib-protected-tools` puede llamar a `private.has_beta_access()` antes de entregar `roi-search`, `rent` y `automated-arv`. Hoy esa comprobación la hace el navegador.
+
 ## Acceso y seguridad (octubre de 2026)
 
 - InvestorBlueprint usa Supabase Auth (correo y contraseña), perfiles de usuarios con aprobación administrativa y políticas RLS.

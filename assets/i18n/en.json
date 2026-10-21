@@ -346,5 +346,6 @@
   "cookieRejectAll": "Reject all",
   "cookieSavePreferences": "Save preferences",
   "cookieAcceptAll": "Accept all",
-  "rentAssumptions": "Target yield is GROSS; annual expenses are only deducted from the displayed net income."
+  "rentAssumptions": "Target yield is GROSS; annual expenses are only deducted from the displayed net income.",
+  "betaTesterLabel": "BETA TESTER"
 }

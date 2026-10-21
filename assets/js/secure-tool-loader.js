@@ -57,6 +57,29 @@
       auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
     const {data:{session},error}=await client.auth.getSession();
     if(error||!session?.access_token){window.location.replace(loginURL.href);return;}
+    // Beta tools open only for the approved owner or members the owner marked as beta testers.
+    if(script?.dataset.beta==='true'){
+      let allowed=false;
+      try{
+        const {data:profile,error:profileError}=await client.from('member_profiles')
+          .select('role,access_status').eq('id',session.user.id).maybeSingle();
+        if(!profileError&&profile?.access_status==='approved'){
+          if(profile.role==='admin')allowed=true;
+          else{
+            const {data:beta,error:betaError}=await client.from('member_profiles')
+              .select('beta_tester').eq('id',session.user.id).maybeSingle();
+            allowed=!betaError&&beta?.beta_tester===true;
+          }
+        }
+      }catch(betaCheckError){allowed=false}
+      if(!allowed){
+        let english=false;
+        try{english=localStorage.getItem('preferredLanguage')==='en'}catch(storageError){}
+        say(english?'This tool is in testing and only available to approved beta testers.'
+          :'Esta herramienta está en fase de pruebas y solo está disponible para probadores autorizados.');
+        return;
+      }
+    }
     const endpoint=cfg.supabaseUrl+'/functions/v1/ib-protected-tools?tool='+encodeURIComponent(tool);
     const response=await fetch(endpoint,{method:'GET',cache:'no-store',
       headers:{Authorization:'Bearer '+session.access_token,apikey:cfg.supabaseAnonKey,Accept:'text/html'}});

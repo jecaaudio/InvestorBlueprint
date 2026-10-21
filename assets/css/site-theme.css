@@ -77,6 +77,10 @@ nav a:hover,.brand-dropdown a:hover{color:var(--primary)!important}
 .tool-grid>.card p{margin:0;flex:1}
 .tool-grid>.card .card-btn{align-self:flex-start;margin-top:auto}
 .badge.free{background:var(--site-soft)!important;color:var(--primary)!important;border:1px solid var(--site-border)}
+/* Beta tools are visible only to approved testers; mark them clearly. */
+.badge.free.beta-tester{background:#fdf1d8!important;color:#8a5a00!important;border-color:#f0d49a!important}
+html[data-theme="dark"] .badge.free.beta-tester{background:#3a2c0e!important;color:#f5c66a!important;border-color:#6b5320!important}
+.tool-grid>.card.is-beta-tool{border-style:dashed!important}
 .price-card.featured{border-color:var(--primary)!important;box-shadow:var(--site-shadow)!important}
 .comparison-table-wrap{background:var(--panel)!important;border-color:var(--site-border)!important}
 .comparison-table th{color:var(--text)}

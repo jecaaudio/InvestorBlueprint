@@ -18,10 +18,13 @@ try {
           getSession:async()=>({data:{session:{user:{id:'fixture-user'},access_token:'fixture-only'}},error:null}),
           signOut:async()=>({error:null})
         },
-        from:()=>({
+        // The fixture member is the approved owner, so beta tools (Automated ARV) open too.
+        from:table=>({
           select(){return this},
           eq(){return this},
-          maybeSingle:async()=>({data:{display_name:'Fixture',company_name:'Fixture LLC',document_language:'es',report_detail:'detailed',notes_detail:'detailed'},error:null})
+          maybeSingle:async()=>table==='member_profiles'
+            ?{data:{role:'admin',access_status:'approved'},error:null}
+            :{data:{display_name:'Fixture',company_name:'Fixture LLC',document_language:'es',report_detail:'detailed',notes_detail:'detailed'},error:null}
         })
       })};
     });
