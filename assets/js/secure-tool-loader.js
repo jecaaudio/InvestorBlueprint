@@ -40,8 +40,9 @@
     // A failed RLS/network lookup must not leak a former user's name/company.
     const safeDefaults={
       ib_display_name:'',ib_company_name:'',ib_document_language:'es',
-      ib_report_detail:'detailed',ib_notes_detail:'detailed'
+      ib_report_detail:'detailed',ib_notes_detail:'detailed',preferredLanguage:'es'
     };
+    let reportPreferences={...safeDefaults};
     try{
       for(const [key,value] of Object.entries(safeDefaults))localStorage.setItem(key,value);
     }catch(error){console.warn('Local report preferences are unavailable')}
@@ -56,19 +57,48 @@
           document_language:'es',report_detail:'detailed',notes_detail:'detailed'};
         const settings={
           ib_display_name:p.display_name||'',ib_company_name:p.company_name||'',
+          preferredLanguage:p.interface_language==='en'?'en':'es',
           ib_document_language:p.document_language==='en'?'en':'es',
           ib_report_detail:p.report_detail==='summary'?'summary':'detailed',
           ib_notes_detail:p.notes_detail==='summary'?'summary':'detailed'
         };
+        reportPreferences={...settings};
         for(const [key,value] of Object.entries(settings))localStorage.setItem(key,value);
       }
     }catch(error){console.warn('Member report preferences could not be synced',error)}
     let markup=await response.text();
     if(!/^<!doctype html>/i.test(markup.trim())||markup.length<1200)throw Error('Unexpected protected page');
+    // Per-document preferences survive disabled storage and cannot be replaced by another tab's account.
+    const snapshot=JSON.stringify(reportPreferences).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
+    markup=markup.replace(/<\/head>/i,'<script>window.IB_REPORT_PREFERENCES=Object.freeze('+snapshot+');</script></head>');
+    if(tool==='seller-net'){
+      const userId=session.user?.id;
+      if(typeof userId!=='string'||!/^[a-z0-9_-]{1,80}$/i.test(userId))throw Error('Invalid member identity');
+      // Keep legacy data intact, but never adopt unowned browser financial data into a member account.
+      const oldKey="const storageKey='seller-net-multistate-2026-v1';";
+      if(!markup.includes(oldKey))throw Error('Seller data storage contract changed');
+      markup=markup.replace(oldKey,'const storageKey='+JSON.stringify('seller-net-multistate-2026-v1:'+userId)+';');
+      markup=markup.replace("const uiLangKey='seller-net-ui-lang',uiThemeKey='seller-net-ui-theme';",
+        'const uiLangKey='+JSON.stringify('seller-net-ui-lang:'+userId)+',uiThemeKey='+JSON.stringify('seller-net-ui-theme:'+userId)+';');
+    }
     if(assetBase){
       const url=new URL(assetBase,window.location.href);
       markup=markup.replace(/<head(\s[^>]*)?>/i,(match)=>match+'<base href="'+url.href+'">');
     }
+    // An authorization response must not finish rendering after another tab changes accounts.
+    let accountChanged=false;
+    const closeOldDocument=()=>{
+      accountChanged=true;
+      if(document.body)document.body.replaceChildren();
+      window.IB_REPORT_PREFERENCES=Object.freeze({...safeDefaults});
+      window.location.replace(loginURL.href);
+    };
+    client.auth.onAuthStateChange?.((event,nextSession)=>{
+      if(event==='SIGNED_OUT'||(nextSession?.user?.id&&nextSession.user.id!==session.user.id))closeOldDocument();
+    });
+    const {data:current,error:currentError}=await client.auth.getSession();
+    if(currentError||!current?.session?.user||current.session.user.id!==session.user.id){closeOldDocument();return;}
+    if(accountChanged)return;
     // This navigation delivers the HTML only AFTER the server authorizes the user.
     document.open();document.write(markup);document.close();
   }catch(err){

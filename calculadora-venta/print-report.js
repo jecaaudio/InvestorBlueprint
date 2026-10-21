@@ -13,7 +13,10 @@
  };
  const txt=id=>$(id)?.textContent?.trim()||'';
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const setting=(key,fallback)=>{try{return localStorage.getItem(key)||fallback}catch(error){return fallback}};
+ const setting=(key,fallback)=>{
+   if(window.IB_REPORT_PREFERENCES&&Object.hasOwn(window.IB_REPORT_PREFERENCES,key))return window.IB_REPORT_PREFERENCES[key]||fallback;
+   try{return localStorage.getItem(key)||fallback}catch(error){return fallback}
+ };
  const en=()=>setting('ib_document_language',document.documentElement.lang)==='en';
  const detailed=()=>setting('ib_report_detail','detailed')!=='summary';
  const L=(es,english)=>en()?english:es;
