@@ -8,7 +8,7 @@ const validHtml='<!doctype html><html><head><title>Protected</title></head><body
   '<a class="tool-logo" href="../index.html">InvestorBlueprint</a><header class="top"><div>Sale report</div></header>'+
   '<main>'+('Secure content '.repeat(95))+'</main></body></html>';
 
-async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool='flip',userId='user_2',responseHtml=validHtml,blockedStorage=false,sessionChangedBeforeRender=false,eventAfterRender=null,beta=false,profile={role:'member',access_status:'approved'},betaTester=false,betaColumn=true,language=null}={}){
+async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool='flip',userId='user_2',responseHtml=validHtml,blockedStorage=false,sessionChangedBeforeRender=false,eventAfterRender=null,beta=false,profile={role:'member',access_status:'approved'},betaTester=false,betaColumn=true,language=null,termsVersion='',terms=undefined,termsError=null}={}){
   let html='',redirect='',signedOut=0,requests=0;
   let shownMessage='',loginLinkHidden=true,authHeader='';
   const cache=new Map([
@@ -28,10 +28,12 @@ async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool
   };
   const client={auth,from(table){
     if(table==='member_profiles'){
-      assert.ok(beta,'Only beta tools read member profiles');
       let columns='';
       const q={select(value){columns=value;return q},eq(column,value){assert.equal(column,'id');assert.equal(value,userId);return q},
-        async maybeSingle(){return columns==='beta_tester'
+        async maybeSingle(){
+          if(columns.includes('terms_accepted_at')){assert.ok(termsVersion,'terms are read only when configured');return {data:terms===undefined?{terms_accepted_at:'2026-10-21T00:00:00Z',terms_version:termsVersion}:terms,error:termsError}}
+          assert.ok(beta,'Only beta tools read the beta flag');
+          return columns==='beta_tester'
           ?(betaColumn?{data:{beta_tester:betaTester},error:null}:{data:null,error:{message:'column member_profiles.beta_tester does not exist'}})
           :{data:profile,error:null}}};
       return q;
@@ -59,7 +61,7 @@ async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool
     pathname:'/InvestorBlueprint/tools/flip-calculator.html',
     search:'',
     replace(url){redirect=url}};
-  const window={location,IB_AUTH_CONFIG:{supabaseUrl:'https://example.supabase.co',supabaseAnonKey:'sb_publishable_dummy'},
+  const window={location,IB_AUTH_CONFIG:{supabaseUrl:'https://example.supabase.co',supabaseAnonKey:'sb_publishable_dummy',...(termsVersion?{termsVersion}:{})},
     supabase:{createClient:()=>client}};
   const fetch=async (url,opts)=>{
     requests++;authHeader=opts.headers.Authorization;
@@ -185,4 +187,22 @@ test('the approved owner and owner-marked testers open beta tools',async()=>{
     const r=await run({tool:'automated-arv',beta:true,...input});
     assert.equal(r.requests,1,JSON.stringify(input));assert.ok(r.html.startsWith('<!doctype html>'));
   }
+});
+
+test('a member who has not accepted the current Terms is sent to My profile first, then back',async()=>{
+  for(const terms of [{terms_accepted_at:null,terms_version:null},{terms_accepted_at:'2026-01-01T00:00:00Z',terms_version:'2026-01-01'}]){
+    const r=await run({termsVersion:'2026-10-21',terms});
+    assert.equal(r.requests,0,'no calculator HTML before accepting');
+    assert.equal(r.html,'');
+    const url=new URL(r.redirect);
+    assert.equal(url.pathname,'/InvestorBlueprint/account.html');
+    assert.equal(url.searchParams.get('returnTo'),'/InvestorBlueprint/tools/flip-calculator.html');
+  }
+});
+
+test('accepted members, and sites without the acceptance migration, open calculators normally',async()=>{
+  let r=await run({termsVersion:'2026-10-21'});
+  assert.equal(r.requests,1);assert.ok(r.html.length>0);assert.equal(r.redirect,'');
+  r=await run({termsVersion:'2026-10-21',terms:null,termsError:{message:'column member_profiles.terms_accepted_at does not exist'}});
+  assert.equal(r.requests,1,'a missing column never blocks the calculators');
 });

@@ -39,6 +39,22 @@
  <p data-es="Necesitas una sesión válida para ver y guardar tu configuración." data-en="You need a valid session to view and save settings.">Necesitas una sesión válida para ver y guardar tu configuración.</p>
  <a href="login.html?reason=login&returnTo=%2FInvestorBlueprint%2Faccount.html" class="btn btn-primary" data-es="Ir al login" data-en="Go to sign in">Ir al login</a>
 </section>
+<section id="account-terms" class="card access-card" hidden aria-labelledby="account-terms-title">
+ <h2 id="account-terms-title" data-es="Antes de continuar" data-en="Before you continue">Antes de continuar</h2>
+ <p class="access-note" data-es="Actualizamos los Términos de uso. Para seguir usando tu cuenta y las calculadoras, confirma lo siguiente." data-en="We updated the Terms of use. To keep using your account and the calculators, please confirm the following.">Actualizamos los Términos de uso. Para seguir usando tu cuenta y las calculadoras, confirma lo siguiente.</p>
+ <form id="account-terms-form" class="access-form">
+  <label class="access-consent"><input id="account-terms-accept" type="checkbox" required>
+   <span><span data-es="Entiendo que los resultados son estimaciones y no una oferta de préstamo, una tasación ni un precio garantizado, y acepto los" data-en="I understand the results are estimates, not a loan offer, an appraisal or a guaranteed price, and I accept the">Entiendo que los resultados son estimaciones y no una oferta de préstamo, una tasación ni un precio garantizado, y acepto los</span>
+   <a href="terms.html" target="_blank" rel="noopener" data-es="Términos de uso" data-en="Terms of use">Términos de uso</a>
+   <span data-es="y la" data-en="and the">y la</span>
+   <a href="privacy.html" target="_blank" rel="noopener" data-es="Política de privacidad" data-en="Privacy policy">Política de privacidad</a>.</span></label>
+  <div class="account-shortcuts">
+   <button class="btn btn-primary" type="submit" id="account-terms-submit" data-es="Aceptar y continuar" data-en="Accept and continue">Aceptar y continuar</button>
+   <button class="btn" type="button" id="account-terms-signout" data-es="Cerrar sesión" data-en="Sign out">Cerrar sesión</button>
+  </div>
+ </form>
+ <p id="account-terms-message" class="access-message" role="status" aria-live="polite" hidden></p>
+</section>
 <div id="account-content" hidden>
  <section class="card access-card">
   <div class="admin-controls">
@@ -82,13 +98,13 @@
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js" integrity="sha384-xPW3QHswsICVC2mW6BFNwMbhpLkbZ133fKOhxNx3QGGgAOJfL3O9t8r2aWn1aez6" crossorigin="anonymous"></script>
-<script src="assets/js/member-auth-config.js?v=20261018-access2"></script>
+<script src="assets/js/member-auth-config.js?v=20261021-terms"></script>
 <script src="assets/js/config.js"></script>
 <script src="assets/js/cookie-banner-component.js"></script>
 <script src="assets/js/consent.js"></script>
 <script src="lang.js"></script>
 <script src="assets/js/member-i18n.js"></script>
-<script src="assets/js/account-settings.js?v=20261019-1"></script>
+<script src="assets/js/account-settings.js?v=20261021-terms"></script>
 <script src="assets/js/billing-config.js?v=20261021"></script>
 <script src="assets/js/account-billing.js?v=20261021"></script>
 <script src="assets/js/site-theme.js?v=20261018"></script>
