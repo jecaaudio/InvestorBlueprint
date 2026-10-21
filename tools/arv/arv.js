@@ -22,9 +22,20 @@ const currentOriginEl = document.getElementById("current-origin");
 
 let latestReport = null;
 let latestReportIsDemo = false;
+let reportGeneration = 0;
+let temporaryWorkerUrl=null;
+function invalidateReport(){
+  reportGeneration++;
+  latestReport=null;latestReportIsDemo=false;
+  resultsEl.hidden=true;compsWrap.hidden=true;actionRow.hidden=true;
+  document.getElementById('arv-printable-report')?.replaceChildren();
+  return reportGeneration;
+}
+form.addEventListener('input',invalidateReport);
 
 function getWorkerUrl() {
-  return localStorage.getItem(WORKER_URL_STORAGE_KEY) || DEFAULT_WORKER_URL;
+  if(temporaryWorkerUrl!==null)return temporaryWorkerUrl;
+  try{return localStorage.getItem(WORKER_URL_STORAGE_KEY)||DEFAULT_WORKER_URL;}catch{return DEFAULT_WORKER_URL;}
 }
 
 function workerSetupMessage() {
@@ -32,7 +43,7 @@ function workerSetupMessage() {
 }
 
 function isWorkerUrlConfigured(url = getWorkerUrl()) {
-  return Boolean(url) && !url.includes("YOUR-WORKER");
+  try{const parsed=new URL(url);return parsed.protocol==='https:'&&!parsed.username&&!parsed.password&&!parsed.hostname.includes('YOUR-WORKER')&&!parsed.hostname.includes('your-worker');}catch{return false;}
 }
 
 function updateWorkerStateUi(url = getWorkerUrl()) {
@@ -84,11 +95,11 @@ function mapWorkerError(error, workerUrl) {
 }
 
 function money(value) {
-  return Number(value || 0).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  return value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value))?Number(value).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }):'N/A';
 }
 
 function number(value, digits = 0) {
-  return Number(value || 0).toLocaleString("en-US", { maximumFractionDigits: digits });
+  return value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value))?Number(value).toLocaleString("en-US", { maximumFractionDigits: digits }):'N/A';
 }
 
 function setStatus(text, loading = false) {
@@ -149,7 +160,12 @@ function renderComps(comps) {
 }
 
 function render(payload, isDemo = false) {
+  if(!payload?.subject||!(payload.subject.sqft>0)||!Array.isArray(payload.comps)||!payload.comps.length||
+    !payload.arv||!['estimate','low','high'].every(k=>typeof payload.arv[k]==='number'&&Number.isFinite(payload.arv[k])&&payload.arv[k]>=0)||
+    payload.arv.estimate<=0||payload.arv.low>payload.arv.estimate||payload.arv.high<payload.arv.estimate||
+    payload.comps.some(c=>!c||!(c.soldPrice>0)||!Number.isFinite(c.soldPrice)||!(c.sqft>0)||!Number.isFinite(c.sqft)))throw Error('Invalid valuation response: required property, comparable sales or range is missing.');
   latestReport = payload;
+  isDemo = isDemo || payload?.meta?.demo === true || payload?.meta?.provider === 'DUMMY';
   latestReportIsDemo = isDemo;
   const { subject, comps, arv, meta } = payload;
 
@@ -167,7 +183,9 @@ function render(payload, isDemo = false) {
     { label: "Estimate", value: money(arv.estimate) },
     { label: "Low", value: money(arv.low) },
     { label: "High", value: money(arv.high) },
-    { label: "Confidence", value: `${arv.confidence}%` },
+    { label: "Calidad orientativa / Screening quality (0–100; no probabilidad)", value: arv.quality?String(arv.quality.qualityScore):"No evaluada / Not assessed" },
+    { label: "Comparables utilizados / Comparable sales used", value: String(arv.quality?.sampleSize??comps.length) },
+    { label: "Base del rango / Range basis", value: arv.rangeType==='observed_comparable_ppsf'?"Precios por pie² observados / Observed prices per sqft":"Rango sin verificar / Unverified range" },
     { label: "Method", value: arv.method },
     { label: "PPSF Weighted", value: money(arv.ppsfWeighted) }
   ]);
@@ -186,6 +204,7 @@ function render(payload, isDemo = false) {
 }
 
 function pref(key, fallback){
+  if(window.IB_REPORT_PREFERENCES&&Object.hasOwn(window.IB_REPORT_PREFERENCES,key))return window.IB_REPORT_PREFERENCES[key]||fallback;
   try{return localStorage.getItem(key)||fallback}catch(error){return fallback}
 }
 function docEnglish(){return pref('ib_document_language','es')==='en'}
@@ -200,6 +219,7 @@ function reportText(payload) {
     R('Generado','Generated')+': '+(meta?.generatedAt||new Date().toISOString()),
     R('Proveedor','Provider')+': '+(meta?.provider||R('No informado','Not supplied')),
     R('Preparado por','Prepared by')+': '+(pref('ib_display_name','')||'—'),
+    R('Compañía','Company')+': '+(pref('ib_company_name','')||'—'),
     '',
     R('Propiedad analizada','Subject')+': '+(subject?.address||'—'),
     R('Habitaciones/Baños','Beds/Baths')+': '+(subject?.beds??'—')+'/'+(subject?.baths??'—'),
@@ -209,7 +229,9 @@ function reportText(payload) {
     '',
     R('ARV estimado','Estimated ARV')+': '+money(arv?.estimate),
     R('Rango','Range')+': '+money(arv?.low)+' – '+money(arv?.high),
-    R('Confianza','Confidence')+': '+(arv?.confidence??'—')+'%',
+    R('Calidad orientativa (0–100, no es probabilidad)','Screening quality (0–100, not probability)')+': '+(arv?.quality?.qualityScore??R('No evaluada','Not assessed')),
+    R('Comparables utilizados','Comparable sales used')+': '+(arv?.quality?.sampleSize??comps?.length??0),
+    R('Base del rango','Range basis')+': '+(arv?.rangeType==='observed_comparable_ppsf'?R('Precios observados por pie²; no es intervalo de confianza','Observed comparable prices per sqft; not a confidence interval'):R('Rango del proveedor/demo sin verificar','Unverified provider/demo range')),
     R('Método','Method')+': '+(arv?.method||'—')
   ];
   if(detailed){
@@ -273,11 +295,14 @@ async function loadDemoReport() {
 }
 
 saveWorkerBtn.addEventListener("click", () => {
+  invalidateReport();
   const value = workerUrlInput.value.trim();
-  localStorage.setItem(WORKER_URL_STORAGE_KEY, value || DEFAULT_WORKER_URL);
+  temporaryWorkerUrl=value||DEFAULT_WORKER_URL;
+  let persisted=true;
+  try{localStorage.setItem(WORKER_URL_STORAGE_KEY,temporaryWorkerUrl);}catch{persisted=false;}
 
   if (isWorkerUrlConfigured(value)) {
-    setStatus("Worker URL saved. You can now calculate ARV.");
+    setStatus(persisted?"Worker URL saved. You can now calculate ARV.":"Configuración temporal: almacenamiento bloqueado / Temporary configuration: browser storage is blocked.");
     setError("");
     updateWorkerStateUi(value);
     return;
@@ -287,24 +312,28 @@ saveWorkerBtn.addEventListener("click", () => {
 });
 
 demoBtn.addEventListener("click", async () => {
+  const generation=invalidateReport();
   setError("");
   setStatus("Loading demo data...", true);
 
   try {
     const payload = await loadDemoReport();
+    if(generation!==reportGeneration)return;
     render(payload, true);
     setStatus("DEMO — example only; not a valuation of the entered address.");
   } catch (error) {
+    if(generation!==reportGeneration)return;
     setStatus("Failed.");
     setError(error.message);
     trackCalcError("demo_load_failed", { message: error.message });
   } finally {
-    statusEl.classList.remove("loader");
+    if(generation===reportGeneration)statusEl.classList.remove("loader");
   }
 });
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  const generation=invalidateReport();
   if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcRun === "function") {
     window.IBAnalytics.trackCalcRun("arv");
   }
@@ -328,18 +357,20 @@ form.addEventListener("submit", async (event) => {
 
   try {
     const payload = await fetchArv(address);
+    if(generation!==reportGeneration)return;
     render(payload, false);
     if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === "function") {
       window.IBAnalytics.trackCalcSuccess("arv", { result: "arv_estimate" });
     }
   } catch (error) {
+    if(generation!==reportGeneration)return;
     const workerUrl = getWorkerUrl();
     const errorMessage = mapWorkerError(error, workerUrl);
     setStatus("Failed.");
     setError(errorMessage);
     trackCalcError("calc_failed", { message: errorMessage, worker_url: workerUrl, mode: "worker" });
   } finally {
-    statusEl.classList.remove("loader");
+    if(generation===reportGeneration)statusEl.classList.remove("loader");
   }
 });
 
@@ -352,7 +383,9 @@ copyBtn.addEventListener("click", async () => {
 
 exportBtn.addEventListener("click", () => {
   if (!latestReport) return;
-  const exported={...latestReport,exportMetadata:{
+  const {confidence:deprecatedConfidence,...assessment}=latestReport.arv;
+  const exported={...latestReport,arv:assessment,exportMetadata:{
+    statisticalConfidence:false,
     demo:latestReportIsDemo,
     documentLanguage:docEnglish()?'en':'es',
     reportDetail:pref('ib_report_detail','detailed'),
@@ -393,5 +426,20 @@ document.addEventListener("DOMContentLoaded",()=>{
     link.href=url;link.download='arv-report-'+Date.now()+'.txt';
     link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
-  actionRow.append(textButton);
+  const printButton=document.createElement('button');printButton.id='arv-print-report';
+  printButton.type='button';printButton.className='btn';
+  printButton.textContent='Imprimir / Guardar PDF · Print / Save PDF';
+  const printable=document.createElement('section');printable.id='arv-printable-report';printable.hidden=true;
+  document.body.append(printable);
+  const printStyle=document.createElement('style');
+  printStyle.textContent='@page{size:letter;margin:0.6in}@media print{body>:not(#arv-printable-report){display:none!important}#arv-printable-report{display:block!important;color:#172b3d;background:#fff;font:11pt/1.5 Arial,sans-serif}#arv-printable-report h1{font-size:19pt;border-bottom:2px solid #146d82;padding-bottom:12px}#arv-printable-report pre{white-space:pre-wrap;overflow-wrap:anywhere;font:10pt/1.5 Arial,sans-serif;margin:0}}';
+  document.head.append(printStyle);
+  printButton.addEventListener('click',()=>{
+    if(!latestReport)return;
+    const heading=document.createElement('h1');heading.textContent='InvestorBlueprint';
+    const body=document.createElement('pre');body.textContent=reportText(latestReport);
+    printable.replaceChildren(heading,body);printable.lang=docEnglish()?'en':'es';
+    window.print();
+  });
+  actionRow.append(textButton,printButton);
 });

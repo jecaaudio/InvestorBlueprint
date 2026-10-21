@@ -82,7 +82,8 @@
   const withFallbacks = (lang, messages) => ({ ...(FALLBACK_MESSAGES[lang] || {}), ...(messages || {}) });
 
   const getPreferredLanguage = () => {
-    const stored = localStorage.getItem('preferredLanguage');
+    let stored = null;
+    try { stored = localStorage.getItem('preferredLanguage'); } catch (_) { /* Private mode can block storage. */ }
     return normalizeLang(stored || DEFAULT_LANG);
   };
 
@@ -126,7 +127,9 @@
 
   const applyLanguage = async (lang) => {
     const nextLang = normalizeLang(lang);
-    const messages = await fetchLanguageFile(nextLang);
+    let messages;
+    try { messages = await fetchLanguageFile(nextLang); }
+    catch (_) { messages = CACHE[nextLang] || withFallbacks(nextLang, null); }
 
     window.translations = {
       ...window.translations,
@@ -135,7 +138,7 @@
     };
 
     document.documentElement.lang = nextLang;
-    localStorage.setItem('preferredLanguage', nextLang);
+    try { localStorage.setItem('preferredLanguage', nextLang); } catch (_) { /* Session-only locale. */ }
     applyTranslations(messages);
     syncLanguageButtons(nextLang);
     document.dispatchEvent(new CustomEvent('ib:language-changed', { detail: { lang: nextLang, messages } }));
@@ -156,7 +159,6 @@
   };
 
   document.addEventListener('DOMContentLoaded', async () => {
-    await fetchLanguageFile(DEFAULT_LANG);
     const preferred = getPreferredLanguage();
     await applyLanguage(preferred);
 

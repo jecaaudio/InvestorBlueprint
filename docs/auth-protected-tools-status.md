@@ -3,7 +3,7 @@
 ## Infrastructure (JECA, Supabase Free)
 - Supabase project ref: `ppeyoovykxomxinumibk`, region `us-east-2`.
 - Auth: Supabase email/password; `member_profiles` and audit/subscription tables protected by PostgreSQL RLS.
-- Administrator registered and approved: `Jansel2913@gmail.com`. Do not put passwords in the repo.
+- The sole administrator was verified privately against Auth and the profile. Do not put owner identifiers or passwords in public documentation.
 - Auth interface: `login.html` and `admin.html`.
 - JS browser SDK script (updated 2026-10-21): pinned to `@supabase/supabase-js@2.117.0/dist/umd/supabase.js` on jsDelivr with a `sha384` Subresource Integrity hash, so the browser refuses any changed file. The floating `@2` tag is no longer used. To upgrade, change the version and hash together in every page and in `scripts/site-smoke.test.mjs`.
 - Recovery flow in `login.html?recover=1`; **URL configuration in Supabase Dashboard and outgoing email delivery must be verified.**

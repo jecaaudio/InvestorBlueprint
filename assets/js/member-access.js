@@ -16,6 +16,13 @@
   const lang=()=>document.documentElement.lang==='en'?'en':'es';
   const t=(es,en)=>lang()==='en'?en:es;
   const say=(id,msg,type='info')=>{const el=$(id);if(!el)return;el.textContent=msg;el.dataset.state=type;el.hidden=false;};
+  // No member's analyst/company metadata should remain after explicit sign-out.
+  const clearReportCache=()=>{
+    for(const key of ['ib_display_name','ib_company_name','ib_document_language',
+      'ib_report_detail','ib_notes_detail','preferredLanguage']){
+      try{localStorage.removeItem(key)}catch(error){/* Disabled storage is safe here. */}
+    }
+  };
   const setBusy=(form,busy)=>form?.querySelectorAll('button[type="submit"]').forEach(x=>{x.disabled=busy;x.setAttribute('aria-busy',String(busy));});
   const readProfile=async()=>{
     if(!client)throw Error(t('El backend todavía no está conectado.','Backend is not connected yet.'));
@@ -205,7 +212,7 @@
         if(result.error)throw result.error;
         canSetRecoveredPassword=false;
         newPassword.reset();
-        await client.auth.signOut();
+        await client.auth.signOut();clearReportCache();
         showPanel('login');
         say('portal-message',t('Contraseña actualizada. Ahora inicia sesión con tu nueva contraseña de InvestorBlueprint.','Password updated. Now sign in with your new InvestorBlueprint password.'),'success');
       }catch(err){
@@ -221,7 +228,7 @@
       finally{setBusy(newPassword,false)}
     });
     $('signout-button')?.addEventListener('click',async()=>{
-      await client.auth.signOut();$('account-summary').hidden=true;
+      await client.auth.signOut();clearReportCache();$('account-summary').hidden=true;
       say('portal-message',t('Sesión cerrada.','Signed out.'),'success');
     });
     await updateAccount();
@@ -237,7 +244,7 @@
     $('admin-root').hidden=false;
     $('admin-denied').hidden=true;
     $('admin-identity').textContent=profile.email;
-    $('admin-logout')?.addEventListener('click',async()=>{await client.auth.signOut();location.href=(document.body.dataset.memberLoginPath||'login.html')});
+    $('admin-logout')?.addEventListener('click',async()=>{await client.auth.signOut();clearReportCache();location.href=(document.body.dataset.memberLoginPath||'login.html')});
     const list=$('member-list'),filter=$('member-filter'),reload=$('members-refresh');
     const allowed=['approved','rejected','suspended','pending'];
     async function loadMembers(){

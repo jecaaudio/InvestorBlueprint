@@ -40,6 +40,7 @@ export async function getSoldComps(subject, options) {
       distanceMiles: Number(jitter(localSeed, 0.15, Math.max(options.radiusMiles * 1.2, 0.8), 4).toFixed(2)),
       soldDate: new Date(now - soldDaysAgo * 24 * 3600 * 1000).toISOString().slice(0, 10),
       soldPrice,
+      propertyType: subject.propertyType,
       beds: Math.max(1, Math.round(subject.beds + jitter(localSeed, -1, 1, 5))),
       baths: Number(Math.max(1, subject.baths + jitter(localSeed, -0.8, 0.8, 6)).toFixed(1)),
       sqft

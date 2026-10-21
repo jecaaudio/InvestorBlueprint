@@ -100,3 +100,19 @@ test('public sitemap does not advertise protected calculators',()=>{
   assert.ok(!sitemap.includes('/calculadora-venta/'));
   assert.ok(robots.includes('Disallow: /InvestorBlueprint/tools/'));
 });
+
+test('every scripts/*.test.mjs runs in npm test or a named special CI step',async()=>{
+  const {readdirSync}=await import('node:fs');
+  const testScript=JSON.parse(read('package.json')).scripts.test;
+  const workflow=read('.github/workflows/quality.yml');
+  // These need a browser engine, the live endpoint or private exports, so CI runs them separately.
+  const special=['live-tool-denial','member-webkit','protected-brand-browser','private-page-dom'];
+  for(const file of readdirSync('scripts').filter(name=>name.endsWith('.test.mjs'))){
+    const name=file.replace('.test.mjs','');
+    if(special.includes(name)){
+      if(name!=='private-page-dom')assert.ok(workflow.includes('scripts/'+file),`Special test not run in CI: ${file}`);
+      continue;
+    }
+    assert.ok(testScript.includes('scripts/'+file),`Test file missing from npm test: ${file}`);
+  }
+});

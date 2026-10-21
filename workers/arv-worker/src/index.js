@@ -1,5 +1,5 @@
 import { normalizeOptions, normalizeSubject } from "./core/normalize.js";
-import { rankAndFilterComps } from "./core/comps.js";
+import { selectComparableSales } from "./core/comps.js";
 import { calculateArv } from "./core/arv.js";
 import * as dummyProvider from "./providers/dummy.js";
 import * as attomProvider from "./providers/attom.js";
@@ -59,7 +59,8 @@ function cacheSet(key, value) {
 function getProvider(env) {
   const provider = (env.PROVIDER || "DUMMY").toUpperCase();
   if (provider === "ATTOM") return { name: "ATTOM", impl: attomProvider };
-  return { name: "DUMMY", impl: dummyProvider };
+  if (provider === "DUMMY") return { name: "DUMMY", impl: dummyProvider };
+  return null;
 }
 
 export default {
@@ -100,7 +101,7 @@ export default {
       let body;
       try {
         const rawBody = await request.text();
-        if (rawBody.length > MAX_BODY_BYTES) {
+        if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
           return errorResponse(allowedOrigin, "PAYLOAD_TOO_LARGE", "Request body is too large.", 413);
         }
         body = JSON.parse(rawBody);
@@ -108,7 +109,10 @@ export default {
         return errorResponse(allowedOrigin, "INVALID_JSON", "Body must be valid JSON", 400);
       }
 
-      const address = (body?.address || "").trim().replace(/[\x00-\x1f\x7f]/g, "");
+      if(typeof body?.address!=='string')return errorResponse(allowedOrigin,'INVALID_ADDRESS','Address must be a string',400);
+      if(body.options!==undefined && (!body.options || typeof body.options!=='object' || Array.isArray(body.options)))
+        return errorResponse(allowedOrigin,'INVALID_OPTIONS','Options must be an object',400);
+      const address = body.address.trim().replace(/[\x00-\x1f\x7f]/g, "");
       if (!address) {
         return errorResponse(allowedOrigin, "ADDRESS_REQUIRED", "Field `address` is required", 400);
       }
@@ -121,14 +125,22 @@ export default {
       const cached = cacheGet(cacheKey);
       if (cached) return json(cached, 200, allowedOrigin);
 
-      const warnings = [];
-      const { name, impl } = getProvider(env);
+      const provider=getProvider(env);
+      if(!provider)return errorResponse(allowedOrigin,'NOT_CONFIGURED','Unsupported provider configuration',503);
+      const { name, impl } = provider;
+      const warnings = name==='DUMMY'?['DEMO: synthetic property and comparable data; not a real valuation.']:[];
+      warnings.push('Quality score is a screening heuristic, not a probability. The range spans the selected comparable prices per sqft, not a confidence interval.');
 
       try {
         const subject = normalizeSubject(await impl.getSubject(address, env), address);
+        if(!(subject.sqft>0)||!subject.propertyType)return errorResponse(allowedOrigin,'INCOMPLETE_SUBJECT','Living area and a recognized property type are required',422);
         const compsRaw = await impl.getSoldComps(subject, options, env);
-        const comps = rankAndFilterComps(subject, compsRaw, options);
+        const {comps,excludedOutliers}=selectComparableSales(subject, compsRaw, options);
+        if(!comps.length)return errorResponse(allowedOrigin,'NO_COMPARABLES','No comparable sales meet the supplied filters',422);
         const arv = calculateArv(subject, comps);
+        if(excludedOutliers)warnings.push(`${excludedOutliers} comparable(s) excluded by the disclosed log-price-per-sqft outlier screen.`);
+        if(arv.quality.sampleSize<3)warnings.push('Insufficient sample: fewer than three comparable sales. This indicative result requires additional evidence.');
+        if(arv.quality.ppsfCv>.2)warnings.push('High dispersion in comparable prices per sqft. Review condition, location and market evidence before relying on this result.');
 
         const response = {
           subject,
@@ -136,8 +148,14 @@ export default {
           arv,
           meta: {
             provider: name,
+            demo: name==='DUMMY',
+            dataType: name==='DUMMY'?'demonstration':'provider_data',
+            statisticalConfidence: false,
             generatedAt: new Date().toISOString(),
             compsUsed: comps.length,
+            excludedOutliers,
+            rangeType:arv.rangeType,
+            legacyConfidenceField:'deprecated_quality_score_not_probability',
             warnings
           }
         };

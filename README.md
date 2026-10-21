@@ -39,7 +39,7 @@ Luego abre:
 
 El workflow `.github/workflows/quality.yml` corre en cada push y pull request:
 
-- **Pruebas unitarias y de estructura** (`npm test`): ejecuta todos los archivos `scripts/*.test.mjs` (rutas protegidas, recuperación de contraseña, finanzas del flip, perfiles, despliegue, etc.).
+- **Pruebas unitarias, de estructura y de DOM** (`npm test`): rutas protegidas, recuperación de contraseña, finanzas de cada calculadora, reportes, perfiles y despliegue. Cuatro pruebas que necesitan navegador, el endpoint en vivo o archivos privados corren en pasos aparte; una prueba falla si aparece un archivo `scripts/*.test.mjs` que no esté en ninguna lista.
 - **Accesibilidad** con `axe` en páginas clave.
 - **Lighthouse** con mínimos de performance, accesibilidad, best-practices y SEO.
 
@@ -48,9 +48,8 @@ GitHub Pages solo publica un commit si este workflow pasó en ese mismo commit (
 Para ejecutarlos localmente:
 
 ```bash
-npm test            # no necesita instalar dependencias
-
 npm install
+npm test
 npx playwright install chromium
 python -m http.server 4173
 npm run qa:axe

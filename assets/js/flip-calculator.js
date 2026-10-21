@@ -68,114 +68,41 @@
   window.addEventListener("scroll", hide, { passive:true });
 })();
 
-function parseMoney(input){
-  if (input == null) return 0;
-  const clean = String(input).replace(/[^0-9.\-]/g, "");
-  const n = Number(clean);
-  return Number.isFinite(n) ? n : 0;
-}
-
-function formatMoney(n){
-  const v = Number(n);
-  if (!Number.isFinite(v)) return "$0";
-  return v.toLocaleString("en-US", { style:"currency", currency:"USD", maximumFractionDigits:0 });
-}
-
-function formatPercent(n){
-  const v = Number(n);
-  if (!Number.isFinite(v)) return "0%";
-  return `${v.toFixed(2)}%`;
-}
-
-function calcFlip({
-  arv,
-  purchasePrice,
-  rehab,
-  holdingMonths,
-  holdingMonthlyCost,
-  buyClosingCosts,
-  sellClosingCosts,
-  agentCommissionPct,
-  loanAmount,
-  interestRatePct,
-  pointsPct,
-  downPayment
-}){
-  const agentCommission = arv * (agentCommissionPct/100);
-  const totalSellCosts = agentCommission + sellClosingCosts;
-
-  const pointsCost = loanAmount * (pointsPct/100);
-  const monthlyRate = (interestRatePct/100)/12;
-  const interestCost = loanAmount * monthlyRate * holdingMonths;
-
-  const totalHolding = holdingMonthlyCost * holdingMonths;
-
-  const totalCosts =
-    purchasePrice +
-    rehab +
-    buyClosingCosts +
-    totalHolding +
-    totalSellCosts +
-    pointsCost +
-    interestCost;
-
-  const netProfit = arv - totalCosts;
-
-  const totalInvestmentSimple = purchasePrice + rehab + buyClosingCosts + totalHolding + pointsCost + interestCost;
-  const roi = totalInvestmentSimple > 0 ? (netProfit / totalInvestmentSimple) * 100 : 0;
-
-  const breakEvenSalePrice = totalCosts;
-  const maxOffer70 = (arv * 0.70) - rehab;
-
-  return { agentCommission, totalSellCosts, pointsCost, interestCost, totalHolding, totalCosts, netProfit, roi, breakEvenSalePrice, maxOffer70, downPayment };
-}
-
-const els = {
-  arv: document.querySelector("#arv"),
-  purchasePrice: document.querySelector("#purchasePrice"),
-  rehab: document.querySelector("#rehab"),
-  holdingMonths: document.querySelector("#holdingMonths"),
-  holdingMonthlyCost: document.querySelector("#holdingMonthlyCost"),
-  buyClosingCosts: document.querySelector("#buyClosingCosts"),
-  sellClosingCosts: document.querySelector("#sellClosingCosts"),
-  agentCommissionPct: document.querySelector("#agentCommissionPct"),
-  loanAmount: document.querySelector("#loanAmount"),
-  interestRatePct: document.querySelector("#interestRatePct"),
-  pointsPct: document.querySelector("#pointsPct"),
-  downPayment: document.querySelector("#downPayment")
-};
-
-function readState(){
-  return {
-    arv: parseMoney(els.arv && els.arv.value),
-    purchasePrice: parseMoney(els.purchasePrice && els.purchasePrice.value),
-    rehab: parseMoney(els.rehab && els.rehab.value),
-    holdingMonths: parseMoney(els.holdingMonths && els.holdingMonths.value),
-    holdingMonthlyCost: parseMoney(els.holdingMonthlyCost && els.holdingMonthlyCost.value),
-    buyClosingCosts: parseMoney(els.buyClosingCosts && els.buyClosingCosts.value),
-    sellClosingCosts: parseMoney(els.sellClosingCosts && els.sellClosingCosts.value),
-    agentCommissionPct: parseMoney(els.agentCommissionPct && els.agentCommissionPct.value),
-    loanAmount: parseMoney(els.loanAmount && els.loanAmount.value),
-    interestRatePct: parseMoney(els.interestRatePct && els.interestRatePct.value),
-    pointsPct: parseMoney(els.pointsPct && els.pointsPct.value),
-    downPayment: parseMoney(els.downPayment && els.downPayment.value)
-  };
-}
-
-function render(){
-  const r = calcFlip(readState());
-
-  document.querySelector("#outNetProfit").textContent = formatMoney(r.netProfit);
-  document.querySelector("#outROI").textContent = formatPercent(r.roi);
-  document.querySelector("#outTotalCosts").textContent = formatMoney(r.totalCosts);
-  document.querySelector("#outBreakEven").textContent = formatMoney(r.breakEvenSalePrice);
-  document.querySelector("#outMaxOffer70").textContent = formatMoney(r.maxOffer70);
-
-  const badge = document.querySelector("#outDecision");
-  const ok = r.roi >= 15;
-  badge.textContent = ok ? "GO" : "NO GO";
-  badge.dataset.state = ok ? "ok" : "bad";
-}
-
-Object.values(els).forEach(el => el && el.addEventListener("input", render));
-render();
+// The private production page uses the legacy fc-* markup. Adapt that exact
+// document to the shared, tested engine; do not keep a second financial formula.
+(function connectPublishedFlip(){
+  const panel=document.querySelector('#flip-calculator .fc-panel');
+  const result=document.getElementById('fcReportArea');
+  if(!panel||!result)return;
+  const scriptRoot=new URL('../../',document.currentScript.src);
+  const form=document.createElement('form');form.id='tool-form';form.noValidate=true;
+  const ids={arv:'salePrice',rehab:'rehabCost',holdingMonthlyCost:'miscMonthly',buyClosingCosts:'buyerClosing',sellClosingCosts:'stagingCost',agentCommissionPct:'realtorPct',interestRatePct:'interestRate'};
+  for(const input of panel.querySelectorAll('input')){
+    const old=input.id,next=ids[old]||old;
+    const label=panel.querySelector('label[for="'+old+'"]');
+    if(label)label.htmlFor=next;
+    input.id=next;input.name=next;
+    if(input.classList.contains('money'))input.dataset.format='currency';
+    if(old==='downPayment'){
+      input.disabled=true;
+      if(label)label.append(document.createTextNode(' (referencia / reference)'));
+    }
+  }
+  while(panel.firstChild)form.append(panel.firstChild);
+  panel.append(form);
+  const zeros=['titleFees','prorations','inspectionCost','insuranceMonthly','taxesMonthly','utilitiesMonthly','maintenanceMonthly','hoaMonthly','concessionPct','sellerClosingPct','transferTax','contingencyPct','loanPurchasePct','loanRehabPct','drawFee','drawInspectionFee','drawCount','originationFees','loanClosingCosts','prepayPenalty','taxRate'];
+  for(const name of zeros){const input=document.createElement('input');input.type='hidden';input.name=name;input.value='0';form.append(input);}
+  const plan=document.createElement('input');plan.type='radio';plan.name='planMode';plan.value='pro';plan.checked=true;plan.hidden=true;form.append(plan);
+  const financing=document.createElement('input');financing.type='hidden';financing.name='financingType';financing.value='hard-money';form.append(financing);
+  const notice=document.createElement('p');notice.textContent='El capital propio se calcula como costos menos desembolsos. La referencia de down payment no es un gasto adicional. / Equity is costs less funded proceeds; the down-payment reference is not an additional expense.';form.append(notice);
+  const error=document.createElement('p');error.id='tool-validation';error.setAttribute('role','alert');error.hidden=true;form.append(error);
+  const actions=document.createElement('div');actions.className='tool-actions';
+  const button=document.createElement('button');button.type='submit';button.dataset.i18n='calculate';button.textContent='Calcular / Calculate';actions.append(button);form.append(actions);
+  result.replaceChildren();
+  const cards=document.createElement('div');cards.id='result-cards';cards.className='result-grid';
+  const details=document.createElement('div');details.id='result-detail';details.setAttribute('aria-live','polite');result.append(cards,details);
+  const engine=document.createElement('script');engine.src=new URL('tools/tool-script.js?v=20261020',scriptRoot).href;
+  engine.onload=()=>window.IBInitFinanceReport?.();
+  engine.onerror=()=>{button.disabled=true;error.hidden=false;error.textContent='No se pudo cargar el modelo financiero. / Unable to load financial model.';};
+  document.head.append(engine);
+})();
