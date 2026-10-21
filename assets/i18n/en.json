@@ -338,5 +338,13 @@
   "reportFlipInterest": "Annual interest rate (%)",
   "reportFlipPoints": "Lender points (%)",
   "cashCommittedLabel": "Net capital committed",
-  "flipMathNotes": "Earnest money credits the purchase price. Interest uses the selected draws and method; without a draw schedule the full commitment is funded at month zero. Net committed capital is not cash due at closing."
+  "flipMathNotes": "Earnest money credits the purchase price. Interest uses the selected draws and method; without a draw schedule the full commitment is funded at month zero. Net committed capital is not cash due at closing.",
+  "cookieMessage": "We use cookies to improve your experience. Choose whether to allow analytics and marketing cookies.",
+  "cookiePrivacyLink": "Privacy policy",
+  "cookieAnalytics": "Analytics cookies",
+  "cookieMarketing": "Marketing cookies",
+  "cookieRejectAll": "Reject all",
+  "cookieSavePreferences": "Save preferences",
+  "cookieAcceptAll": "Accept all",
+  "rentAssumptions": "Target yield is GROSS; annual expenses are only deducted from the displayed net income."
 }

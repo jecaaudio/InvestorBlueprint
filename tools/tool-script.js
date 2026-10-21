@@ -146,7 +146,80 @@
     callback();
   };
 
+  // The private tool pages carry some fixed English text without data-i18n keys.
+  // Translate those exact strings (text, tooltips, aria labels) with the page language.
+  const STATIC_ES={
+    'Flip Calculator':'Calculadora de Flip','Inputs':'Datos del proyecto',
+    'Financial diagnostics with live updates and resilient validation.':'Calcula ganancia, ROI, precio de equilibrio y oferta máxima de un flip.',
+    'ARV':'ARV (precio de venta esperado)','Purchase Price':'Precio de compra','Rehab Costs':'Costo de reparación',
+    'Holding Months':'Meses hasta vender','Holding Monthly Cost':'Costo mensual mientras la tienes',
+    'Buy Closing Costs':'Costos de cierre de compra','Sell Closing Costs':'Costos de cierre de venta',
+    'Agent Commission %':'Comisión de agentes %','Loan Amount':'Monto del préstamo','Interest Rate %':'Tasa de interés anual %',
+    'Points %':'Puntos %','Down Payment':'Pago inicial',
+    'Estimated value after repairs based on recent comparable sales.':'Valor estimado después de reparar, según ventas comparables recientes.',
+    'Agreed purchase price (excluding closing costs).':'Precio de compra acordado, sin costos de cierre.',
+    'Total renovation cost (materials, labor, and permits).':'Costo total de la remodelación: materiales, mano de obra y permisos.',
+    'Estimated months from purchase to sale.':'Meses estimados desde la compra hasta la venta.',
+    'Monthly carrying costs: taxes, insurance, utilities, lawn care, etc.':'Gastos de cada mes: impuestos, seguro, servicios, jardín, etc.',
+    'Closing costs when buying: title, lender fees, recording, etc.':'Costos al comprar: título, cargos del prestamista, registro, etc.',
+    'Closing costs when selling (excluding agent commission).':'Costos al vender, sin contar la comisión de agentes.',
+    'Total commission percentage (listing + buyer agent).':'Porcentaje total de comisión (agente vendedor + agente comprador).',
+    'Borrowed amount (hard money/loan).':'Monto prestado (hard money u otro préstamo).',
+    'Annual loan interest rate.':'Tasa de interés anual del préstamo.',
+    'Loan points (upfront fee). 1 point = 1% of the loan amount.':'Puntos del préstamo (cargo inicial). 1 punto = 1% del monto prestado.',
+    'Cash you bring to closing (if applicable).':'Efectivo que llevas al cierre, si aplica.',
+    'What is ARV?':'¿Qué es el ARV?','What is Purchase Price?':'¿Qué es el precio de compra?','What are Rehab Costs?':'¿Qué es el costo de reparación?',
+    'What are Holding Months?':'¿Qué son los meses hasta vender?','What is Holding Monthly Cost?':'¿Qué es el costo mensual?',
+    'What are Buy Closing Costs?':'¿Qué son los costos de cierre de compra?','What are Sell Closing Costs?':'¿Qué son los costos de cierre de venta?',
+    'What is Agent Commission?':'¿Qué es la comisión de agentes?','What is Loan Amount?':'¿Qué es el monto del préstamo?',
+    'What is Interest Rate?':'¿Qué es la tasa de interés?','What are Points?':'¿Qué son los puntos?','What is Down Payment?':'¿Qué es el pago inicial?',
+    'Net Profit':'Ganancia neta','Total Costs':'Costos totales','Break-even Sale Price':'Precio de venta de equilibrio',
+    'Max Offer (70% Rule)':'Oferta máxima (regla del 70%)','Decision':'Decisión',
+    'Income':'Ingresos','Use signed lease rent before expenses.':'Usa la renta del contrato firmado, antes de gastos.',
+    'Expenses & assumptions':'Gastos y supuestos','Reserve 5–10% of monthly rent for repairs.':'Reserva entre 5% y 10% de la renta mensual para reparaciones.',
+    'Typical stabilized vacancy is 3%–8%.':'La vacancia típica de una propiedad estabilizada es de 3% a 8%.',
+    'Property assumptions':'Datos de la propiedad','Include taxes, insurance and maintenance.':'Incluye impuestos, seguro y mantenimiento.',
+    'Yield goals':'Metas de rendimiento','Use realistic occupancy based on your local market.':'Usa una ocupación realista para tu mercado.',
+    'Comparable sales':'Ventas comparables','Use sold comps from the last 3–6 months nearby.':'Usa ventas cercanas cerradas en los últimos 3 a 6 meses.',
+    'Deal assumptions':'Supuestos de la operación','Loan terms':'Condiciones del préstamo',
+    'Enter total amount financed by the lender.':'Escribe el monto total que financia el prestamista.','months':'meses',
+    'Beta: tool available. Please send feedback below.':'Beta: herramienta disponible. Envíanos tus comentarios.',
+    'Use example':'Usar ejemplo','Reset':'Restablecer','ROI map':'Mapa de ROI',
+    'Send Feedback':'Enviar comentarios','Tool':'Herramienta','Your feedback':'Tus comentarios','Send':'Enviar',
+    'Close feedback modal':'Cerrar comentarios','Tell us what is working and what we should improve.':'Cuéntanos qué funciona y qué debemos mejorar.'
+  };
+  const translateStaticText=()=>{
+    if(typeof document==='undefined'||!document.body)return;
+    const spanish=document.documentElement.lang!=='en';
+    const skip='script,style,textarea,[data-i18n],#ib-finance-report,#printReport';
+    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+    const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+    for(const node of nodes){
+      if(node.parentElement?.closest(skip))continue;
+      node.ibEnglish??=node.textContent.trim();
+      const english=node.ibEnglish,target=spanish?STATIC_ES[english]:english;
+      if(!STATIC_ES[english]||!target)continue;
+      const current=node.textContent.trim();
+      if(current!==target)node.textContent=node.textContent.replace(current,target);
+    }
+    for(const attr of ['data-tooltip','aria-label','placeholder']){
+      for(const el of document.body.querySelectorAll('['+attr+']')){
+        if(el.closest('#ib-finance-report,#printReport'))continue;
+        const store='ibEn'+attr.replace(/(^|-)(\w)/g,(m,a,c)=>c.toUpperCase());
+        el.dataset[store]??=el.getAttribute(attr);
+        const english=el.dataset[store];
+        if(STATIC_ES[english])el.setAttribute(attr,spanish?STATIC_ES[english]:english);
+      }
+    }
+  };
+  if(typeof window!=='undefined')window.IBTranslateStaticText=translateStaticText;
+  if(typeof window?.addEventListener==='function'&&typeof document?.addEventListener==='function'){
+    document.addEventListener('ib:language-changed',translateStaticText);
+    window.addEventListener('load',translateStaticText);
+  }
+
   onDomReady(() => {
+  translateStaticText();
   const form = document.getElementById('tool-form');
   const output = document.getElementById('result-detail') || document.getElementById('result');
   const cards = document.getElementById('result-cards');

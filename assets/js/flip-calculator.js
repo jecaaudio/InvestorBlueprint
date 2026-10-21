@@ -84,25 +84,31 @@
     input.id=next;input.name=next;
     if(input.classList.contains('money'))input.dataset.format='currency';
     if(old==='downPayment'){
+      // Equity is derived from costs and loan draws, so this field never affects results.
       input.disabled=true;
-      if(label)label.append(document.createTextNode(' (referencia / reference)'));
+      const row=input.closest('.fc-row');if(row)row.hidden=true;
     }
   }
+  for(const icon of panel.querySelectorAll('.info-icon'))if(icon.textContent.trim()==='!')icon.textContent='?';
   while(panel.firstChild)form.append(panel.firstChild);
   panel.append(form);
   const zeros=['titleFees','prorations','inspectionCost','insuranceMonthly','taxesMonthly','utilitiesMonthly','maintenanceMonthly','hoaMonthly','concessionPct','sellerClosingPct','transferTax','contingencyPct','loanPurchasePct','loanRehabPct','drawFee','drawInspectionFee','drawCount','originationFees','loanClosingCosts','prepayPenalty','taxRate'];
   for(const name of zeros){const input=document.createElement('input');input.type='hidden';input.name=name;input.value='0';form.append(input);}
   const plan=document.createElement('input');plan.type='radio';plan.name='planMode';plan.value='pro';plan.checked=true;plan.hidden=true;form.append(plan);
   const financing=document.createElement('input');financing.type='hidden';financing.name='financingType';financing.value='hard-money';form.append(financing);
-  const notice=document.createElement('p');notice.textContent='El capital propio se calcula como costos menos desembolsos. La referencia de down payment no es un gasto adicional. / Equity is costs less funded proceeds; the down-payment reference is not an additional expense.';form.append(notice);
+  const english=()=>document.documentElement.lang==='en';
+  const notice=document.createElement('p');notice.className='access-note';
+  const noticeText=()=>english()?'Your equity is total costs minus the money the lender funds.':'Tu capital propio es el costo total menos el dinero que financia el prestamista.';
+  notice.textContent=noticeText();form.append(notice);
+  document.addEventListener('ib:language-changed',()=>{notice.textContent=noticeText();});
   const error=document.createElement('p');error.id='tool-validation';error.setAttribute('role','alert');error.hidden=true;form.append(error);
   const actions=document.createElement('div');actions.className='tool-actions';
-  const button=document.createElement('button');button.type='submit';button.dataset.i18n='calculate';button.textContent='Calcular / Calculate';actions.append(button);form.append(actions);
+  const button=document.createElement('button');button.type='submit';button.dataset.i18n='calculate';button.textContent=english()?'Calculate':'Calcular';actions.append(button);form.append(actions);
   result.replaceChildren();
   const cards=document.createElement('div');cards.id='result-cards';cards.className='result-grid';
   const details=document.createElement('div');details.id='result-detail';details.setAttribute('aria-live','polite');result.append(cards,details);
-  const engine=document.createElement('script');engine.src=new URL('tools/tool-script.js?v=20261020',scriptRoot).href;
+  const engine=document.createElement('script');engine.src=new URL('tools/tool-script.js?v=20261021',scriptRoot).href;
   engine.onload=()=>window.IBInitFinanceReport?.();
-  engine.onerror=()=>{button.disabled=true;error.hidden=false;error.textContent='No se pudo cargar el modelo financiero. / Unable to load financial model.';};
+  engine.onerror=()=>{button.disabled=true;error.hidden=false;error.textContent=english()?'Unable to load the financial model. Reload the page.':'No se pudo cargar el modelo financiero. Recarga la página.';};
   document.head.append(engine);
 })();

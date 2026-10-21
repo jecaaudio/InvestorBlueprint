@@ -134,3 +134,34 @@ test('numeric fields read Spanish notation and say how an ambiguous entry was re
  assert.match(d.getElementById('result-cards').textContent,/\$2,268/);
  dom.window.close();
 });
+test('private Flip labels, help and notices follow the page language; unused down payment is hidden',async()=>{
+ const row=(id,label,tip)=>'<div class="fc-row"><label for="'+id+'">'+label+' <button type="button" class="info-icon" aria-label="What is '+label+'?" data-tooltip="'+tip+'">!</button></label><input id="'+id+'" class="fc-input money" type="text" inputmode="decimal"></div>';
+ const html='<html lang="es"><head></head><body data-tool="flip"><main><section id="flip-calculator"><div class="fc-panel"><div class="fc-section"><h3>Inputs</h3>'+
+  row('purchasePrice','Purchase Price','Agreed purchase price (excluding closing costs).')+row('downPayment','Down Payment','Cash you bring to closing (if applicable).')+
+  '</div></div><div id="fcReportArea"></div></section></main></body></html>';
+ const dom=new JSDOM(html,{url:'https://jecaaudio.github.io/InvestorBlueprint/tools/flip-calculator.html',runScripts:'outside-only'});
+ const w=dom.window,d=w.document;w.IBI18n={getCurrentMessages:()=>es};
+ const tag=d.createElement('script');tag.src='https://jecaaudio.github.io/InvestorBlueprint/assets/js/flip-calculator.js';
+ Object.defineProperty(d,'currentScript',{configurable:true,value:tag});w.eval(fs.readFileSync('assets/js/flip-calculator.js','utf8'));
+ Object.defineProperty(d,'currentScript',{configurable:true,value:null});w.eval(source);await tick();
+ const label=d.querySelector('label[for="purchasePrice"]'),icon=label.querySelector('.info-icon');
+ assert.match(label.textContent,/Precio de compra/);assert.equal(icon.textContent,'?');
+ assert.match(icon.getAttribute('data-tooltip'),/Precio de compra acordado/);
+ assert.match(d.querySelector('h3').textContent,/Datos del proyecto/);
+ assert.equal(d.getElementById('downPayment').closest('.fc-row').hidden,true);
+ assert.match(d.getElementById('tool-form').textContent,/Tu capital propio/);assert.doesNotMatch(d.getElementById('tool-form').textContent,/Equity is/);
+ assert.equal(d.querySelector('#tool-form button[type="submit"]').textContent,'Calcular');
+ d.documentElement.lang='en';d.dispatchEvent(new w.CustomEvent('ib:language-changed'));
+ assert.match(label.textContent,/Purchase Price/);assert.match(icon.getAttribute('data-tooltip'),/Agreed purchase price/);
+ assert.match(d.getElementById('tool-form').textContent,/Your equity is/);
+ dom.window.close();
+});
+test('cookie banner is Spanish by default and uses translation keys for English',async()=>{
+ const dom=new JSDOM('<html lang="es"><body></body></html>',{url:'https://jecaaudio.github.io/InvestorBlueprint/',runScripts:'outside-only'});
+ const w=dom.window,d=w.document;w.eval(fs.readFileSync('assets/js/cookie-banner-component.js','utf8'));await new Promise(resolve=>setTimeout(resolve,20));
+ assert.match(d.getElementById('cookie-banner').textContent,/Usamos cookies/);
+ assert.equal(d.getElementById('cookie-accept-all').textContent,'Aceptar todas');
+ for(const node of d.querySelectorAll('#cookie-banner [data-i18n]'))assert.ok(en[node.dataset.i18n]&&es[node.dataset.i18n],'Missing banner key '+node.dataset.i18n);
+ assert.ok(d.getElementById('cookie-analytics'),'checkbox survives translation markup');
+ dom.window.close();
+});
