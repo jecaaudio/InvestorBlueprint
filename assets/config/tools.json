@@ -7,7 +7,8 @@
     "url": "tools/flip-calculator.html",
     "status": "beta_free",
     "description_es": "Analiza compra, rehab, holding y venta con escenarios de sensibilidad y checks de ROI.",
-    "description_en": "Analyze purchase, rehab, holding, and sale with sensitivity scenarios and ROI checks."
+    "description_en": "Analyze purchase, rehab, holding, and sale with sensitivity scenarios and ROI checks.",
+    "landing": "calculadoras/flip.html"
   },
   {
     "id": "rental_cash_flow",
@@ -17,7 +18,8 @@
     "url": "tools/rental-cash-flow.html",
     "status": "beta_free",
     "description_es": "Modela flujo mensual/anual con vacancia y escenarios para análisis ROI de renta.",
-    "description_en": "Model monthly/annual cash flow with vacancy and scenario-based rental ROI analysis."
+    "description_en": "Model monthly/annual cash flow with vacancy and scenario-based rental ROI analysis.",
+    "landing": "calculadoras/rentas.html"
   },
   {
     "id": "rent",
@@ -39,7 +41,8 @@
     "url": "tools/arv-estimator.html",
     "status": "beta_free",
     "description_es": "Calcula ARV con comparables, ajustes y margen de seguridad para decisiones avanzadas.",
-    "description_en": "Estimate ARV with comparables, adjustments, and safety buffers for advanced decisions."
+    "description_en": "Estimate ARV with comparables, adjustments, and safety buffers for advanced decisions.",
+    "landing": "calculadoras/arv.html"
   },
   {
     "id": "automated_arv",
@@ -61,7 +64,8 @@
     "url": "tools/hard-money-analyzer.html",
     "status": "beta_free",
     "description_es": "Evalúa intereses, puntos y costo total de hard money con enfoque en retorno neto.",
-    "description_en": "Evaluate interest, points, and total hard money cost with net-return focus."
+    "description_en": "Evaluate interest, points, and total hard money cost with net-return focus.",
+    "landing": "calculadoras/hard-money.html"
   },
   {
     "id": "roi_search",
@@ -83,6 +87,7 @@
     "url": "calculadora-venta/",
     "status": "beta_free",
     "description_es": "Calcula los gastos de cierre y el dinero neto del vendedor. Selecciona estado y condado y consulta las fuentes legales disponibles.",
-    "description_en": "Calculate closing costs and seller net proceeds. Choose a state and county and review available legal sources."
+    "description_en": "Calculate closing costs and seller net proceeds. Choose a state and county and review available legal sources.",
+    "landing": "calculadoras/venta.html"
   }
 ]
