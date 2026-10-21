@@ -432,13 +432,19 @@ document.addEventListener("DOMContentLoaded",()=>{
   const printable=document.createElement('section');printable.id='arv-printable-report';printable.hidden=true;
   document.body.append(printable);
   const printStyle=document.createElement('style');
-  printStyle.textContent='@page{size:letter;margin:0.6in}@media print{body>:not(#arv-printable-report){display:none!important}#arv-printable-report{display:block!important;color:#172b3d;background:#fff;font:11pt/1.5 Arial,sans-serif}#arv-printable-report h1{font-size:19pt;border-bottom:2px solid #146d82;padding-bottom:12px}#arv-printable-report pre{white-space:pre-wrap;overflow-wrap:anywhere;font:10pt/1.5 Arial,sans-serif;margin:0}}';
+  printStyle.textContent='@page{size:letter;margin:0.6in}#arv-printable-report .arv-print-brand{display:flex;align-items:center;gap:5px;margin-top:10px;padding-top:5px;border-top:1px solid #e3e8ee;font-size:8pt;color:#7b8a99}@media print{body>:not(#arv-printable-report){display:none!important}#arv-printable-report{display:block!important;color:#172b3d;background:#fff;font:11pt/1.5 Arial,sans-serif}#arv-printable-report h1{font-size:19pt;border-bottom:2px solid #146d82;padding-bottom:12px}#arv-printable-report pre{white-space:pre-wrap;overflow-wrap:anywhere;font:10pt/1.5 Arial,sans-serif;margin:0}}';
   document.head.append(printStyle);
   printButton.addEventListener('click',()=>{
     if(!latestReport)return;
-    const heading=document.createElement('h1');heading.textContent='InvestorBlueprint';
+    // The member's company leads the document; our brand is a small closing line.
+    const client=pref('ib_company_name','')||pref('ib_display_name','');
+    const heading=document.createElement('h1');heading.textContent=client||(docEnglish()?'ARV report':'Informe de ARV');
     const body=document.createElement('pre');body.textContent=reportText(latestReport);
-    printable.replaceChildren(heading,body);printable.lang=docEnglish()?'en':'es';
+    const brand=document.createElement('p');brand.className='arv-print-brand';
+    const root=new URL('../../',document.baseURI).href;
+    const logo=document.createElement('img');logo.src=root+'assets/brand/favicon.svg';logo.alt='';logo.width=12;logo.height=12;
+    brand.append(logo,document.createTextNode((docEnglish()?'Prepared with':'Preparado con')+' InvestorBlueprint · '+root.replace(/^https?:\/\//,'').replace(/\/$/,'')));
+    printable.replaceChildren(heading,body,brand);printable.lang=docEnglish()?'en':'es';
     window.print();
   });
   actionRow.append(textButton,printButton);

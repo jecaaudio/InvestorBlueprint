@@ -151,6 +151,8 @@
  }
  #printReport .pr-footer{
    font-size:7pt!important;margin:4pt 0 0!important;
+   display:flex!important;justify-content:flex-end!important;align-items:center!important;gap:4pt!important;
    text-align:right!important;break-inside:avoid!important
  }
+ #printReport .pr-footer img{width:9pt!important;height:9pt!important}
 }

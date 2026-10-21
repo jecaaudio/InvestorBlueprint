@@ -165,3 +165,26 @@ test('cookie banner is Spanish by default and uses translation keys for English'
  assert.ok(d.getElementById('cookie-analytics'),'checkbox survives translation markup');
  dom.window.close();
 });
+test('finance PDF leads with the member company and ends with a small brand line',async()=>{
+ const dom=await setup('rent',{propertyValue:300000,annualExpenses:0,targetYield:8,occupancy:100});
+ const render=dom.window.IBRenderFinanceReport;
+ const snapshot={title:'Rent',titleKey:'',date:'2026-10-21T14:32:07.512Z',logo:'https://jecaaudio.github.io/InvestorBlueprint/assets/brand/favicon.svg',
+  inputs:[],metrics:[{key:'',label:'Rent',value:'$2,000'}],details:'',sourceMessages:{}};
+ const html=render(snapshot,{ib_document_language:'es',ib_display_name:'María López',ib_company_name:'López Investments'},{});
+ const doc=new JSDOM('<body>'+html+'</body>').window.document;
+ assert.equal(doc.querySelector('.ib-r-company').textContent,'López Investments');
+ assert.match(doc.querySelector('.ib-r-head').textContent,/María López/);
+ assert.equal(doc.querySelector('h1').textContent,'Rent','the brand is not the document title');
+ assert.match(doc.querySelector('.ib-r-doc p').textContent,/21 de octubre de 2026/);
+ assert.doesNotMatch(html,/2026-10-21T/);
+ const brand=doc.querySelector('.ib-r-brand');
+ assert.equal(brand.textContent,'Preparado con InvestorBlueprint · jecaaudio.github.io/InvestorBlueprint');
+ assert.equal(brand.querySelector('img').getAttribute('width'),'12');
+ const english=new JSDOM('<body>'+render(snapshot,{ib_document_language:'en'},{})+'</body>').window.document;
+ assert.equal(english.querySelector('.ib-r-client').textContent,'','no empty client line without a name');
+ assert.match(english.querySelector('.ib-r-brand').textContent,/^Prepared with InvestorBlueprint/);
+ assert.match(english.querySelector('.ib-r-doc p').textContent,/October 21, 2026/);
+ const inline=new JSDOM('<body>'+render({...snapshot,logo:'data:image/svg+xml;base64,AAAA'},{},{})+'</body>').window.document;
+ assert.equal(inline.querySelector('.ib-r-brand').textContent,'Preparado con InvestorBlueprint','an inline logo never prints as a site address');
+ dom.window.close();
+});

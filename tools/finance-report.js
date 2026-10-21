@@ -16,14 +16,22 @@
    };
    const rows=list=>list.map(row=>'<tr><th scope="row">'+escape(label(row))+'</th><td>'+escape(messages[row.valueKey]||row.value)+'</td></tr>').join('');
    const detailed=prefs.ib_report_detail!=='summary';
-   return '<header><img src="'+escape(snapshot.logo)+'" alt="" width="40" height="40"><h1>InvestorBlueprint</h1><h2>'+escape(messages[snapshot.titleKey]||snapshot.title)+'</h2><p>'+escape(snapshot.date)+'</p>'+
-     '<p>'+escape(prefs.ib_display_name)+(prefs.ib_company_name?' · '+escape(prefs.ib_company_name):'')+'</p></header>'+
+   // The document belongs to the member: their company and name lead the page.
+   // Our brand is a small line repeated at the foot of every printed page.
+   const client=prefs.ib_company_name||prefs.ib_display_name||'';
+   const preparer=prefs.ib_company_name&&prefs.ib_display_name?prefs.ib_display_name:'';
+   const when=new Date(snapshot.date);
+   const date=Number.isNaN(when.getTime())?snapshot.date:when.toLocaleDateString(english?'en-US':'es-US',{year:'numeric',month:'long',day:'numeric'});
+   const site=/^https?:\/\//.test(String(snapshot.logo||''))?String(snapshot.logo).replace(/^https?:\/\//,'').replace(/\/?assets\/brand\/favicon\.svg.*$/,''):'';
+   return '<header class="ib-r-head"><div class="ib-r-client">'+(client?'<p class="ib-r-company">'+escape(client)+'</p>':'')+(preparer?'<p>'+escape(preparer)+'</p>':'')+'</div>'+
+     '<div class="ib-r-doc"><h1>'+escape(messages[snapshot.titleKey]||snapshot.title)+'</h1><p>'+escape(date)+'</p></div></header>'+
      '<h3>'+L('Resultados','Results')+'</h3><table>'+rows(snapshot.metrics)+'</table>'+
      (detailed?'<h3>'+L('Datos utilizados','Inputs used')+'</h3><table>'+rows(snapshot.inputs)+'</table><h3>'+L('Cálculos y supuestos','Calculations and assumptions')+'</h3><p class="detail">'+escape(translateDetails(snapshot.details))+'</p>':'')+
      '<h3>'+L('Origen de los datos','Data sources')+'</h3><p>'+L('Datos y supuestos introducidos por el usuario; no verificados contra registros públicos ni cotizaciones de prestamistas.','User-entered data and assumptions; not verified against public records or lender quotes.')+'</p>'+
      (snapshot.demo?'<p class="flag">'+L('DEMOSTRACIÓN: inventario simulado, no son oportunidades verificadas.','DEMONSTRATION: simulated inventory, not verified investment opportunities.')+'</p>':'')+
      (snapshot.notes?'<h3>'+L('Notas del análisis','Analysis notes')+'</h3><p class="detail">'+escape(snapshot.notes)+'</p>':'')+
-     '<footer>'+L('Estimación informativa en USD. Comprueba contratos, impuestos, costos y datos comparables antes de tomar decisiones.','Informational estimate in USD. Verify contracts, taxes, costs and comparable data before making decisions.')+'</footer>';
+     '<footer><p>'+L('Estimación informativa en USD. Comprueba contratos, impuestos, costos y datos comparables antes de tomar decisiones.','Informational estimate in USD. Verify contracts, taxes, costs and comparable data before making decisions.')+'</p></footer>'+
+     '<div class="ib-r-brand"><img src="'+escape(snapshot.logo)+'" alt="" width="12" height="12">'+L('Preparado con','Prepared with')+' InvestorBlueprint'+(site?' · '+escape(site):'')+'</div>';
  }
  window.IBRenderFinanceReport=render;
  const init=()=>{
@@ -43,7 +51,7 @@
    invalidate();panel.append(label,notes,button,status);form.after(panel);
    const report=document.createElement('section');report.id='ib-finance-report';report.hidden=true;document.body.append(report);
    const style=document.createElement('style');style.textContent='.ib-finance-report-controls{margin:20px 0;display:grid;gap:12px}.ib-finance-report-controls textarea{width:100%;box-sizing:border-box}'+
-     '@media print{body>:not(#ib-finance-report){display:none!important}#ib-finance-report{display:block!important;color:#172b3d;background:white;font:12px Arial;line-height:1.5}#ib-finance-report header{border-bottom:2px solid #146d82}#ib-finance-report table{width:100%;border-collapse:collapse;margin-bottom:20px}#ib-finance-report td,#ib-finance-report th{padding:7px;text-align:left;border-bottom:1px solid #ddd}#ib-finance-report tr{break-inside:avoid}#ib-finance-report .detail{white-space:pre-wrap;overflow-wrap:anywhere}#ib-finance-report footer{margin-top:24px}#ib-finance-report .flag{font-weight:bold}}';document.head.append(style);
+     '@media print{body>:not(#ib-finance-report){display:none!important}#ib-finance-report{display:block!important;color:#172b3d;background:white;font:12px Arial;line-height:1.5}#ib-finance-report .ib-r-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:2px solid #146d82;padding-bottom:8px;margin-bottom:12px}#ib-finance-report .ib-r-head p{margin:0}#ib-finance-report .ib-r-company{font-size:17px;font-weight:bold}#ib-finance-report .ib-r-doc{text-align:right}#ib-finance-report .ib-r-doc h1{font-size:16px;margin:0}#ib-finance-report .ib-r-brand{display:flex;align-items:center;gap:5px;margin-top:10px;font-size:8px;color:#7b8a99;border-top:1px solid #e3e8ee;padding-top:5px;break-inside:avoid}#ib-finance-report .ib-r-brand img{width:12px;height:12px}#ib-finance-report table{width:100%;border-collapse:collapse;margin-bottom:20px}#ib-finance-report td,#ib-finance-report th{padding:7px;text-align:left;border-bottom:1px solid #ddd}#ib-finance-report tr{break-inside:avoid}#ib-finance-report .detail{white-space:pre-wrap;overflow-wrap:anywhere}#ib-finance-report footer{margin-top:24px}#ib-finance-report .flag{font-weight:bold}}';document.head.append(style);
    form.addEventListener('input',invalidate);form.addEventListener('change',invalidate);form.addEventListener('reset',invalidate);
    form.addEventListener('ib:calculation-complete',()=>{
      const validation=document.getElementById('tool-validation');
