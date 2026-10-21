@@ -68,6 +68,11 @@
     badge.className = `badge ${statusMeta.className}`;
     badge.dataset.toolPlanBadge = '';
     badge.textContent = messages.betaFreeLabel || 'BETA (FREE)';
+    if (tool.access === 'beta') {
+      badge.classList.add('beta-tester');
+      badge.textContent = messages.betaTesterLabel || 'BETA TESTER';
+      article.classList.add('is-beta-tool');
+    }
 
     const title = document.createElement('h3');
     title.textContent = getLocalizedName(tool);
@@ -97,11 +102,14 @@
     const messages = getMessages();
     toolGrid.innerHTML = '';
 
-    tools.forEach((tool) => {
+    // Beta tools appear only for the owner and approved beta testers (set by member-navigation.js).
+    const listed = tools.filter((tool) => tool.access !== 'beta' || window.IB_BETA_ACCESS === true)
+      .sort((a, b) => Number(a.access === 'beta') - Number(b.access === 'beta'));
+    listed.forEach((tool) => {
       toolGrid.append(createHomeCard(tool, messages));
     });
 
-    const freeCount = tools.filter((tool) => !getStatusMeta(tool.status).isPro).length;
+    const freeCount = listed.filter((tool) => tool.access !== 'beta' && !getStatusMeta(tool.status).isPro).length;
     const freeFeature = document.getElementById('free-feature-count');
     if (freeFeature) {
       freeFeature.textContent = `${freeCount} ${messages.toolsUnit || 'tools'}`;
@@ -125,7 +133,7 @@
 
     const title = document.querySelector('[data-tool-title]');
     if (title) {
-      title.textContent = `${getLocalizedName(tool)} — ${messages.betaFreeLabel || 'BETA (FREE)'}`;
+      title.textContent = getLocalizedName(tool);
     }
 
     const description = document.querySelector('[data-tool-description]');
@@ -149,6 +157,7 @@
 
     render();
     document.addEventListener('ib:language-changed', render);
+    document.addEventListener('ib:beta-access', render);
   };
 
   init();

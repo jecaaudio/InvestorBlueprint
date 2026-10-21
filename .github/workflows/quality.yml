@@ -15,17 +15,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Test public routes, member forms and PWA assets
-        run: node --test scripts/site-smoke.test.mjs scripts/member-recovery.test.mjs scripts/flip-finance.test.mjs scripts/member-profile.test.mjs scripts/secure-tool-loader.test.mjs scripts/deploy-gate.test.mjs scripts/member-resilience.test.mjs scripts/admin-navigation.test.mjs scripts/arv-provenance.test.mjs scripts/property-data.test.mjs scripts/review-preview.test.mjs
+      - name: Install locked test dependencies
+        run: npm ci
+
+      - name: Run offline unit, DOM, seller and report regressions
+        # The list lives in package.json "test"; site-smoke fails if a test file is in no list.
+        run: npm test
 
       - name: Verify live protected endpoint refuses missing and forged credentials
         run: node scripts/live-tool-denial.test.mjs
-
-      - name: Install locked DOM test dependencies
-        run: npm ci
-
-      - name: Verify expanded financial forms, seller patch and bilingual reports
-        run: node --test scripts/finance-dom.test.mjs scripts/seller-tax.test.mjs scripts/seller-validation.test.mjs scripts/arv-print.test.mjs scripts/arv-resilience.test.mjs
 
   quality-gates:
     runs-on: ubuntu-latest
@@ -60,6 +58,7 @@ jobs:
           curl -fsS http://127.0.0.1:4173/InvestorBlueprint/index.html >/dev/null
           npm run qa:axe
           node scripts/protected-brand-browser.test.mjs
+          node scripts/mobile-header-browser.test.mjs
 
       - name: Run Lighthouse CI assertions
         run: npm run qa:lighthouse

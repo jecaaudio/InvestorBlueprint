@@ -8,7 +8,7 @@ const validHtml='<!doctype html><html><head><title>Protected</title></head><body
   '<a class="tool-logo" href="../index.html">InvestorBlueprint</a><header class="top"><div>Sale report</div></header>'+
   '<main>'+('Secure content '.repeat(95))+'</main></body></html>';
 
-async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool='flip',userId='user_2',responseHtml=validHtml,blockedStorage=false,sessionChangedBeforeRender=false,eventAfterRender=null}={}){
+async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool='flip',userId='user_2',responseHtml=validHtml,blockedStorage=false,sessionChangedBeforeRender=false,eventAfterRender=null,beta=false,profile={role:'member',access_status:'approved'},betaTester=false,betaColumn=true,language=null}={}){
   let html='',redirect='',signedOut=0,requests=0;
   let shownMessage='',loginLinkHidden=true,authHeader='';
   const cache=new Map([
@@ -17,6 +17,7 @@ async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool
     ['ib_document_language','en'],
     ['ib_report_detail','summary']
   ]);
+  if(language)cache.set('preferredLanguage',language);
   const localStorage={setItem(key,value){if(blockedStorage)throw Error('Storage disabled');cache.set(key,String(value))},getItem(key){return cache.get(key)||null}};
   const session=signedIn?{access_token:'dummy_access_token',user:{id:userId}}:null;
   let sessionReads=0,authListener=null;
@@ -26,6 +27,15 @@ async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool
     async signOut(){signedOut++;return {error:null}}
   };
   const client={auth,from(table){
+    if(table==='member_profiles'){
+      assert.ok(beta,'Only beta tools read member profiles');
+      let columns='';
+      const q={select(value){columns=value;return q},eq(column,value){assert.equal(column,'id');assert.equal(value,userId);return q},
+        async maybeSingle(){return columns==='beta_tester'
+          ?(betaColumn?{data:{beta_tester:betaTester},error:null}:{data:null,error:{message:'column member_profiles.beta_tester does not exist'}})
+          :{data:profile,error:null}}};
+      return q;
+    }
     assert.equal(table,'member_preferences');
     const builder={
       select(){return builder},
@@ -37,7 +47,7 @@ async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool
   const link={hidden:true,href:''};
   const status={textContent:''};
   const document={
-    currentScript:{dataset:{tool,root:'../',assetBase:'tools/'}},
+    currentScript:{dataset:{tool,root:'../',assetBase:'tools/',...(beta?{beta:'true'}:{})}},
     documentElement:{classList:{remove(){}}},
     body:{replaceChildren(){html=''}},
     getElementById(id){return id==='secure-loading-message'?status:id==='secure-login-link'?link:null},
@@ -158,4 +168,21 @@ test('protected seller net receives branding without exposing it to unauthorized
   assert.match(approved.html,/class="ib-seller-brand"/);
   const denied=await run({tool:'seller-net',httpStatus:403});
   assert.equal(denied.html,'');
+});
+
+test('beta tools never reach the server for members who are not beta testers',async()=>{
+  for(const input of [{},{betaTester:false},{betaTester:true,profile:{role:'member',access_status:'suspended'}},
+    {betaTester:true,betaColumn:false},{profile:{role:'admin',access_status:'pending'}},{profile:null}]){
+    const r=await run({tool:'roi-search',beta:true,...input});
+    assert.equal(r.requests,0,JSON.stringify(input));assert.equal(r.html,'');
+    assert.match(r.shownMessage,/probadores autorizados/);assert.equal(r.loginLinkHidden,true);
+  }
+  const english=await run({tool:'rent',beta:true,language:'en'});
+  assert.match(english.shownMessage,/approved beta testers/);assert.doesNotMatch(english.shownMessage,/probadores/);
+});
+test('the approved owner and owner-marked testers open beta tools',async()=>{
+  for(const input of [{profile:{role:'admin',access_status:'approved'}},{betaTester:true}]){
+    const r=await run({tool:'automated-arv',beta:true,...input});
+    assert.equal(r.requests,1,JSON.stringify(input));assert.ok(r.html.startsWith('<!doctype html>'));
+  }
 });

@@ -363,6 +363,19 @@ button.secondary { background: transparent; border:1px solid var(--border); colo
   .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  /* Label on the left; field, help, errors and "read as" note stacked on the right.
+     Without explicit columns, help text shifted every following label out of place. */
+  .form-grid > label { grid-column: 1; }
+  .form-grid > .input-control,
+  .form-grid > input,
+  .form-grid > select,
+  .form-grid > .help-text,
+  .form-grid > .field-error,
+  .form-grid > .ib-number-echo { grid-column: 2; }
+  .form-grid > .help-text,
+  .form-grid > .field-error,
+  .form-grid > .ib-number-echo { margin-top: -0.45rem; }
 }
 
 @media (max-width: 839px) {

@@ -6,18 +6,35 @@
     for(const value of Object.values(result))if(typeof value==='number'&&!Number.isFinite(value))throw new RangeError('Financial result exceeds numeric limits');
     return result;
   };
+  // Accepts US (250,000.50) and Spanish (250.000,50) notation. A dot followed by
+  // groups of exactly three digits is a thousands separator, so 250.000 is 250000,
+  // never 250. A comma with one or two trailing digits is a decimal comma.
   const parseFinanceNumber=value=>{
     if(typeof value==='number')return Number.isFinite(value)?value:NaN;
     let clean=String(value??'').trim();if(!clean)return 0;
-    clean=clean.replace(/^([+-]?)\$/,'$1');
-    if(clean.includes(',')){
-      if(!/^[+-]?\d{1,3}(,\d{3})+(\.\d+)?$/.test(clean))return NaN;
-      clean=clean.replace(/,/g,'');
-    }
-    if(!/^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(clean))return NaN;
-    const parsed=Number(clean);return Number.isFinite(parsed)?parsed:NaN;
+    clean=clean.replace(/^([+-]?)\$\s*/,'$1');
+    const sign=/^[+-]/.test(clean)?clean[0]:'';
+    let body=sign?clean.slice(1):clean;
+    if(/^[1-9]\d{0,2}(,\d{3})+(\.\d+)?$/.test(body))body=body.replace(/,/g,'');
+    else if(/^[1-9]\d{0,2}(\.\d{3})+(,\d+)?$/.test(body))body=body.replace(/\./g,'').replace(',','.');
+    else if(/^\d+,\d{1,2}$/.test(body))body=body.replace(',','.');
+    else if(body.includes(','))return NaN;
+    if(!/^(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(body))return NaN;
+    const parsed=Number(sign+body);return Number.isFinite(parsed)?parsed:NaN;
   };
   if(typeof window!=='undefined')window.IBParseFinanceNumber=parseFinanceNumber;
+  // Percentages, months and counts never use thousands separators, so 7.125 stays
+  // 7.125 (a common US rate) and a decimal comma (7,5) is also accepted.
+  const parseRatioNumber=value=>{
+    if(typeof value==='number')return Number.isFinite(value)?value:NaN;
+    let clean=String(value??'').trim().replace(/\s*%$/,'');if(!clean)return 0;
+    if(/^[+-]?\d+,\d+$/.test(clean))clean=clean.replace(',','.');
+    if(!/^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(clean))return NaN;
+    const parsed=Number(clean);return Number.isFinite(parsed)?parsed:NaN;
+  };
+  const isRatioField=name=>/(pct|rate|points|months|count|yield|occupancy|roi|return)$/i.test(String(name||''));
+  const parseFieldNumber=(name,value)=>isRatioField(name)?parseRatioNumber(value):parseFinanceNumber(value);
+  if(typeof window!=='undefined')window.IBParseFieldNumber=parseFieldNumber;
   // Pure flip model; full-draw interest is a conservative simplified estimate.
   const calculateFlipFinance = (x) => {
     for(const key of ['purchase','sale','rehabTotal','buyerClosing','titleFees','inspectionCost','monthlyHolding','holdingMonths','stagingCost','transferTax','loanAmount','drawFee','drawInspectionFee','drawCount','originationFees','loanClosingCosts','prepayPenalty'])checkNumber(key,x[key]);
@@ -129,7 +146,80 @@
     callback();
   };
 
+  // The private tool pages carry some fixed English text without data-i18n keys.
+  // Translate those exact strings (text, tooltips, aria labels) with the page language.
+  const STATIC_ES={
+    'Flip Calculator':'Calculadora de Flip','Inputs':'Datos del proyecto',
+    'Financial diagnostics with live updates and resilient validation.':'Calcula ganancia, ROI, precio de equilibrio y oferta máxima de un flip.',
+    'ARV':'ARV (precio de venta esperado)','Purchase Price':'Precio de compra','Rehab Costs':'Costo de reparación',
+    'Holding Months':'Meses hasta vender','Holding Monthly Cost':'Costo mensual mientras la tienes',
+    'Buy Closing Costs':'Costos de cierre de compra','Sell Closing Costs':'Costos de cierre de venta',
+    'Agent Commission %':'Comisión de agentes %','Loan Amount':'Monto del préstamo','Interest Rate %':'Tasa de interés anual %',
+    'Points %':'Puntos %','Down Payment':'Pago inicial',
+    'Estimated value after repairs based on recent comparable sales.':'Valor estimado después de reparar, según ventas comparables recientes.',
+    'Agreed purchase price (excluding closing costs).':'Precio de compra acordado, sin costos de cierre.',
+    'Total renovation cost (materials, labor, and permits).':'Costo total de la remodelación: materiales, mano de obra y permisos.',
+    'Estimated months from purchase to sale.':'Meses estimados desde la compra hasta la venta.',
+    'Monthly carrying costs: taxes, insurance, utilities, lawn care, etc.':'Gastos de cada mes: impuestos, seguro, servicios, jardín, etc.',
+    'Closing costs when buying: title, lender fees, recording, etc.':'Costos al comprar: título, cargos del prestamista, registro, etc.',
+    'Closing costs when selling (excluding agent commission).':'Costos al vender, sin contar la comisión de agentes.',
+    'Total commission percentage (listing + buyer agent).':'Porcentaje total de comisión (agente vendedor + agente comprador).',
+    'Borrowed amount (hard money/loan).':'Monto prestado (hard money u otro préstamo).',
+    'Annual loan interest rate.':'Tasa de interés anual del préstamo.',
+    'Loan points (upfront fee). 1 point = 1% of the loan amount.':'Puntos del préstamo (cargo inicial). 1 punto = 1% del monto prestado.',
+    'Cash you bring to closing (if applicable).':'Efectivo que llevas al cierre, si aplica.',
+    'What is ARV?':'¿Qué es el ARV?','What is Purchase Price?':'¿Qué es el precio de compra?','What are Rehab Costs?':'¿Qué es el costo de reparación?',
+    'What are Holding Months?':'¿Qué son los meses hasta vender?','What is Holding Monthly Cost?':'¿Qué es el costo mensual?',
+    'What are Buy Closing Costs?':'¿Qué son los costos de cierre de compra?','What are Sell Closing Costs?':'¿Qué son los costos de cierre de venta?',
+    'What is Agent Commission?':'¿Qué es la comisión de agentes?','What is Loan Amount?':'¿Qué es el monto del préstamo?',
+    'What is Interest Rate?':'¿Qué es la tasa de interés?','What are Points?':'¿Qué son los puntos?','What is Down Payment?':'¿Qué es el pago inicial?',
+    'Net Profit':'Ganancia neta','Total Costs':'Costos totales','Break-even Sale Price':'Precio de venta de equilibrio',
+    'Max Offer (70% Rule)':'Oferta máxima (regla del 70%)','Decision':'Decisión',
+    'Income':'Ingresos','Use signed lease rent before expenses.':'Usa la renta del contrato firmado, antes de gastos.',
+    'Expenses & assumptions':'Gastos y supuestos','Reserve 5–10% of monthly rent for repairs.':'Reserva entre 5% y 10% de la renta mensual para reparaciones.',
+    'Typical stabilized vacancy is 3%–8%.':'La vacancia típica de una propiedad estabilizada es de 3% a 8%.',
+    'Property assumptions':'Datos de la propiedad','Include taxes, insurance and maintenance.':'Incluye impuestos, seguro y mantenimiento.',
+    'Yield goals':'Metas de rendimiento','Use realistic occupancy based on your local market.':'Usa una ocupación realista para tu mercado.',
+    'Comparable sales':'Ventas comparables','Use sold comps from the last 3–6 months nearby.':'Usa ventas cercanas cerradas en los últimos 3 a 6 meses.',
+    'Deal assumptions':'Supuestos de la operación','Loan terms':'Condiciones del préstamo',
+    'Enter total amount financed by the lender.':'Escribe el monto total que financia el prestamista.','months':'meses',
+    'Beta: tool available. Please send feedback below.':'Beta: herramienta disponible. Envíanos tus comentarios.',
+    'Use example':'Usar ejemplo','Reset':'Restablecer','ROI map':'Mapa de ROI',
+    'Send Feedback':'Enviar comentarios','Tool':'Herramienta','Your feedback':'Tus comentarios','Send':'Enviar',
+    'Close feedback modal':'Cerrar comentarios','Tell us what is working and what we should improve.':'Cuéntanos qué funciona y qué debemos mejorar.'
+  };
+  const translateStaticText=()=>{
+    if(typeof document==='undefined'||!document.body)return;
+    const spanish=document.documentElement.lang!=='en';
+    const skip='script,style,textarea,[data-i18n],#ib-finance-report,#printReport';
+    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+    const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+    for(const node of nodes){
+      if(node.parentElement?.closest(skip))continue;
+      node.ibEnglish??=node.textContent.trim();
+      const english=node.ibEnglish,target=spanish?STATIC_ES[english]:english;
+      if(!STATIC_ES[english]||!target)continue;
+      const current=node.textContent.trim();
+      if(current!==target)node.textContent=node.textContent.replace(current,target);
+    }
+    for(const attr of ['data-tooltip','aria-label','placeholder']){
+      for(const el of document.body.querySelectorAll('['+attr+']')){
+        if(el.closest('#ib-finance-report,#printReport'))continue;
+        const store='ibEn'+attr.replace(/(^|-)(\w)/g,(m,a,c)=>c.toUpperCase());
+        el.dataset[store]??=el.getAttribute(attr);
+        const english=el.dataset[store];
+        if(STATIC_ES[english])el.setAttribute(attr,spanish?STATIC_ES[english]:english);
+      }
+    }
+  };
+  if(typeof window!=='undefined')window.IBTranslateStaticText=translateStaticText;
+  if(typeof window?.addEventListener==='function'&&typeof document?.addEventListener==='function'){
+    document.addEventListener('ib:language-changed',translateStaticText);
+    window.addEventListener('load',translateStaticText);
+  }
+
   onDomReady(() => {
+  translateStaticText();
   const form = document.getElementById('tool-form');
   const output = document.getElementById('result-detail') || document.getElementById('result');
   const cards = document.getElementById('result-cards');
@@ -241,6 +331,42 @@
 
   setupCurrencyInputs();
 
+  // Native number fields read the Spanish "250.000" as 250 without any warning.
+  // Make every numeric field a decimal text field parsed by parseFinanceNumber,
+  // and show how an entry was read whenever it differs from a plain US reading.
+  const setupLocaleNumbers=()=>{
+    const english=()=>document.documentElement.lang==='en';
+    form.querySelectorAll('input[type="number"]').forEach(input=>{
+      input.type='text';input.inputMode='decimal';input.autocomplete='off';
+    });
+    form.querySelectorAll('input[inputmode="decimal"],input[data-format="currency"]').forEach(input=>{
+      if(input.dataset.ibNumberEcho||!input.id)return;
+      input.dataset.ibNumberEcho='true';
+      const echo=document.createElement('small');
+      echo.id=input.id+'-read-as';echo.className='ib-number-echo';echo.hidden=true;echo.setAttribute('aria-live','polite');
+      const anchor=input.parentElement?.classList.contains('input-control')?input.parentElement:input;
+      anchor.after(echo);
+      input.setAttribute('aria-describedby',[input.getAttribute('aria-describedby'),echo.id].filter(Boolean).join(' '));
+      const update=()=>{
+        const raw=input.value.trim();
+        const plain=Number(raw.replace(/^([+-]?)\$\s*/,'$1').replace(/\s*%$/,'').replace(/,/g,''));
+        const read=parseFieldNumber(input.name||input.id,raw);
+        if(!raw||read===plain){echo.hidden=true;echo.textContent='';return;}
+        echo.hidden=false;
+        echo.textContent=Number.isFinite(read)
+          ?(english()?'Read as ':'Se lee como ')+new Intl.NumberFormat('en-US',{maximumFractionDigits:6}).format(read)
+          :(english()?'Not a valid number. Example: 250,000 or 250.000':'Número no válido. Ejemplo: 250,000 o 250.000');
+      };
+      input.addEventListener('input',update);input.addEventListener('blur',update);update();
+    });
+    if(!document.getElementById('ib-number-echo-style')){
+      const style=document.createElement('style');style.id='ib-number-echo-style';
+      style.textContent='.ib-number-echo{display:block;margin-top:4px;font-size:.82rem;font-weight:600;color:#0a6fd1}.ib-number-echo[hidden]{display:none}';
+      document.head.append(style);
+    }
+  };
+  setupLocaleNumbers();
+
   const syncPlanMode = () => {
     if (type !== 'flip') return;
     const selected = form.querySelector('input[name="planMode"]:checked')?.value || 'free';
@@ -294,7 +420,7 @@
     clearFieldErrors();
     const invalid = [];
     rules.forEach((rule) => {
-      const value = parseNumeric(form.elements[rule.name]?.value);
+      const value = parseFieldNumber(rule.name, form.elements[rule.name]?.value);
       const isBlank = String(form.elements[rule.name]?.value || '').trim() === '';
       if (rule.required && isBlank) {
         setFieldError(rule.name, messages.requiredField);
@@ -515,7 +641,7 @@
       window.IBAnalytics.trackCalcRun(type);
     }
     const values = Object.fromEntries(new FormData(form).entries());
-    const num = (name) => parseNumeric(values[name]);
+    const num = (name) => parseFieldNumber(name, values[name]);
     try {
     if (type === 'flip') {
       if (!validateFlip(messages)) return;

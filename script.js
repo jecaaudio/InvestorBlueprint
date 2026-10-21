@@ -1,5 +1,4 @@
 (function () {
-  const BETA_FREE_MODE = true;
   const menuToggle = document.getElementById('menu-toggle');
   const nav = document.getElementById('primary-nav');
 
@@ -22,16 +21,6 @@
       if (window.innerWidth > 840) {
         closeMenu();
       }
-    });
-  }
-
-  // Keep this block disabled while beta free mode is active.
-  if (!BETA_FREE_MODE) {
-    document.querySelectorAll('[data-pro-tool="true"]').forEach((link) => {
-      link.addEventListener('click', (event) => {
-        event.preventDefault();
-        window.location.href = 'login.html';
-      });
     });
   }
 })();

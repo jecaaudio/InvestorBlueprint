@@ -7,8 +7,8 @@ const report=fs.readFileSync('tools/finance-report.js','utf8');
 const en=JSON.parse(fs.readFileSync('assets/i18n/en.json','utf8'));
 const es=JSON.parse(fs.readFileSync('assets/i18n/es.json','utf8'));
 const tick=()=>new Promise(resolve=>setTimeout(resolve,0));
-async function setup(type,fields,extra=''){
- const inputs=Object.entries(fields).map(([id,value])=>`<label for="${id}">${id}</label><input id="${id}" name="${id}" value="${value}"><p id="${id}-error" class="field-error" hidden></p>`).join('');
+async function setup(type,fields,extra='',inputAttrs=''){
+ const inputs=Object.entries(fields).map(([id,value])=>`<label for="${id}">${id}</label><input id="${id}" name="${id}" value="${value}"${inputAttrs}><p id="${id}-error" class="field-error" hidden></p>`).join('');
  const dom=new JSDOM(`<!doctype html><html lang="es"><head></head><body data-tool="${type}"><h1>Fixture</h1><form id="tool-form">${inputs}<p id="tool-validation" hidden></p><div class="tool-actions"><button>Calculate</button></div></form><div id="result-cards"></div><div id="result"></div>${extra}</body></html>`,{url:'https://jecaaudio.github.io/InvestorBlueprint/tools/fixture.html',runScripts:'outside-only'});
  const w=dom.window;
  w.IBI18n={getCurrentMessages:()=>es};
@@ -116,5 +116,52 @@ test('ROI filters one explicit metric, shows both returns, and exports the selec
  assert.match(d.getElementById('ib-finance-report').textContent,/Capitalization rate \(NOI \/ property value\)/);
  assert.match(d.getElementById('ib-finance-report').textContent,/DEMONSTRATION/);
  f.elements.returnMetric.value='bad';submit();assert.equal(d.getElementById('ib-finance-print').disabled,true);
+ dom.window.close();
+});
+test('numeric fields read Spanish notation and say how an ambiguous entry was read',async()=>{
+ const dom=await setup('rental',{monthlyRent:'',taxes:0,insurance:0,maintenance:0,management:0,vacancyRate:'5'},'',' type="number" inputmode="decimal" min="0" step="0.01"');
+ const w=dom.window,d=w.document,f=d.getElementById('tool-form');
+ for(const input of f.querySelectorAll('input:not([type="hidden"])'))assert.notEqual(input.type,'number',input.name+' must not use the native number parser');
+ const rent=f.elements.monthlyRent,echo=d.getElementById('monthlyRent-read-as');
+ rent.value='2.400';rent.dispatchEvent(new w.Event('input',{bubbles:true}));
+ assert.equal(echo.hidden,false);assert.match(echo.textContent,/Se lee como 2,400/);
+ assert.match(rent.getAttribute('aria-describedby'),/monthlyRent-read-as/);
+ rent.value='2400';rent.dispatchEvent(new w.Event('input',{bubbles:true}));assert.equal(echo.hidden,true);
+ rent.value='2.4.0';rent.dispatchEvent(new w.Event('input',{bubbles:true}));assert.match(echo.textContent,/Número no válido/);
+ rent.value='2.400';f.elements.vacancyRate.value='5,5';
+ f.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();
+ // 2,400 rent less 5.5% vacancy = 2,268 monthly cash flow with no costs.
+ assert.match(d.getElementById('result-cards').textContent,/\$2,268/);
+ dom.window.close();
+});
+test('private Flip labels, help and notices follow the page language; unused down payment is hidden',async()=>{
+ const row=(id,label,tip)=>'<div class="fc-row"><label for="'+id+'">'+label+' <button type="button" class="info-icon" aria-label="What is '+label+'?" data-tooltip="'+tip+'">!</button></label><input id="'+id+'" class="fc-input money" type="text" inputmode="decimal"></div>';
+ const html='<html lang="es"><head></head><body data-tool="flip"><main><section id="flip-calculator"><div class="fc-panel"><div class="fc-section"><h3>Inputs</h3>'+
+  row('purchasePrice','Purchase Price','Agreed purchase price (excluding closing costs).')+row('downPayment','Down Payment','Cash you bring to closing (if applicable).')+
+  '</div></div><div id="fcReportArea"></div></section></main></body></html>';
+ const dom=new JSDOM(html,{url:'https://jecaaudio.github.io/InvestorBlueprint/tools/flip-calculator.html',runScripts:'outside-only'});
+ const w=dom.window,d=w.document;w.IBI18n={getCurrentMessages:()=>es};
+ const tag=d.createElement('script');tag.src='https://jecaaudio.github.io/InvestorBlueprint/assets/js/flip-calculator.js';
+ Object.defineProperty(d,'currentScript',{configurable:true,value:tag});w.eval(fs.readFileSync('assets/js/flip-calculator.js','utf8'));
+ Object.defineProperty(d,'currentScript',{configurable:true,value:null});w.eval(source);await tick();
+ const label=d.querySelector('label[for="purchasePrice"]'),icon=label.querySelector('.info-icon');
+ assert.match(label.textContent,/Precio de compra/);assert.equal(icon.textContent,'?');
+ assert.match(icon.getAttribute('data-tooltip'),/Precio de compra acordado/);
+ assert.match(d.querySelector('h3').textContent,/Datos del proyecto/);
+ assert.equal(d.getElementById('downPayment').closest('.fc-row').hidden,true);
+ assert.match(d.getElementById('tool-form').textContent,/Tu capital propio/);assert.doesNotMatch(d.getElementById('tool-form').textContent,/Equity is/);
+ assert.equal(d.querySelector('#tool-form button[type="submit"]').textContent,'Calcular');
+ d.documentElement.lang='en';d.dispatchEvent(new w.CustomEvent('ib:language-changed'));
+ assert.match(label.textContent,/Purchase Price/);assert.match(icon.getAttribute('data-tooltip'),/Agreed purchase price/);
+ assert.match(d.getElementById('tool-form').textContent,/Your equity is/);
+ dom.window.close();
+});
+test('cookie banner is Spanish by default and uses translation keys for English',async()=>{
+ const dom=new JSDOM('<html lang="es"><body></body></html>',{url:'https://jecaaudio.github.io/InvestorBlueprint/',runScripts:'outside-only'});
+ const w=dom.window,d=w.document;w.eval(fs.readFileSync('assets/js/cookie-banner-component.js','utf8'));await new Promise(resolve=>setTimeout(resolve,20));
+ assert.match(d.getElementById('cookie-banner').textContent,/Usamos cookies/);
+ assert.equal(d.getElementById('cookie-accept-all').textContent,'Aceptar todas');
+ for(const node of d.querySelectorAll('#cookie-banner [data-i18n]'))assert.ok(en[node.dataset.i18n]&&es[node.dataset.i18n],'Missing banner key '+node.dataset.i18n);
+ assert.ok(d.getElementById('cookie-analytics'),'checkbox survives translation markup');
  dom.window.close();
 });

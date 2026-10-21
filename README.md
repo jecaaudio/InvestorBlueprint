@@ -35,17 +35,21 @@ Luego abre:
 - `http://localhost:4173/InvestorBlueprint/` si estas sirviendo desde la carpeta padre.
 - `http://localhost:4173/` si estas sirviendo desde la carpeta del proyecto.
 
-## Quality gates (CI)
+## Pruebas y quality gates (CI)
 
-El workflow `.github/workflows/quality-gates.yml` ejecuta:
+El workflow `.github/workflows/quality.yml` corre en cada push y pull request:
 
-- Pruebas de accesibilidad con `axe` en paginas clave.
-- Auditoria de Lighthouse con minimos de performance, accesibilidad, best-practices y SEO.
+- **Pruebas unitarias, de estructura y de DOM** (`npm test`): rutas protegidas, recuperación de contraseña, finanzas de cada calculadora, reportes, perfiles y despliegue. Cuatro pruebas que necesitan navegador, el endpoint en vivo o archivos privados corren en pasos aparte; una prueba falla si aparece un archivo `scripts/*.test.mjs` que no esté en ninguna lista.
+- **Accesibilidad** con `axe` en páginas clave.
+- **Lighthouse** con mínimos de performance, accesibilidad, best-practices y SEO.
+
+GitHub Pages solo publica un commit si este workflow pasó en ese mismo commit (ver `.github/workflows/deploy-pages.yml`).
 
 Para ejecutarlos localmente:
 
 ```bash
 npm install
+npm test
 npx playwright install chromium
 python -m http.server 4173
 npm run qa:axe
@@ -57,6 +61,21 @@ Si estas sirviendo desde la carpeta del proyecto y no desde la carpeta padre, ej
 ```bash
 AXE_SITE_BASE_PATH= npm run qa:axe
 ```
+
+El worker ARV (`workers/arv-worker`) tiene sus propias pruebas: `cd workers/arv-worker && npm test`.
+
+## SDK de Supabase
+
+Todas las páginas cargan la misma versión fija del SDK (`@supabase/supabase-js@2.117.0`) con un hash de integridad (`integrity="sha384-..."`). Si el CDN entrega un archivo distinto, el navegador no lo ejecuta. Para actualizar la versión, cambia la URL y el hash juntos en todas las páginas y en `scripts/site-smoke.test.mjs`; la prueba falla si alguna página queda distinta.
+
+## Modo beta tester
+
+Tres herramientas siguen en pruebas: **Búsqueda por ROI** (datos simulados), **ARV automático** (sin proveedor de datos real) y **Renta sugerida** (se fusionará con Flujo de renta). En `assets/config/tools.json` tienen `"access": "beta"`.
+
+- Solo las ven y las abren el administrador y los miembros marcados como **beta tester**. Para los demás no aparecen en el catálogo, y si abren el enlace ven un aviso en lugar de la herramienta.
+- El administrador marca o desmarca a cada miembro en `admin.html` con la casilla **Beta tester**.
+- **Paso único en Supabase:** aplicar `supabase/migrations/20261021120000_beta_testers.sql` (SQL Editor o `supabase db push`). Agrega la columna `beta_tester`, que solo el administrador puede cambiar, y la función `private.has_beta_access()`. Hasta aplicarla, el administrador ya tiene acceso beta y la casilla aparece desactivada con un aviso. Reversión: `supabase/rollback/beta_testers.sql`. Pruebas: `supabase/tests/beta-testers.sql`.
+- Para bloquear también desde el servidor, la Edge Function `ib-protected-tools` puede llamar a `private.has_beta_access()` antes de entregar `roi-search`, `rent` y `automated-arv`. Hoy esa comprobación la hace el navegador.
 
 ## Acceso y seguridad (octubre de 2026)
 

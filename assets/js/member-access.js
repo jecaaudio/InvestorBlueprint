@@ -249,8 +249,15 @@
     const allowed=['approved','rejected','suspended','pending'];
     async function loadMembers(){
       say('admin-message',t('Cargando solicitudes…','Loading requests…'),'info');
-      const {data,error}=await client.from('member_profiles')
-        .select('id,email,full_name,role,access_status,requested_at,reviewed_at').order('requested_at',{ascending:false});
+      const columns='id,email,full_name,role,access_status,requested_at,reviewed_at';
+      // beta_tester exists only after the beta-testers migration; keep the panel usable without it.
+      let betaAvailable=true;
+      let {data,error}=await client.from('member_profiles')
+        .select(columns+',beta_tester').order('requested_at',{ascending:false});
+      if(error&&/beta_tester/i.test(error.message||'')){
+        betaAvailable=false;
+        ({data,error}=await client.from('member_profiles').select(columns).order('requested_at',{ascending:false}));
+      }
       if(error){say('admin-message',error.message,'error');return}
       list.replaceChildren();
       const rows=(data||[]).filter(x=>filter.value==='all'||x.access_status===filter.value);
@@ -280,12 +287,27 @@
             await loadMembers();
           });
           const actions=document.createElement('div');actions.className='member-actions';actions.append(select,button);row.append(actions);
+          // Beta testers can open tools that are still in testing.
+          const betaLabel=document.createElement('label');betaLabel.className='member-beta';
+          const beta=document.createElement('input');beta.type='checkbox';beta.checked=member.beta_tester===true;
+          beta.disabled=!betaAvailable;
+          betaLabel.append(beta,document.createTextNode(' '+t('Beta tester (herramientas en prueba)','Beta tester (tools in testing)')));
+          if(!betaAvailable)betaLabel.title=t('Aplica la migración de beta testers en Supabase para activar esta opción.','Apply the beta-testers migration in Supabase to enable this option.');
+          beta.addEventListener('change',async()=>{
+            beta.disabled=true;
+            const {error}=await client.from('member_profiles').update({beta_tester:beta.checked}).eq('id',member.id);
+            beta.disabled=false;
+            if(error){beta.checked=!beta.checked;say('admin-message',error.message,'error');return}
+            member.beta_tester=beta.checked;
+            say('admin-message',beta.checked?t('Acceso beta activado para ','Beta access enabled for ')+member.email:t('Acceso beta retirado para ','Beta access removed for ')+member.email,'success');
+          });
+          actions.append(betaLabel);
         } else {
-          const self=document.createElement('small');self.textContent=t('Cuenta administradora','Administrator account');row.append(self);
+          const self=document.createElement('small');self.textContent=t('Cuenta administradora · incluye acceso beta','Administrator account · includes beta access');row.append(self);
         }
         list.append(row);
       }
-      say('admin-message',rows.length?t('Solicitudes actualizadas.','Requests loaded.'):t('No hay solicitudes con ese estado.','No requests with that status.'),'success');
+      say('admin-message',!betaAvailable?t('Solicitudes cargadas. Para usar beta testers, aplica la migración 20261021120000_beta_testers.sql en Supabase.','Requests loaded. To use beta testers, apply migration 20261021120000_beta_testers.sql in Supabase.'):rows.length?t('Solicitudes actualizadas.','Requests loaded.'):t('No hay solicitudes con ese estado.','No requests with that status.'),betaAvailable?'success':'warning');
     }
     filter.addEventListener('change',loadMembers);
     reload.addEventListener('click',loadMembers);

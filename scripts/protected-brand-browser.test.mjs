@@ -18,14 +18,19 @@ try {
           getSession:async()=>({data:{session:{user:{id:'fixture-user'},access_token:'fixture-only'}},error:null}),
           signOut:async()=>({error:null})
         },
-        from:()=>({
+        // The fixture member is the approved owner, so beta tools (Automated ARV) open too.
+        from:table=>({
           select(){return this},
           eq(){return this},
-          maybeSingle:async()=>({data:{display_name:'Fixture',company_name:'Fixture LLC',document_language:'es',report_detail:'detailed',notes_detail:'detailed'},error:null})
+          maybeSingle:async()=>table==='member_profiles'
+            ?{data:{role:'admin',access_status:'approved'},error:null}
+            :{data:{display_name:'Fixture',company_name:'Fixture LLC',document_language:'es',report_detail:'detailed',notes_detail:'detailed'},error:null}
         })
       })};
     });
-    await page.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+    // Match any pinned SDK version; the mock body fails the page's integrity check,
+    // so the browser skips it and the window.supabase fixture above stays in place.
+    await page.route(/^https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@/,
       route=>route.fulfill({status:200,contentType:'application/javascript',body:'/* SDK mocked in CI */'}));
     await page.route('**/functions/v1/ib-protected-tools?tool=*',route=>{
       const cors={'access-control-allow-origin':'*',

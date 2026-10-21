@@ -338,5 +338,14 @@
   "reportFlipInterest": "Tasa anual de interés (%)",
   "reportFlipPoints": "Puntos del préstamo (%)",
   "cashCommittedLabel": "Capital propio comprometido",
-  "flipMathNotes": "El depósito se acredita al precio de compra. El interés usa los desembolsos y el método seleccionados; si no se especifican desembolsos, se financia todo el compromiso desde el mes cero. El capital comprometido no equivale al efectivo requerido al cierre."
+  "flipMathNotes": "El depósito se acredita al precio de compra. El interés usa los desembolsos y el método seleccionados; si no se especifican desembolsos, se financia todo el compromiso desde el mes cero. El capital comprometido no equivale al efectivo requerido al cierre.",
+  "cookieMessage": "Usamos cookies para mejorar tu experiencia. Decide si aceptas las cookies de analítica y de marketing.",
+  "cookiePrivacyLink": "Política de privacidad",
+  "cookieAnalytics": "Cookies de analítica",
+  "cookieMarketing": "Cookies de marketing",
+  "cookieRejectAll": "Rechazar todas",
+  "cookieSavePreferences": "Guardar preferencias",
+  "cookieAcceptAll": "Aceptar todas",
+  "rentAssumptions": "El rendimiento meta es BRUTO; los gastos anuales solo se restan del ingreso neto que se muestra.",
+  "betaTesterLabel": "PRUEBA BETA"
 }

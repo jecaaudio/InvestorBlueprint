@@ -77,6 +77,10 @@ nav a:hover,.brand-dropdown a:hover{color:var(--primary)!important}
 .tool-grid>.card p{margin:0;flex:1}
 .tool-grid>.card .card-btn{align-self:flex-start;margin-top:auto}
 .badge.free{background:var(--site-soft)!important;color:var(--primary)!important;border:1px solid var(--site-border)}
+/* Beta tools are visible only to approved testers; mark them clearly. */
+.badge.free.beta-tester{background:#fdf1d8!important;color:#8a5a00!important;border-color:#f0d49a!important}
+html[data-theme="dark"] .badge.free.beta-tester{background:#3a2c0e!important;color:#f5c66a!important;border-color:#6b5320!important}
+.tool-grid>.card.is-beta-tool{border-style:dashed!important}
 .price-card.featured{border-color:var(--primary)!important;box-shadow:var(--site-shadow)!important}
 .comparison-table-wrap{background:var(--panel)!important;border-color:var(--site-border)!important}
 .comparison-table th{color:var(--text)}
@@ -127,9 +131,23 @@ body[data-tool] .fc-row label{color:var(--text)}
  .navbar .brand-menu{flex:1 1 auto;max-width:none}
  .navbar .lang-switcher{width:auto!important;margin-left:0!important}
  .navbar .lang-option{flex:none!important}
- .navbar .menu-toggle{margin-left:auto;order:2}
+ /* One row on phones: logo | EN ES | theme | menu icon. The logo takes the free space. */
+ /* The logo shrinks first (basis 0), so a wider fallback font never pushes the
+    buttons to a second row; the name ends in an ellipsis only if space runs out. */
+ .navbar .brand-menu{flex:1 1 0!important;margin-right:auto;min-width:0}
+ .navbar .brand-lockup{min-width:0;max-width:100%;overflow:hidden!important}
+ .navbar .brand-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .navbar .lang-switcher{order:2}
+ .navbar .lang-option{padding:6px 10px!important;min-width:0!important}
+ .navbar .lang-option .flag-emoji{display:none!important}
+ .navbar .site-theme-button{order:3}
+ .navbar .menu-toggle{
+   order:4;margin-left:0!important;width:36px;min-width:36px;height:36px;padding:0!important;
+   align-items:center;justify-content:center;border-radius:9px;
+   font-size:0!important;line-height:1;overflow:hidden
+ }
+ .navbar .menu-toggle::before{content:"\2630";font-size:1.15rem;line-height:1}
  .navbar nav{width:100%;order:5}
- .navbar .site-theme-button{order:4}
  .tool-navbar{padding:10px 13px!important;flex-wrap:wrap}
  .tool-navbar .lang-switcher{margin-left:auto!important}
  .tool-navbar .site-theme-button{margin-left:0!important}

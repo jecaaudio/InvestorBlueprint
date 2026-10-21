@@ -32,7 +32,9 @@ try {
       }
     })};
   });
-  await page.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+  // Match any pinned SDK version; the mock body fails the page's integrity check,
+  // so the browser skips it and the window.supabase fixture above stays in place.
+  await page.route(/^https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@/,
     route=>route.fulfill({status:200,contentType:'application/javascript',body:'/* SDK mocked for WebKit CI */'}));
   await page.goto(base+'/InvestorBlueprint/account.html',{waitUntil:'domcontentloaded'});
   await page.locator('#account-content').waitFor({state:'visible',timeout:12000});
