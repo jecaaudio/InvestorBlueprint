@@ -1,0 +1,41 @@
+name: Property data safety
+on:
+  push:
+    paths: ['supabase/**', 'scripts/property-*', '.github/workflows/property-data.yml']
+  pull_request:
+    paths: ['supabase/**', 'scripts/property-*', '.github/workflows/property-data.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  guarded-provider:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: disposable_ci_password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: disposable_ci_password
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Provider authorization, privacy and error tests (no external calls)
+        run: node --test scripts/property-data.test.mjs
+      - name: Prepare disposable PostgreSQL roles
+        run: psql -v ON_ERROR_STOP=1 -c 'create role anon; create role authenticated; create role service_role; create schema private;'
+      - name: Apply candidate migration to disposable database
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261020115959_guarded_property_data.sql
+      - name: Verify real SQL grants, cache and budget expiration
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/property-budget.sql
+      - name: Verify 40 concurrent attempts cannot exceed seven reserved calls
+        run: bash scripts/property-budget-concurrency.sh
