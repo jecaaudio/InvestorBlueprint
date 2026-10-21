@@ -121,7 +121,6 @@
           :profile.access_status==='pending'
           ?t('Solicitud recibida. El administrador revisará tu cuenta antes de autorizar las herramientas.','Request received. The administrator must approve your account before you can use the tools.')
           :t('Para obtener más información, contacta al administrador.','Contact the administrator for more information.');
-        $('admin-link').hidden=!(profile.role==='admin'&&profile.access_status==='approved');
         $('signout-button').hidden=false;
         return profile;
       }catch(e){say('portal-message',e.message,'error');return null}

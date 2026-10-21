@@ -1,5 +1,5 @@
-/* Reveal the administrative shortcut only when Supabase confirms an approved admin,
- * and tell the tool catalog whether this member may see beta tools. */
+/* Tell the tool catalog whether this member may see beta tools.
+ * Administration is never linked from page menus; the approved owner reaches it from My profile. */
 (function(){
  'use strict';
  // The approved owner always has beta access; other approved members need the
@@ -19,10 +19,8 @@
    }
  }
  async function init(){
-   const adminLinks=['index-admin-link','primary-admin-link']
-     .map(id=>document.getElementById(id)).filter(Boolean);
    const hasCatalog=Boolean(document.querySelector?.('.tool-grid'));
-   if(!adminLinks.length&&!hasCatalog)return;
+   if(!hasCatalog)return;
    const cfg=window.IB_AUTH_CONFIG||{};
    if(!cfg.supabaseUrl||!cfg.supabaseAnonKey||!window.supabase?.createClient)return;
    try{
@@ -34,11 +32,8 @@
      const {data:profile,error:profileError}=await client.from('member_profiles')
        .select('role,access_status').eq('id',session.user.id).maybeSingle();
      if(profileError)return;
-     if(profile?.role==='admin'&&profile.access_status==='approved'){
-       adminLinks.forEach(link=>{link.hidden=false});
-     }
-     if(hasCatalog)publishBetaAccess(await readBetaAccess(client,session.user.id,profile));
-   }catch(error){/* Admin shortcut and beta tools stay hidden. Protected pages check again. */}
+     publishBetaAccess(await readBetaAccess(client,session.user.id,profile));
+   }catch(error){/* Beta tools stay hidden. Protected pages check again. */}
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
  else init();
