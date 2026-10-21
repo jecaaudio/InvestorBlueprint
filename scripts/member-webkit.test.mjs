@@ -38,6 +38,9 @@ try {
     route=>route.fulfill({status:200,contentType:'application/javascript',body:'/* SDK mocked for WebKit CI */'}));
   await page.goto(base+'/InvestorBlueprint/account.html',{waitUntil:'domcontentloaded'});
   await page.locator('#account-content').waitFor({state:'visible',timeout:12000});
+  // A first visit shows the cookie banner over the form; answer it like a visitor would.
+  await page.locator('#cookie-reject-all').click({timeout:12000});
+  await page.locator('#cookie-banner').waitFor({state:'hidden',timeout:5000});
   assert.equal(await page.locator('#account-admin-button').isVisible(),true);
   await page.locator('#setting-display-name').fill('Safari QA');
   await page.locator('#setting-document-language').selectOption('en');
