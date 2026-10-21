@@ -73,7 +73,9 @@
      fill(effective);
      setCache(effective);
      $('account-email').textContent=user.email||profile.email||'';
-     $('account-role').textContent=profile.role==='admin'?t('Rol: administrador','Role: administrator'):t('Rol: miembro','Role: member');
+     // Only the administrator sees a role line; members never see administration wording.
+     $('account-role').textContent=profile.role==='admin'?t('Rol: administrador','Role: administrator'):'';
+     $('account-role').hidden=profile.role!=='admin';
      const status={approved:t('Cuenta aprobada','Account approved'),pending:t('Pendiente de aprobación','Awaiting approval'),rejected:t('Solicitud rechazada','Request declined'),suspended:t('Cuenta suspendida','Account suspended')};
      $('account-status').textContent=status[profile.access_status]||profile.access_status;
      const isAdmin=profile.role==='admin'&&profile.access_status==='approved';

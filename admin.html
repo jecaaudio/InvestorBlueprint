@@ -25,14 +25,15 @@
  </div>
 </header>
 <main>
- <section class="access-hero">
+ <p id="admin-checking" class="card access-card" role="status" data-es="Verificando tu cuenta…" data-en="Checking your account…">Verificando tu cuenta…</p>
+ <section class="access-hero" id="admin-hero" hidden>
   <p class="eyebrow">InvestorBlueprint · Admin</p>
   <h1 data-es="Panel de administración" data-en="Administrator dashboard">Panel de administración</h1>
   <p data-es="Aprueba, rechaza o suspende las cuentas que solicitan acceso. Todas las decisiones quedan registradas." data-en="Approve, decline or suspend member requests. All decisions are recorded.">Aprueba, rechaza o suspende las cuentas que solicitan acceso. Todas las decisiones quedan registradas.</p>
  </section>
- <div id="admin-denied" class="card access-card">
-  <h2 data-es="Acceso restringido" data-en="Restricted access">Acceso restringido</h2>
-  <p data-es="Solo una cuenta administradora, autenticada y aprobada, puede utilizar este panel." data-en="Only an authenticated, approved administrator account can access this dashboard.">Solo una cuenta administradora, autenticada y aprobada, puede utilizar este panel.</p>
+ <div id="admin-denied" class="card access-card" hidden>
+  <h2 data-es="No pudimos verificar tu cuenta" data-en="We could not verify your account">No pudimos verificar tu cuenta</h2>
+  <p data-es="Comprueba tu conexión e inténtalo de nuevo." data-en="Check your connection and try again.">Comprueba tu conexión e inténtalo de nuevo.</p>
   <a href="login.html" class="btn btn-primary" data-es="Iniciar sesión" data-en="Sign in">Iniciar sesión</a>
  </div>
  <div id="admin-root" class="card access-card" hidden>
@@ -58,7 +59,7 @@
    <button type="button" class="btn" id="members-refresh" data-es="Actualizar" data-en="Refresh">Actualizar</button>
   </div>
   <div id="member-list" class="member-list" aria-live="polite"></div>
-  <p class="access-note" data-es="La autorización de las calculadoras ya se comprueba en Supabase antes de entregar su contenido. La aprobación y suspensión de cuentas tienen efecto sobre las nuevas solicitudes." data-en="Supabase verifies calculator access before delivering protected content. Account approval and suspension affect subsequent access requests.">El administrador puede aprobar el acceso, pero la autorización de las calculadoras se activará solo cuando las herramientas estén alojadas en una ruta protegida por el servidor.</p>
+  <p class="access-note" data-es="Cada calculadora comprueba en el servidor que la cuenta esté aprobada antes de abrirse. Aprobar o suspender una cuenta se aplica en su próxima visita." data-en="Every calculator checks on the server that the account is approved before opening. Approving or suspending an account applies on its next visit.">Cada calculadora comprueba en el servidor que la cuenta esté aprobada antes de abrirse. Aprobar o suspender una cuenta se aplica en su próxima visita.</p>
  </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js" integrity="sha384-xPW3QHswsICVC2mW6BFNwMbhpLkbZ133fKOhxNx3QGGgAOJfL3O9t8r2aWn1aez6" crossorigin="anonymous"></script>

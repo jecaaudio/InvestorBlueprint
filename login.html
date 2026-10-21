@@ -30,7 +30,7 @@
 <section class="access-hero">
  <p class="eyebrow">InvestorBlueprint · Members</p>
  <h1 data-es="Tu acceso a las herramientas inmobiliarias" data-en="Your real estate toolkit starts here">Tu acceso a las herramientas inmobiliarias</h1>
- <p data-es="Crea tu cuenta, confirma tu correo y solicita autorización. El administrador decide quién puede utilizar la plataforma." data-en="Create an account, verify your email, and request authorization. The administrator approves who can use the platform.">Crea tu cuenta, confirma tu correo y solicita autorización. El administrador decide quién puede utilizar la plataforma.</p>
+ <p data-es="Crea tu cuenta gratis, confirma tu correo y empieza a analizar propiedades. Revisamos cada solicitud para mantener la plataforma segura." data-en="Create your free account, confirm your email and start analyzing properties. We review each request to keep the platform safe.">Crea tu cuenta gratis, confirma tu correo y empieza a analizar propiedades. Revisamos cada solicitud para mantener la plataforma segura.</p>
 </section>
 <div class="access-grid">
  <section class="card access-card" id="member-login">
@@ -51,13 +51,12 @@
    <label><span data-es="Correo electrónico" data-en="Email">Correo electrónico</span><input id="signin-email" type="email" autocomplete="username" required></label>
    <label><span data-es="Contraseña" data-en="Password">Contraseña</span><input id="signin-password" type="password" autocomplete="current-password" required></label>
    <button id="toggle-signin-password" class="btn password-visibility-toggle" type="button" aria-controls="signin-password" aria-pressed="false" data-es="Mostrar contraseña" data-en="Show password">Mostrar contraseña</button>
-   <p class="access-note" data-es="Utiliza la contraseña que creaste para tu usuario en Authentication → Users de InvestorBlueprint, no la contraseña de tu cuenta de administración de Supabase." data-en="Use the password created for your InvestorBlueprint user under Authentication → Users, not your Supabase dashboard password.">Utiliza la contraseña que creaste para tu usuario en Authentication → Users de InvestorBlueprint, no la contraseña de tu cuenta de administración de Supabase.</p>
    <button class="btn btn-primary" type="submit" data-es="Entrar" data-en="Sign in">Entrar</button>
    <a href="login.html?recover=1" style="display:inline-block;color:var(--primary);margin-top:8px;" data-es="¿Olvidaste la contraseña? Restablecer acceso" data-en="Forgot password? Reset access">¿Olvidaste la contraseña? Restablecer acceso</a>
   </form>
   <form id="recover-form" class="access-form" hidden>
    <label><span data-es="Correo de recuperación" data-en="Recovery email">Correo de recuperación</span><input id="recover-email" type="email" autocomplete="email" required></label>
-   <p class="access-note" data-es="Solicita el enlace una sola vez y espera unos minutos. Abre el correo más reciente directamente en Safari. No compartas el enlace." data-en="Request the link once and wait a few minutes. Open the newest email directly in Safari. Never share the link.">Solicita el enlace una sola vez y espera unos minutos. Abre el correo más reciente directamente en Safari. No compartas el enlace.</p>
+   <p class="access-note" data-es="Solicita el enlace una sola vez y espera unos minutos. Ábrelo en este mismo dispositivo y no lo compartas." data-en="Request the link once and wait a few minutes. Open it on this same device and never share it.">Solicita el enlace una sola vez y espera unos minutos. Ábrelo en este mismo dispositivo y no lo compartas.</p>
    <button class="btn btn-primary" type="submit" data-es="Enviar recuperación" data-en="Send recovery email">Enviar recuperación</button>
   </form>
   <form id="new-password-form" class="access-form" hidden>
@@ -73,8 +72,8 @@
   <ol class="access-benefits">
    <li data-es="Te registras con correo y contraseña." data-en="Create your account using email and password.">Te registras con correo y contraseña.</li>
    <li data-es="Confirmas tu dirección de correo electrónico." data-en="Confirm your email address.">Confirmas tu dirección de correo electrónico.</li>
-   <li data-es="El administrador revisa y aprueba tu solicitud." data-en="The administrator reviews and approves your request.">El administrador revisa y aprueba tu solicitud.</li>
-   <li data-es="Una vez aprobada y habilitado el entorno protegido, accedes a las herramientas." data-en="Once approved and the protected environment is enabled, you can access the tools.">Una vez aprobada y habilitado el entorno protegido, accedes a las herramientas.</li>
+   <li data-es="Revisamos tu solicitud y la aprobamos." data-en="We review and approve your request.">Revisamos tu solicitud y la aprobamos.</li>
+   <li data-es="Con la cuenta aprobada usas todas las calculadoras y exportas PDF con tu nombre." data-en="Once approved, you use every calculator and export PDFs with your name.">Con la cuenta aprobada usas todas las calculadoras y exportas PDF con tu nombre.</li>
   </ol>
   <div id="account-summary" hidden>
    <hr>
@@ -85,7 +84,7 @@
    <a href="admin.html" id="admin-link" class="btn btn-primary" hidden data-es="Panel de administración" data-en="Admin dashboard">Panel de administración</a>
    <button id="signout-button" class="btn" type="button" hidden data-es="Cerrar sesión" data-en="Sign out">Cerrar sesión</button>
   </div>
-  <p class="access-note" data-es="Tus datos de acceso los valida el proveedor de autenticación. La contraseña no se guarda en esta página ni en GitHub." data-en="Your login credentials are verified by the authentication provider. Passwords are never stored in this page or in GitHub.">Tus datos de acceso los valida el proveedor de autenticación. La contraseña no se guarda en esta página ni en GitHub.</p>
+  <p class="access-note" data-es="Tu contraseña se guarda cifrada. Nadie de InvestorBlueprint puede verla." data-en="Your password is stored encrypted. Nobody at InvestorBlueprint can see it.">Tu contraseña se guarda cifrada. Nadie de InvestorBlueprint puede verla.</p>
   <p><a href="privacy.html" data-es="Política de privacidad" data-en="Privacy policy">Política de privacidad</a></p>
  </aside>
 </div>

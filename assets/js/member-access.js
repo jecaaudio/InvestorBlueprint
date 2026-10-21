@@ -160,7 +160,8 @@
           ['pending','approved'].includes(profile?.access_status)){window.location.assign('pricing.html');return}
         if(profile?.access_status==='approved'){
           const raw=new URLSearchParams(window.location.search).get('returnTo')||'';
-          const ok=raw.startsWith('/InvestorBlueprint/tools/')||raw.startsWith('/InvestorBlueprint/calculadora-venta/')||raw==='/InvestorBlueprint/account.html';
+          const ok=raw.startsWith('/InvestorBlueprint/tools/')||raw.startsWith('/InvestorBlueprint/calculadora-venta/')||raw==='/InvestorBlueprint/account.html'||
+            (raw==='/InvestorBlueprint/admin.html'&&profile.role==='admin');
           if(ok && !raw.startsWith('//') && !raw.includes('\\')) {
             const target=new URL(raw,window.location.origin);
             if(target.origin===window.location.origin){window.location.assign(target.href);return}
@@ -170,7 +171,7 @@
       }catch(err){
         const invalid=err?.code==='invalid_credentials'||/invalid login credentials/i.test(err?.message||'');
         say('portal-message',invalid
-          ?t('Correo o contraseña incorrectos. Comprueba la contraseña creada en Supabase. Si no la recuerdas, selecciona «Recuperar contraseña».','Incorrect email or password. Check the password you created in Supabase, or select “Reset password”.')
+          ?t('Correo o contraseña incorrectos. Si no recuerdas la contraseña, selecciona «Recuperar contraseña».','Incorrect email or password. If you don’t remember it, select “Reset password”.')
           :t('No fue posible iniciar sesión: ','Could not sign in: ')+(err?.message||t('Error desconocido.','Unknown error.')),'error');
       }
       finally{setBusy(login,false)}
@@ -180,7 +181,7 @@
       try{
         const {error}=await client.auth.resetPasswordForEmail($('recover-email').value.trim().toLowerCase(),{redirectTo:new URL('login.html',location.href).href});
         if(error)throw error;
-        say('portal-message',t('Solicitud recibida. Revisa tu correo y la carpeta de spam. Si el enlace te envía a localhost, será necesario configurar la URL de redirección en Supabase.','Request received. Check your email and spam. If the link leads to localhost, configure the redirect URL in Supabase.'),'success');
+        say('portal-message',t('Te enviamos un enlace para restablecer la contraseña. Revisa tu correo, también la carpeta de spam.','We sent you a link to reset your password. Check your email, including spam.'),'success');
       }catch(err){
         const rateLimited=err?.status===429||err?.code==='over_email_send_rate_limit'||err?.code==='over_email_send_limit';
         say('portal-message',rateLimited
@@ -238,12 +239,20 @@
   }
   async function initAdmin(){
     if(!client){say('admin-message',t('El backend no está configurado.','Backend not configured.'),'warning');return}
-    const profile=await readProfile().catch(()=>null);
-    if(!profile||profile.role!=='admin'||profile.access_status!=='approved'){
-      $('admin-root').hidden=true;
-      $('admin-denied').hidden=false;
+    // Nothing about administration is shown until an approved administrator is confirmed.
+    let profile=null,readFailed=false;
+    try{profile=await readProfile()}catch(error){readFailed=true}
+    // IBNavigate lets tests observe redirects; browsers use location.replace.
+    const leave=url=>typeof window.IBNavigate==='function'?window.IBNavigate(url):location.replace(url);
+    if(!readFailed&&!profile){leave('login.html?returnTo='+encodeURIComponent('/InvestorBlueprint/admin.html'));return}
+    if(!readFailed&&(profile.role!=='admin'||profile.access_status!=='approved')){leave('account.html');return}
+    if(readFailed){
+      if($('admin-checking'))$('admin-checking').hidden=true;
+      $('admin-root').hidden=true;$('admin-denied').hidden=false;
       return;
     }
+    if($('admin-checking'))$('admin-checking').hidden=true;
+    if($('admin-hero'))$('admin-hero').hidden=false;
     $('admin-root').hidden=false;
     $('admin-denied').hidden=true;
     $('admin-identity').textContent=profile.email;

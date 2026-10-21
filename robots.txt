@@ -1,5 +1,6 @@
 User-agent: *
 Disallow: /InvestorBlueprint/admin.html
+Disallow: /InvestorBlueprint/account.html
 Disallow: /InvestorBlueprint/tools/
 Disallow: /InvestorBlueprint/calculadora-venta/
 Disallow: /InvestorBlueprint/preview-
