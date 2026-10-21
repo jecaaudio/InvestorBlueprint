@@ -23,7 +23,7 @@ try {
           select(){return this},
           eq(){return this},
           maybeSingle:async()=>table==='member_profiles'
-            ?{data:{role:'admin',access_status:'approved'},error:null}
+            ?{data:{role:'admin',access_status:'approved',terms_accepted_at:'2026-10-21T00:00:00Z',terms_version:'2026-10-21'},error:null}
             :{data:{display_name:'Fixture',company_name:'Fixture LLC',document_language:'es',report_detail:'detailed',notes_detail:'detailed'},error:null}
         })
       })};

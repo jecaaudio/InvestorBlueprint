@@ -60,6 +60,19 @@
       auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
     const {data:{session},error}=await client.auth.getSession();
     if(error||!session?.access_token){window.location.replace(loginURL.href);return;}
+    // Members who have not accepted the current notice and Terms accept them in My profile first.
+    // A missing column (migration not applied) or a failed read never blocks the calculators.
+    if(cfg.termsVersion){
+      try{
+        const {data:terms,error:termsError}=await client.from('member_profiles')
+          .select('terms_accepted_at,terms_version').eq('id',session.user.id).maybeSingle();
+        if(!termsError&&terms&&(!terms.terms_accepted_at||terms.terms_version!==cfg.termsVersion)){
+          const account=new URL(rootPath+'account.html',window.location.href);
+          account.searchParams.set('returnTo',window.location.pathname);
+          window.location.replace(account.href);return;
+        }
+      }catch(termsCheckError){/* Never block on a failed read. */}
+    }
     // Beta tools open only for the approved owner or members the owner marked as beta testers.
     if(script?.dataset.beta==='true'){
       let allowed=false;

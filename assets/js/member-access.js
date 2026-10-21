@@ -16,7 +16,7 @@
   const lang=()=>document.documentElement.lang==='en'?'en':'es';
   const t=(es,en)=>lang()==='en'?en:es;
   // Change when the Terms or the results notice change, so new acceptances can be told apart.
-  const TERMS_VERSION='2026-10-21';
+  const TERMS_VERSION=cfg.termsVersion||'2026-10-21';
   const say=(id,msg,type='info')=>{const el=$(id);if(!el)return;el.textContent=msg;el.dataset.state=type;el.hidden=false;};
   // No member's analyst/company metadata should remain after explicit sign-out.
   const clearReportCache=()=>{

@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - name: Provider authorization, privacy and error tests (no external calls)
         run: node --test scripts/property-data.test.mjs
       - name: Prepare disposable PostgreSQL roles

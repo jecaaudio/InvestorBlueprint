@@ -43,6 +43,41 @@
      updated_at:new Date().toISOString()
    };
  }
+ // Returns false when the acceptance columns do not exist yet (migration not applied).
+ async function needsTerms(client,userId){
+   if(!cfg.termsVersion)return false;
+   try{
+     const {data,error}=await client.from('member_profiles').select('terms_accepted_at,terms_version').eq('id',userId).maybeSingle();
+     return !error&&(!data?.terms_accepted_at||data.terms_version!==cfg.termsVersion);
+   }catch(error){return false}
+ }
+ // Resolves once the database has recorded the acceptance (server time).
+ function acceptTerms(client){
+   const card=$('account-terms'),form=$('account-terms-form'),box=$('account-terms-accept'),button=$('account-terms-submit');
+   card.hidden=false;
+   return new Promise(resolve=>{
+     form.addEventListener('submit',async event=>{
+       event.preventDefault();
+       const note=$('account-terms-message');
+       const say=(text,type)=>{note.hidden=false;note.dataset.state=type;note.textContent=text};
+       if(!box.checked){say(t('Marca la casilla para continuar.','Tick the box to continue.'),'error');return}
+       button.disabled=true;
+       try{
+         const {data,error}=await client.rpc('ib_accept_terms',{p_version:cfg.termsVersion});
+         if(error||!data)throw error||Error('not recorded');
+         card.hidden=true;
+         resolve();
+       }catch(error){
+         say(t('No pudimos guardar tu aceptación. Comprueba tu conexión e inténtalo de nuevo.','We could not save your acceptance. Check your connection and try again.'),'error');
+       }finally{button.disabled=false}
+     });
+   });
+ }
+ // Calculators send members here with returnTo; only pages of this site are allowed.
+ function safeReturn(){
+   const raw=new URLSearchParams(window.location?.search||'').get('returnTo')||'';
+   return /^\/InvestorBlueprint\/(tools|calculadora-venta)\/[A-Za-z0-9_./-]*$/.test(raw)&&!raw.includes('..')?raw:'';
+ }
  function showLogin(){
    $('account-loading').hidden=true;
    $('account-content').hidden=true;
@@ -62,6 +97,13 @@
      const {data:profile,error:profileError}=await client.from('member_profiles')
        .select('id,email,full_name,role,access_status').eq('id',user.id).single();
      if(profileError||!profile){showLogin();return}
+     // Members who never accepted the current notice and Terms accept here before anything else.
+     if(await needsTerms(client,user.id)){
+       $('account-loading').hidden=true;
+       await acceptTerms(client);
+       const back=safeReturn();
+       if(back){(window.IBNavigate||(url=>window.location.replace(url)))(back);return}
+     }
      const {data:settings,error:settingsError}=await client.from('member_preferences')
        .select('display_name,company_name,interface_language,document_language,report_detail,notes_detail')
        .eq('user_id',user.id).maybeSingle();

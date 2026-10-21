@@ -48,10 +48,36 @@ begin
     raise exception 'Acceptance record changed after signup';
   end if;
 
+  -- An existing member without a record accepts later from My profile; the server sets the time.
+  perform set_config('request.jwt.claim.sub','50000000-0000-4000-8000-000000000002',true);
+  perform set_config('request.jwt.claims','{"sub":"50000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
+  set local role authenticated;
+  begin perform public.ib_accept_terms('2099-01-01'); raise exception 'Accepted a future version';
+  exception when invalid_parameter_value then null; end;
+  begin perform public.ib_accept_terms('yes'); raise exception 'Accepted an invalid version';
+  exception when invalid_parameter_value then null; end;
+  if public.ib_accept_terms('2026-10-21') is distinct from now() then raise exception 'Later acceptance not recorded'; end if;
+  begin update public.member_profiles set terms_accepted_at='2019-01-01' where id='50000000-0000-4000-8000-000000000002';
+    raise exception 'Member rewrote its acceptance after accepting';
+  exception when insufficient_privilege then null; end;
+  reset role;
+  select * into strict p from public.member_profiles where id='50000000-0000-4000-8000-000000000002';
+  if p.terms_version<>'2026-10-21' or p.terms_accepted_at<>now() or p.access_status<>'pending' then
+    raise exception 'Later acceptance changed something else';
+  end if;
+  -- It only ever touches the caller's own row.
+  if (select terms_accepted_at from public.member_profiles where id='50000000-0000-4000-8000-000000000003') is not null then
+    raise exception 'Acceptance leaked to another member';
+  end if;
+  set local role anon;
+  begin perform public.ib_accept_terms('2026-10-21'); raise exception 'Anonymous call accepted';
+  exception when insufficient_privilege then null; end;
+  reset role;
+
   -- The owner can read the record for every member.
   perform set_config('request.jwt.claim.sub',owner_id::text,true);
   set local role authenticated;
-  if (select count(*) from public.member_profiles where id::text like '50000000-%' and terms_accepted_at is not null)<>1 then
+  if (select count(*) from public.member_profiles where id::text like '50000000-%' and terms_accepted_at is not null)<>2 then
     raise exception 'Owner cannot read acceptance records';
   end if;
   reset role;

@@ -3,5 +3,7 @@
 window.IB_AUTH_CONFIG = {
   supabaseUrl: "https://ppeyoovykxomxinumibk.supabase.co",
   supabaseAnonKey: "sb_publishable_8l9Aq4Cnb3GXvoQaBh6MaA_kGA6jNoB",
-  toolsOrigin: ""
+  toolsOrigin: "",
+  // Version of the results notice and Terms members accept. Change it when the Terms change.
+  termsVersion: "2026-10-21"
 };

@@ -3,15 +3,15 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "test": "node --test scripts/site-smoke.test.mjs scripts/member-recovery.test.mjs scripts/flip-finance.test.mjs scripts/member-profile.test.mjs scripts/secure-tool-loader.test.mjs scripts/deploy-gate.test.mjs scripts/member-resilience.test.mjs scripts/admin-navigation.test.mjs scripts/arv-provenance.test.mjs scripts/property-data.test.mjs scripts/review-preview.test.mjs scripts/finance-dom.test.mjs scripts/seller-tax.test.mjs scripts/seller-validation.test.mjs scripts/arv-print.test.mjs scripts/arv-resilience.test.mjs scripts/tool-catalog.test.mjs scripts/admin-beta.test.mjs scripts/feedback-widget.test.mjs scripts/disclaimers.test.mjs scripts/auth-nav.test.mjs scripts/landing-pages.test.mjs scripts/billing-webhook.test.mjs scripts/pricing.test.mjs",
+    "test": "node --test scripts/site-smoke.test.mjs scripts/member-recovery.test.mjs scripts/flip-finance.test.mjs scripts/member-profile.test.mjs scripts/secure-tool-loader.test.mjs scripts/deploy-gate.test.mjs scripts/member-resilience.test.mjs scripts/admin-navigation.test.mjs scripts/arv-provenance.test.mjs scripts/property-data.test.mjs scripts/review-preview.test.mjs scripts/finance-dom.test.mjs scripts/seller-tax.test.mjs scripts/seller-validation.test.mjs scripts/arv-print.test.mjs scripts/arv-resilience.test.mjs scripts/tool-catalog.test.mjs scripts/admin-beta.test.mjs scripts/feedback-widget.test.mjs scripts/disclaimers.test.mjs scripts/auth-nav.test.mjs scripts/terms-gate.test.mjs scripts/landing-pages.test.mjs scripts/billing-webhook.test.mjs scripts/pricing.test.mjs",
     "qa:axe": "node scripts/axe-check.mjs",
     "qa:lighthouse": "node scripts/run-lighthouse.mjs"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.10.2",
-    "@lhci/cli": "^0.14.0",
-    "@puppeteer/browsers": "^2.10.1",
-    "jsdom": "26.1.0",
-    "playwright": "^1.51.1"
+    "@axe-core/playwright": "^4.14.0",
+    "@lhci/cli": "^0.15.1",
+    "@puppeteer/browsers": "^3.2.5",
+    "jsdom": "30.1.3",
+    "playwright": "^1.64.1"
   }
 }
