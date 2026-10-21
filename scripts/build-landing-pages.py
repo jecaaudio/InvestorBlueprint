@@ -8,7 +8,7 @@ def t(es, en, tag='span', cls='', attrs=''):
     return f'<{tag}{c}{attrs} data-es="{html.escape(es, True)}" data-en="{html.escape(en, True)}">{html.escape(es)}</{tag}>'
 
 PAGES = [
- dict(slug='venta', tool='../calculadora-venta/', title='Calculadora de venta: cuánto te queda al vender una casa',
+ dict(slug='venta', tool='../calculadora-venta/', title='Calculadora de venta: cuánto te queda al vender una casa', title_en='Seller net calculator: what you take home from a home sale',
   desc='Calcula gratis cuánto dinero te queda al vender una propiedad en EE. UU.: comisiones, hipoteca, gastos de cierre e impuesto de transferencia por estado. En español.',
   eyebrow=('Calculadora de venta · neto del vendedor','Seller net calculator'),
   h1=('¿Cuánto te queda en el bolsillo al vender la propiedad?','How much will you actually take home from the sale?'),
@@ -28,7 +28,7 @@ PAGES = [
   faq=[('¿Reemplaza el Closing Disclosure?','Does it replace the Closing Disclosure?','No. Es una estimación para planificar; los montos finales los confirma la compañía de título.','No. It is a planning estimate; the title company confirms final amounts.'),
    ('¿Qué estados calcula solos?','Which states are calculated automatically?','Kentucky, Illinois, Florida y Texas. En los demás escribes el impuesto confirmado y el resto se calcula igual.','Kentucky, Illinois, Florida and Texas. Elsewhere you enter the confirmed tax and everything else is calculated the same way.'),
    ('¿Puedo escribir 385.000 con punto?','Can I type 385.000 with a dot?','Sí. La calculadora entiende 385.000 y 385,000 y te muestra cómo leyó el número.','Yes. It understands 385.000 and 385,000 and shows you how it read the number.')]),
- dict(slug='flip', tool='../tools/flip-calculator.html', title='Calculadora de flip: ganancia, ROI y oferta máxima',
+ dict(slug='flip', tool='../tools/flip-calculator.html', title='Calculadora de flip: ganancia, ROI y oferta máxima', title_en='Flip calculator: profit, ROI and maximum offer',
   desc='Calcula gratis la ganancia de un flip de casas: compra, reparación, meses de espera y venta. ROI sobre tu dinero, precio mínimo de venta y regla del 70%. En español.',
   eyebrow=('Calculadora de flip','Flip calculator'),
   h1=('¿Este flip deja ganancia? Sábelo antes de hacer la oferta.','Will this flip make money? Know before you make the offer.'),
@@ -48,7 +48,7 @@ PAGES = [
   faq=[('¿Qué es el ARV?','What is ARV?','El valor estimado de la propiedad después de repararla, según ventas comparables recientes.','The estimated value after repairs, based on recent comparable sales.'),
    ('¿Qué es la regla del 70%?','What is the 70% rule?','Una guía rápida: ofrecer como máximo el 70% del ARV menos la reparación. Sirve para filtrar, no para decidir sola.','A quick guide: offer at most 70% of ARV minus repairs. It filters deals; it should not decide alone.'),
    ('¿Por qué el ROI cambia con préstamo?','Why does ROI change with a loan?','Porque pones menos dinero propio. La versión completa calcula el ROI sobre tu capital, no sobre el costo total.','Because you put in less of your own money. The full version measures ROI on your capital, not on total cost.')]),
- dict(slug='rentas', tool='../tools/rental-cash-flow.html', title='Calculadora de rentas: flujo de caja, NOI y cap rate',
+ dict(slug='rentas', tool='../tools/rental-cash-flow.html', title='Calculadora de rentas: flujo de caja, NOI y cap rate', title_en='Rental calculator: cash flow, NOI and cap rate',
   desc='Calcula gratis si una propiedad de renta paga su hipoteca: flujo de caja mensual, NOI, cap rate y cash-on-cash. En español.',
   eyebrow=('Calculadora de propiedades de renta','Rental property calculator'),
   h1=('¿Esta propiedad paga sola su hipoteca?','Does this rental pay for itself?'),
@@ -67,7 +67,7 @@ PAGES = [
   faq=[('¿Qué es el NOI?','What is NOI?','Ingresos menos gastos operativos, antes de la hipoteca. Es la base del cap rate.','Income minus operating expenses, before the mortgage. It drives the cap rate.'),
    ('¿Qué es cash-on-cash?','What is cash-on-cash?','El flujo anual dividido entre el dinero que pusiste tú.','Annual cash flow divided by the cash you put in.'),
    ('¿Por qué una reserva de capital?','Why a capital reserve?','Techos, calentadores y aires se reemplazan. Apartar cada mes evita sorpresas.','Roofs, heaters and AC units get replaced. Setting money aside each month avoids surprises.')]),
- dict(slug='arv', tool='../tools/arv-estimator.html', title='Calculadora de ARV con ventas comparables',
+ dict(slug='arv', tool='../tools/arv-estimator.html', title='Calculadora de ARV con ventas comparables', title_en='ARV calculator with comparable sales',
   desc='Calcula gratis el ARV (valor después de reparar) con ventas comparables, y la oferta máxima con la regla del 70%. En español.',
   eyebrow=('Calculadora de ARV','ARV calculator'),
   h1=('Calcula el valor después de reparar con tus comparables.','Estimate after-repair value from your comparables.'),
@@ -84,7 +84,7 @@ PAGES = [
   includes=[('Ajustes positivos o negativos por comparable','Positive or negative adjustments per comparable'),('Notas de fecha, fuente y evidencia','Date, source and evidence notes'),('Rango observado y oferta máxima','Observed range and maximum offer'),('PDF con fuentes','PDF with sources')],
   faq=[('¿Qué es un comparable?','What is a comparable?','Una venta cerrada reciente de una propiedad parecida y cercana.','A recent closed sale of a similar, nearby property.'),
    ('¿Es un avalúo?','Is it an appraisal?','No. Es una estimación para analizar ofertas; no reemplaza un avalúo ni un CMA certificado.','No. It is an estimate for analyzing offers; it does not replace an appraisal or a certified CMA.')]),
- dict(slug='hard-money', tool='../tools/hard-money-analyzer.html', title='Calculadora de préstamo hard money: intereses y puntos',
+ dict(slug='hard-money', tool='../tools/hard-money-analyzer.html', title='Calculadora de préstamo hard money: intereses y puntos', title_en='Hard money loan calculator: interest and points',
   desc='Calcula gratis el costo real de un préstamo hard money: intereses, puntos y cargos según los desembolsos. En español.',
   eyebrow=('Calculadora de préstamo hard money','Hard money loan calculator'),
   h1=('¿Cuánto te cuesta de verdad el préstamo hard money?','What does the hard money loan really cost?'),
@@ -108,12 +108,21 @@ HEAD = '''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{title} | InvestorBlueprint</title>
+<title data-es="{title} | InvestorBlueprint" data-en="{title_en} | InvestorBlueprint">{title} | InvestorBlueprint</title>
 <meta name="description" content="{desc}">
 <link rel="canonical" href="{site}calculadoras/{slug}.html">
+<meta property="og:site_name" content="InvestorBlueprint">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:type" content="website">
+<meta property="og:url" content="{site}calculadoras/{slug}.html">
+<meta property="og:image" content="{site}assets/brand/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="es_US">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{jsonld}</script>
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="../assets/css/cookie-banner.css">
 <link rel="stylesheet" href="../assets/css/site-theme.css?v=20261018">
@@ -157,13 +166,23 @@ FOOT_SCRIPTS = '''<script src="../assets/js/config.js"></script>
 <script src="../script.js"></script>
 <script src="../tools/tool-script.js?v=20261021"></script>
 <script src="../assets/js/landing.js?v=20261021"></script>
+<script src="../assets/js/site-config.js?v=20261021"></script>
+<script src="../assets/js/site-footer.js?v=20261021"></script>
 <script src="../assets/js/site-theme.js?v=20261018"></script>
 </body>
 </html>
 '''
 
 def page(p):
-    out = [HEAD.format(title=html.escape(p['title']), desc=html.escape(p['desc'], True), site=SITE, slug=p['slug'])]
+    jsonld = json.dumps({
+        '@context': 'https://schema.org', '@type': 'WebApplication', 'name': p['title'],
+        'url': f"{SITE}calculadoras/{p['slug']}.html", 'description': p['desc'],
+        'applicationCategory': 'FinanceApplication', 'operatingSystem': 'Web', 'inLanguage': ['es', 'en'],
+        'isAccessibleForFree': True, 'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'USD'},
+        'publisher': {'@type': 'Organization', 'name': 'InvestorBlueprint', 'logo': SITE + 'assets/brand/icon-512.png'}
+    }, ensure_ascii=False).replace('</', '<\\/')
+    out = [HEAD.format(title=html.escape(p['title'], True), title_en=html.escape(p['title_en'], True),
+                       desc=html.escape(p['desc'], True), site=SITE, slug=p['slug'], jsonld=jsonld)]
     fields = ''.join(
         f'<label for="q-{n}">{t(es, en)}<input id="q-{n}" name="{n}" type="text" inputmode="decimal" autocomplete="off" value="{v}"><small aria-live="polite"></small></label>'
         for n, es, en, v in p['fields'])

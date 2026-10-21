@@ -158,3 +158,22 @@ body[data-tool] .fc-row label{color:var(--text)}
  .site-theme-button{display:none!important}
  .hero,.card,.price-card{box-shadow:none!important}
 }
+
+/* Homepage guides are whole-card links to the public calculator pages. */
+.guide-card{display:grid;gap:6px;text-decoration:none!important;color:var(--text)!important}
+.guide-card h3{margin:0;color:var(--primary)!important}
+.guide-card:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+#pricing .btn{margin-top:4px}
+
+/* Shared footer (assets/js/site-footer.js) */
+.site-footer{margin-top:48px;border-top:1px solid var(--site-border);background:var(--panel);color:var(--muted);padding:32px max(16px,4vw) 24px}
+.site-footer-inner{width:min(1100px,100%);margin:0 auto;display:grid;grid-template-columns:1.4fr repeat(3,minmax(0,1fr));gap:24px}
+.site-footer strong{color:var(--text)}
+.site-footer p{margin:6px 0 0;font-size:.9rem}
+.site-footer h2{margin:0 0 8px;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
+.site-footer ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.site-footer a,.site-footer-cookies{color:var(--muted);text-decoration:none;font:inherit;font-size:.92rem;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.site-footer a:hover,.site-footer-cookies:hover{color:var(--primary)}
+.site-footer-legal{width:min(1100px,100%);margin:24px auto 0!important;padding-top:16px;border-top:1px solid var(--site-border);font-size:.82rem!important}
+@media(max-width:760px){.site-footer-inner{grid-template-columns:1fr 1fr}}
+@media print{.site-footer{display:none!important}}

@@ -3,3 +3,4 @@ workers/arv-worker/node_modules/
 .lighthouseci/
 
 .cache/chrome/
+tmp/

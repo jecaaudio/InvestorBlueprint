@@ -4,10 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Mi perfil y configuración | InvestorBlueprint</title>
+<title data-es="Mi perfil y configuración | InvestorBlueprint" data-en="My profile and settings | InvestorBlueprint">Mi perfil y configuración | InvestorBlueprint</title>
 <meta name="description" content="Configura tu perfil, idioma y preferencias de informes de InvestorBlueprint.">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="assets/css/site-theme.css?v=20261018">
+<link rel="stylesheet" href="assets/css/cookie-banner.css">
 <link rel="stylesheet" href="assets/css/member-access.css?v=20261019-profile">
 <link rel="stylesheet" href="assets/css/brand.css?v=20261019">
 <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg?v=1">
@@ -31,7 +32,7 @@
 <section class="access-hero">
  <p class="eyebrow">InvestorBlueprint · Members</p>
  <h1 data-es="Mi perfil y configuración" data-en="My profile and settings">Mi perfil y configuración</h1>
- <p data-es="Gestiona tus datos, el idioma de los documentos y el detalle de los informes. Puedes usar las calculadoras aunque seas administrador." data-en="Manage your information, document language and report detail. Administrators can use calculators too.">Gestiona tus datos, el idioma de los documentos y el detalle de los informes. Puedes usar las calculadoras aunque seas administrador.</p>
+ <p data-es="Gestiona tus datos, el idioma de los documentos y el detalle de los informes." data-en="Manage your details, document language and report detail.">Gestiona tus datos, el idioma de los documentos y el detalle de los informes.</p>
 </section>
 <div id="account-loading" class="card access-card" role="status" data-es="Verificando tu cuenta…" data-en="Checking your account…">Verificando tu cuenta…</div>
 <section id="account-login-needed" class="card access-card" hidden>
@@ -74,7 +75,7 @@
     <label><span data-es="Detalle de las notas" data-en="Notes detail">Detalle de las notas</span>
      <select id="setting-notes-detail"><option value="detailed" data-es="Notas detalladas" data-en="Detailed notes">Notas detalladas</option><option value="summary" data-es="Notas resumidas" data-en="Summary notes">Notas resumidas</option></select></label>
    </div>
-   <p class="access-note" data-es="Las preferencias se guardan por cuenta en Supabase. Los reportes las irán incorporando calculadora por calculadora; todavía no todas las exportaciones usan estas opciones." data-en="Preferences are saved per account in Supabase. Report exports will adopt them tool by tool; not every export uses these options yet.">Las preferencias se guardan por cuenta en Supabase. Los reportes las irán incorporando calculadora por calculadora; todavía no todas las exportaciones usan estas opciones.</p>
+   <p class="access-note" data-es="Tu nombre, empresa e idioma se guardan en tu cuenta y aparecen en los PDF que exportas." data-en="Your name, company and language are saved to your account and appear on the PDFs you export.">Tu nombre, empresa e idioma se guardan en tu cuenta y aparecen en los PDF que exportas.</p>
    <div class="account-shortcuts"><button class="btn btn-primary" type="submit" id="account-save" data-es="Guardar configuración" data-en="Save settings">Guardar configuración</button></div>
   </form>
   <p id="account-settings-message" class="access-message" role="status" aria-live="polite" hidden></p>
@@ -83,11 +84,16 @@
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js" integrity="sha384-xPW3QHswsICVC2mW6BFNwMbhpLkbZ133fKOhxNx3QGGgAOJfL3O9t8r2aWn1aez6" crossorigin="anonymous"></script>
 <script src="assets/js/member-auth-config.js?v=20261018-access2"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/cookie-banner-component.js"></script>
+<script src="assets/js/consent.js"></script>
 <script src="lang.js"></script>
 <script src="assets/js/member-i18n.js"></script>
 <script src="assets/js/account-settings.js?v=20261019-1"></script>
 <script src="assets/js/billing-config.js?v=20261021"></script>
 <script src="assets/js/account-billing.js?v=20261021"></script>
 <script src="assets/js/site-theme.js?v=20261018"></script>
+<script src="assets/js/site-config.js?v=20261021"></script>
+<script src="assets/js/site-footer.js?v=20261021"></script>
 </body>
 </html>

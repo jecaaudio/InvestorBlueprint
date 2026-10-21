@@ -2,12 +2,19 @@
   const SUPPORTED_LANGS = new Set(['es', 'en']);
   const DEFAULT_LANG = 'es';
   const CACHE = {};
-  const I18N_PATHS = [
+  // lang.js sits at the site root, so its own URL locates the language files from any folder.
+  // The relative guesses remain only for pages that inline or proxy this script.
+  const scriptBase = (() => {
+    try { return document.currentScript?.src ? new URL('assets/i18n/', document.currentScript.src).href : ''; }
+    catch (_) { return ''; }
+  })();
+  const I18N_PATHS = [...new Set([
+    scriptBase,
     'assets/i18n/',
     '../assets/i18n/',
     '../../assets/i18n/',
     '/InvestorBlueprint/assets/i18n/'
-  ];
+  ].filter(Boolean))];
 
   const FALLBACK_MESSAGES = {
     en: {

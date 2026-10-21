@@ -76,6 +76,15 @@
     const analyticsCheckbox = document.getElementById('cookie-analytics');
     const marketingCheckbox = document.getElementById('cookie-marketing');
 
+    // Footer "Cookie preferences" reopens the banner with the current choices.
+    window.IBOpenCookieSettings = function () {
+      const current = readStoredConsent();
+      if (analyticsCheckbox) analyticsCheckbox.checked = Boolean(current && current.analytics);
+      if (marketingCheckbox) marketingCheckbox.checked = Boolean(current && current.marketing);
+      banner.hidden = false;
+      (saveBtn || acceptAllBtn || banner).focus?.();
+    };
+
     const stored = readStoredConsent();
     if (stored) {
       if (analyticsCheckbox) analyticsCheckbox.checked = stored.analytics;

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { posix as path } from 'node:path';
 
 const read = file => readFileSync(file, 'utf8');
@@ -70,13 +70,16 @@ test('mobile manifest and icon paths are valid',()=>{
 });
 
 test('public pages reference files present in the repository',()=>{
-  const pages=['index.html','login.html','admin.html','pricing.html','privacy.html',
+  const pages=['index.html','login.html','admin.html','pricing.html','privacy.html','terms.html','404.html',
     ...tools.map(x=>x.url.endsWith('/')?x.url+'index.html':x.url)];
   for(const page of pages){
     for(const match of read(page).matchAll(/(?:src|href)\s*=\s*["']([^"'#]+)["']/gi)){
       let target=match[1].split(/[?#]/)[0];
       if(!target||/^(https?:|mailto:|tel:|data:|javascript:|\/\/)/i.test(target))continue;
-      const resolved=path.normalize(path.join(path.dirname(page),target));
+      // Site-absolute paths ("/InvestorBlueprint/x") map to the repository root.
+      const siteRoot=target.startsWith('/InvestorBlueprint/');
+      if(siteRoot)target=target.slice('/InvestorBlueprint/'.length)||'index.html';
+      const resolved=path.normalize(siteRoot?target:path.join(path.dirname(page),target));
       const valid=existsSync(resolved)||(existsSync(path.join(resolved,'index.html')));
       assert.ok(valid, `Broken local reference ${page}: ${target}`);
     }
@@ -124,5 +127,16 @@ test('every tools/ script that protected pages load is copied by the Pages deplo
   assert.ok(scripts.has('finance-report.js')&&scripts.has('tool-script.js'),'expected loader script references');
   for(const file of scripts){
     assert.ok(new RegExp('cp [^\\n]*tools/'+file.replace('.','\\.')).test(deploy),`Deploy does not publish tools/${file}`);
+  }
+});
+
+test('every page with the footer can reopen cookie settings',()=>{
+  const pages=['index.html','login.html','account.html','pricing.html','privacy.html','terms.html','404.html',
+    ...readdirSync('calculadoras').filter(f=>f.endsWith('.html')).map(f=>'calculadoras/'+f)];
+  for(const page of pages){
+    const html=read(page);
+    if(!html.includes('site-footer.js'))continue;
+    assert.match(html,/cookie-banner-component\.js/,page+' must load the cookie banner');
+    assert.match(html,/consent\.js/,page+' must load consent controls');
   }
 });
