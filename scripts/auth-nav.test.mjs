@@ -4,12 +4,14 @@ import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
 
 const source=fs.readFileSync('assets/js/auth-nav.js','utf8');
+const siteConfig=fs.readFileSync('assets/js/site-config.js','utf8');
 const key='sb-ppeyoovykxomxinumibk-auth-token';
 
-function open(page,{saved=null,lang='es'}={}){
+function open(page,{saved=null,lang='es',storageKey=key}={}){
   const html=fs.readFileSync(page,'utf8').replace(/<script\b[\s\S]*?<\/script>/gi,'').replace('<html lang="es">',`<html lang="${lang}">`);
   const dom=new JSDOM(html,{url:'https://jecaaudio.github.io/InvestorBlueprint/'+page,runScripts:'outside-only'});
-  if(saved!==null)dom.window.localStorage.setItem(key,typeof saved==='string'?saved:JSON.stringify(saved));
+  if(saved!==null)dom.window.localStorage.setItem(storageKey,typeof saved==='string'?saved:JSON.stringify(saved));
+  dom.window.eval(siteConfig);
   dom.window.eval(source);
   dom.window.document.dispatchEvent(new dom.window.Event('DOMContentLoaded'));
   const links=[...dom.window.document.querySelectorAll('.navbar #primary-nav a')].filter(a=>/login\.html|account\.html/.test(a.getAttribute('href')));
@@ -53,4 +55,16 @@ test('every public page with "Ingresar" in the header loads the session check',(
   const pages=['index.html','pricing.html','privacy.html','terms.html','404.html',
     ...fs.readdirSync('calculadoras').filter(f=>f.endsWith('.html')).map(f=>'calculadoras/'+f)];
   for(const page of pages)assert.match(fs.readFileSync(page,'utf8'),/auth-nav\.js/,page);
+});
+
+test('a session from another Supabase project on the same github.io origin is ignored',()=>{
+  const {dom,links}=open('index.html',{saved:session,storageKey:'sb-someotherproject-auth-token'});
+  assert.match(links[0].getAttribute('href'),/login\.html$/);
+  dom.window.close();
+});
+
+test('the project in site-config matches the login configuration',()=>{
+  const ref=/IB_SITE[\s\S]*supabaseProjectRef:'([a-z0-9]+)'/.exec(siteConfig)?.[1];
+  const auth=/https:\/\/([a-z0-9]+)\.supabase\.co/.exec(fs.readFileSync('assets/js/member-auth-config.js','utf8'))?.[1];
+  assert.ok(ref);assert.equal(ref,auth);
 });

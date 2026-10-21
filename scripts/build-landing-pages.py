@@ -175,7 +175,7 @@ FOOT_SCRIPTS = '''<script src="../assets/js/config.js"></script>
 <script src="../script.js"></script>
 <script src="../tools/tool-script.js?v=20261021"></script>
 <script src="../assets/js/landing.js?v=20261021"></script>
-<script src="../assets/js/site-config.js?v=20261021"></script>
+<script src="../assets/js/site-config.js?v=20261021b"></script>
 <script src="../assets/js/site-footer.js?v=20261021"></script>
 <script src="../assets/js/auth-nav.js?v=20261021"></script>
 <script src="../assets/js/site-theme.js?v=20261018"></script>

@@ -3,17 +3,21 @@
  * It only reads the saved Supabase session; pages that need access still check on the server. */
 (function () {
   'use strict';
+  // github.io pages share one storage origin with the owner's other projects,
+  // so only this site's Supabase project counts (ref set in site-config.js).
+  const projectRef = () => {
+    const fromAuth = /^https:\/\/([a-z0-9]+)\.supabase\.co/i.exec(window.IB_AUTH_CONFIG?.supabaseUrl || '')?.[1];
+    const ref = fromAuth || window.IB_SITE?.supabaseProjectRef || '';
+    return /^[a-z0-9]+$/i.test(ref) ? ref : '';
+  };
   const signedIn = () => {
+    const ref = projectRef();
+    if (!ref) return false;
     try {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (!/^sb-[a-z0-9]+-auth-token$/i.test(key || '')) continue;
-        const saved = JSON.parse(localStorage.getItem(key) || 'null');
-        const session = saved?.currentSession || saved;
-        if (session?.user?.id && (session.refresh_token || Number(session.expires_at) * 1000 > Date.now())) return true;
-      }
-    } catch (error) { /* Blocked storage or unreadable data: keep "Ingresar". */ }
-    return false;
+      const saved = JSON.parse(localStorage.getItem('sb-' + ref + '-auth-token') || 'null');
+      const session = saved?.currentSession || saved;
+      return Boolean(session?.user?.id && (session.refresh_token || Number(session.expires_at) * 1000 > Date.now()));
+    } catch (error) { return false; /* Blocked storage or unreadable data: keep "Ingresar". */ }
   };
   const update = () => {
     if (!signedIn()) return;
