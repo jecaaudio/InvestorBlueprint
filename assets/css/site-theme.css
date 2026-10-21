@@ -127,9 +127,19 @@ body[data-tool] .fc-row label{color:var(--text)}
  .navbar .brand-menu{flex:1 1 auto;max-width:none}
  .navbar .lang-switcher{width:auto!important;margin-left:0!important}
  .navbar .lang-option{flex:none!important}
- .navbar .menu-toggle{margin-left:auto;order:2}
+ /* One row on phones: logo | EN ES | theme | menu icon. The logo takes the free space. */
+ .navbar .brand-menu{margin-right:auto;min-width:0}
+ .navbar .lang-switcher{order:2}
+ .navbar .lang-option{padding:6px 10px!important;min-width:0!important}
+ .navbar .lang-option .flag-emoji{display:none!important}
+ .navbar .site-theme-button{order:3}
+ .navbar .menu-toggle{
+   order:4;margin-left:0!important;width:36px;min-width:36px;height:36px;padding:0!important;
+   align-items:center;justify-content:center;border-radius:9px;
+   font-size:0!important;line-height:1;overflow:hidden
+ }
+ .navbar .menu-toggle::before{content:"\2630";font-size:1.15rem;line-height:1}
  .navbar nav{width:100%;order:5}
- .navbar .site-theme-button{order:4}
  .tool-navbar{padding:10px 13px!important;flex-wrap:wrap}
  .tool-navbar .lang-switcher{margin-left:auto!important}
  .tool-navbar .site-theme-button{margin-left:0!important}

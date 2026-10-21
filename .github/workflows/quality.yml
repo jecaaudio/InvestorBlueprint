@@ -58,6 +58,7 @@ jobs:
           curl -fsS http://127.0.0.1:4173/InvestorBlueprint/index.html >/dev/null
           npm run qa:axe
           node scripts/protected-brand-browser.test.mjs
+          node scripts/mobile-header-browser.test.mjs
 
       - name: Run Lighthouse CI assertions
         run: npm run qa:lighthouse
