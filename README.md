@@ -68,6 +68,12 @@ El worker ARV (`workers/arv-worker`) tiene sus propias pruebas: `cd workers/arv-
 
 Todas las páginas cargan la misma versión fija del SDK (`@supabase/supabase-js@2.117.0`) con un hash de integridad (`integrity="sha384-..."`). Si el CDN entrega un archivo distinto, el navegador no lo ejecuta. Para actualizar la versión, cambia la URL y el hash juntos en todas las páginas y en `scripts/site-smoke.test.mjs`; la prueba falla si alguna página queda distinta.
 
+## Portadas públicas y precios
+
+- `calculadoras/` tiene una portada por herramienta pública (venta, flip, rentas, ARV, hard money), con una calculadora rápida que funciona sin cuenta. Los textos se editan en `scripts/build-landing-pages.py`; luego se ejecuta `python3 scripts/build-landing-pages.py`.
+- `pricing.html` muestra los planes Gratis y Pro. El cobro con Stripe está listo pero apagado; para encenderlo sigue `docs/billing-setup.md`.
+- Los PDF ponen arriba la empresa o el nombre del miembro, y al final una línea pequeña con el logo y "Preparado con InvestorBlueprint".
+
 ## Modo beta tester
 
 Tres herramientas siguen en pruebas: **Búsqueda por ROI** (datos simulados), **ARV automático** (sin proveedor de datos real) y **Renta sugerida** (se fusionará con Flujo de renta). En `assets/config/tools.json` tienen `"access": "beta"`.

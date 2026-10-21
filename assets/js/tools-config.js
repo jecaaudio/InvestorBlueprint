@@ -82,7 +82,8 @@
 
     const link = document.createElement('a');
     link.className = 'card-btn';
-    link.href = tool.url;
+    // Public tools open their landing page (quick calculator, no account); beta tools go straight in.
+    link.href = tool.landing || tool.url;
     link.textContent = messages.tryTool || 'Open Tool';
     link.setAttribute('data-cta-click', 'Open Tool');
     if (statusMeta.isPro) {

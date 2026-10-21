@@ -1,0 +1,62 @@
+/* Public calculator landing pages: hero question, working quick calculator, benefits. */
+.lp-main{width:min(1100px,92vw);margin:0 auto;padding:28px 0 56px;display:grid;gap:44px}
+.lp-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px;align-items:start}
+.lp-eyebrow{margin:0 0 10px;color:var(--primary);font-weight:750;font-size:.86rem;letter-spacing:.06em;text-transform:uppercase}
+.lp-hero h1{margin:0;font-size:clamp(1.9rem,4.4vw,2.9rem);line-height:1.08;letter-spacing:-.03em;color:var(--text);text-wrap:balance}
+.lp-lead{margin:16px 0 0;font-size:1.08rem;color:var(--muted);max-width:56ch}
+.lp-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.lp-trust{margin:14px 0 0;font-size:.86rem;color:var(--muted)}
+.lp-quick{background:var(--panel);border:1px solid var(--site-border);border-radius:18px;padding:20px;box-shadow:var(--site-shadow);display:grid;gap:14px}
+.lp-quick h2{margin:0;font-size:1.05rem;color:var(--text)}
+.lp-quick-note{margin:0;font-size:.82rem;color:var(--muted)}
+.lp-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.lp-fields label{display:grid;gap:4px;font-size:.84rem;font-weight:650;color:var(--text);min-width:0}
+.lp-fields input{width:100%;box-sizing:border-box;padding:9px 10px;border:1px solid var(--site-border);border-radius:9px;background:var(--site-input);color:var(--text);font:inherit;font-weight:500}
+.lp-fields small{font-weight:600;color:var(--primary);min-height:1em}
+.lp-result{border-radius:14px;background:#0f2a47;color:#e8f1fb;padding:16px;display:grid;gap:8px}
+.lp-result-main{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.lp-result-main span{font-size:.86rem;color:#b8cde3}
+.lp-result-main strong{font-size:1.9rem;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.lp-result dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:.88rem}
+.lp-result dt{color:#b8cde3}
+.lp-result dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.lp-result.is-invalid strong{font-size:1.1rem}
+.lp-section{display:grid;gap:16px}
+.lp-section>h2{margin:0;font-size:clamp(1.35rem,2.6vw,1.8rem);letter-spacing:-.02em;color:var(--text)}
+.lp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.lp-card{background:var(--panel);border:1px solid var(--site-border);border-radius:14px;padding:16px;display:grid;gap:6px;align-content:start}
+.lp-card h3{margin:0;font-size:1rem;color:var(--text)}
+.lp-card p{margin:0;color:var(--muted);font-size:.94rem}
+.lp-step{font-variant-numeric:tabular-nums;font-weight:800;color:var(--primary)}
+.lp-includes{margin:0;padding-left:1.2em;display:grid;gap:6px;color:var(--text)}
+.lp-faq{display:grid;gap:10px}
+.lp-faq details{background:var(--panel);border:1px solid var(--site-border);border-radius:12px;padding:12px 14px}
+.lp-faq summary{cursor:pointer;font-weight:700;color:var(--text)}
+.lp-faq p{margin:8px 0 0;color:var(--muted)}
+.lp-cta{background:var(--site-soft);border:1px solid var(--site-border);border-radius:18px;padding:24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.lp-cta h2{margin:0;font-size:1.3rem;color:var(--text)}
+.lp-cta p{margin:6px 0 0;color:var(--muted)}
+.lp-related{display:flex;flex-wrap:wrap;gap:8px}
+.lp-related a{border:1px solid var(--site-border);border-radius:999px;padding:6px 12px;text-decoration:none;color:var(--text);background:var(--panel);font-size:.9rem}
+@media(max-width:820px){.lp-hero{grid-template-columns:1fr}.lp-grid{grid-template-columns:1fr}}
+@media(max-width:420px){.lp-fields{grid-template-columns:1fr}}
+
+/* Pricing page */
+.pr-intro h1{margin:0;font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.1;letter-spacing:-.03em;color:var(--text);text-wrap:balance;max-width:22ch}
+.pr-beta{margin:0;padding:10px 14px;border-radius:10px;background:#fdf1d8;color:#6b4500;border:1px solid #f0d49a;font-size:.94rem;max-width:70ch}
+html[data-theme="dark"] .pr-beta{background:#3a2c0e;color:#f5d48f;border-color:#6b5320}
+.pr-plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+.pr-plan{background:var(--panel);border:1px solid var(--site-border);border-radius:18px;padding:22px;display:grid;gap:12px;box-shadow:var(--site-shadow)}
+.pr-plan.featured{border:2px solid var(--primary)}
+.pr-plan h2{margin:0;font-size:1.3rem;color:var(--text)}
+.pr-plan-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.pr-price{margin:0;color:var(--muted)}
+.pr-price strong{font-size:2.3rem;color:var(--text);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.pr-save{margin:0;font-weight:700;color:var(--primary)}
+.pr-plan ul{margin:0;padding-left:1.2em;display:grid;gap:6px;color:var(--text)}
+.pr-plan .btn{justify-self:start}
+.pr-fine{margin:0;font-size:.82rem;color:var(--muted)}
+.pr-toggle{display:inline-flex;border:1px solid var(--site-border);border-radius:9px;overflow:hidden}
+.pr-toggle button{border:0;background:transparent;color:var(--muted);padding:6px 12px;font:inherit;font-size:.86rem;font-weight:700;cursor:pointer}
+.pr-toggle button[aria-pressed="true"]{background:var(--site-soft);color:var(--primary)}
+@media(max-width:760px){.pr-plans{grid-template-columns:1fr}}

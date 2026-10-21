@@ -54,7 +54,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p public-site/tools/arv public-site/calculadora-venta
+          mkdir -p public-site/tools/arv public-site/calculadora-venta public-site/calculadoras
           cp index.html login.html admin.html account.html pricing.html privacy.html style.css lang.js script.js robots.txt sitemap.xml manifest.webmanifest public-site/
           cp -R assets public-site/assets
           # Do not deploy deprecated front-end authentication or unused gating scripts.
@@ -63,6 +63,7 @@ jobs:
           cp tools/arv/index.html tools/arv/arv.css tools/arv/arv.js public-site/tools/arv/
           cp -R tools/arv/fixtures public-site/tools/arv/fixtures
           cp calculadora-venta/index.html calculadora-venta/print-report.css calculadora-venta/print-report.js public-site/calculadora-venta/
+          cp calculadoras/*.html public-site/calculadoras/
           touch public-site/.nojekyll
           node -e 'require("node:fs").writeFileSync("public-site/build-info.json",JSON.stringify({commit:process.env.IB_DEPLOY_SHA,builtAt:new Date().toISOString()}))'
           # Fail deployment if a calculator is accidentally embedded into a public entry page.
@@ -72,6 +73,8 @@ jobs:
           fi
           test -f public-site/assets/js/secure-tool-loader.js
           test -f public-site/tools/finance-report.js
+          test -f public-site/calculadoras/venta.html
+          test -f public-site/assets/js/landing.js
           test -f public-site/tools/tool-script.js
           test -f public-site/assets/js/member-access.js
           test -f public-site/account.html

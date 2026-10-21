@@ -12,6 +12,9 @@
    const n=Number(normalized);return Number.isFinite(n)?Math.max(0,n):0;
  };
  const txt=id=>$(id)?.textContent?.trim()||'';
+ // Logo and site come from where this script is served, so a custom domain updates them.
+ const brandRoot=(()=>{try{return new URL('../',document.currentScript?.src||document.baseURI).href}catch(error){return ''}})();
+ const brandSite=brandRoot.replace(/^https?:\/\//,'').replace(/\/$/,'');
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const setting=(key,fallback)=>{
    if(window.IB_REPORT_PREFERENCES&&Object.hasOwn(window.IB_REPORT_PREFERENCES,key))return window.IB_REPORT_PREFERENCES[key]||fallback;
@@ -79,7 +82,7 @@
     L('El impuesto estatal de transferencia está pendiente de confirmación: el neto mostrado es parcial.','State transfer tax is not confirmed: net proceeds shown are partial.'):
     L('Los impuestos locales, exenciones y cargos finales deben verificarse para la jurisdicción y contrato.','Local taxes, exemptions, and final charges must be confirmed for the jurisdiction and contract.');
   return '<div class="pr-header">'+
-    '<div><div class="pr-brand">InvestorBlueprint · Seller Net</div><h1>'+L('Estimación de venta inmobiliaria','Real estate sale estimate')+'</h1>'+
+    '<div>'+((company||author)?'<div class="pr-brand">'+esc(company||author)+'</div>':'')+'<h1>'+L('Estimación de venta inmobiliaria','Real estate sale estimate')+'</h1>'+
     '<div class="pr-subhead">'+L('Estado de liquidación estimado para el vendedor · USD','Estimated seller settlement statement · USD')+'</div></div>'+
     '<div class="pr-meta"><strong>'+L('Preparado','Prepared')+'</strong><div>'+esc(date)+'</div><div>'+L('Documento informativo','Informational estimate')+'</div>'+
       (author?'<div>'+esc(author)+'</div>':'')+(company?'<div>'+esc(company)+'</div>':'')+'</div></div>'+
@@ -108,7 +111,8 @@
       '<p class="pr-note">'+L('El listado de condados no implica que sus impuestos locales estén verificados.','County selection does not mean local taxes have been verified.')+'</p></section>'):'')+
     illinoisBasis+methodBlock+notesBlock+userNotesGuidance+
     '<div class="pr-disclaimer">'+L('Estimación informativa, no es un Closing Disclosure ni un ALTA Settlement Statement. Los saldos reales de payoff, prorrateos, impuestos, exenciones, cargos y distribución contractual de gastos deben confirmarse con la compañía de título. El neto recibido no equivale a la ganancia fiscal.','Informational estimate, not a Closing Disclosure or ALTA Settlement Statement. Actual payoffs, prorations, taxes, exemptions, fees, and contractual cost allocation must be confirmed by the title company. Net proceeds are not taxable capital gains.')+'</div>'+
-    '<div class="pr-footer">InvestorBlueprint · '+L('Calculadora de Venta','Seller Net Calculator')+' · '+esc(date)+'</div>';
+    '<div class="pr-footer">'+(brandRoot?'<img src="'+esc(brandRoot+'assets/brand/favicon.svg')+'" alt="" width="12" height="12">':'')+
+      L('Preparado con','Prepared with')+' InvestorBlueprint'+(brandSite?' · '+esc(brandSite):'')+' · '+L('Calculadora de Venta','Seller Net Calculator')+' · '+esc(date)+'</div>';
  }
  function refresh(){
    const holder=$('printReport');

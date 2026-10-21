@@ -21,7 +21,13 @@ for(const lang of ['es','en'])for(const detail of ['summary','detailed']){
   assert.doesNotMatch(report.textContent,/(?:Confidence|Confianza):\s*\d+%/);
   assert.match(report.textContent,/not probability|no es probabilidad/);
   assert.match(report.textContent,/Current Analyst/);assert.match(report.textContent,/Current Company/);assert.doesNotMatch(report.textContent,/Other User/);
-  assert.equal(report.querySelector('img'),null);
+  // Only the brand logo may be an image; the analyst note stays text.
+  const images=[...report.querySelectorAll('img')];
+  assert.equal(images.length,1);assert.ok(images[0].closest('.arv-print-brand'));
+  assert.match(images[0].src,/\/InvestorBlueprint\/assets\/brand\/favicon\.svg$/);
+  assert.equal(report.querySelector('[onerror]'),null);
+  assert.equal(report.querySelector('h1').textContent,'Current Company');
+  assert.match(report.querySelector('.arv-print-brand').textContent,lang==='en'?/^Prepared with InvestorBlueprint · jecaaudio\.github\.io\/InvestorBlueprint$/:/^Preparado con InvestorBlueprint · jecaaudio\.github\.io\/InvestorBlueprint$/);
   assert.ok(report.textContent.includes(lang==='en'?'ARV REPORT':'INFORME DE ARV'));
   assert.equal(report.textContent.includes(lang==='en'?'Comparable properties:':'Comparables:'),detail==='detailed');
   d.getElementById('address').value='Changed address';d.getElementById('address').dispatchEvent(new w.Event('input',{bubbles:true}));

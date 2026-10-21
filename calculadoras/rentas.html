@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de rentas: flujo de caja, NOI y cap rate | InvestorBlueprint</title>
+<meta name="description" content="Calcula gratis si una propiedad de renta paga su hipoteca: flujo de caja mensual, NOI, cap rate y cash-on-cash. En español.">
+<link rel="canonical" href="https://jecaaudio.github.io/InvestorBlueprint/calculadoras/rentas.html">
+<meta property="og:title" content="Calculadora de rentas: flujo de caja, NOI y cap rate">
+<meta property="og:description" content="Calcula gratis si una propiedad de renta paga su hipoteca: flujo de caja mensual, NOI, cap rate y cash-on-cash. En español.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../assets/css/cookie-banner.css">
+<link rel="stylesheet" href="../assets/css/site-theme.css?v=20261018">
+<link rel="stylesheet" href="../assets/css/brand.css?v=20261019">
+<link rel="stylesheet" href="../assets/css/landing.css?v=20261021">
+<link rel="icon" type="image/svg+xml" href="../assets/brand/favicon.svg?v=1">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/favicon-32.png?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/brand/apple-touch-icon.png?v=1">
+<link rel="manifest" href="../manifest.webmanifest?v=1">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-title" content="InvestorBlueprint">
+</head>
+<body data-landing="rentas">
+<header class="navbar">
+  <div class="brand-menu has-primary-nav">
+    <a class="logo home-link brand-lockup" href="../index.html" aria-label="InvestorBlueprint"><img class="brand-icon" src="../assets/brand/favicon.svg" width="45" height="45" alt="" aria-hidden="true"><span class="brand-name" aria-hidden="true"><span class="brand-name-investor">Investor</span><span class="brand-name-blueprint">Blueprint</span></span></a>
+  </div>
+  <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" data-i18n="menuToggle">☰ Menú</button>
+  <nav id="primary-nav">
+    <a href="../index.html#tools" data-i18n="navTools">Herramientas</a>
+    <a href="../index.html#learn" data-i18n="navLearn">Aprender</a>
+    <a href="../pricing.html" data-i18n="navPricing">Precios</a>
+    <a href="../login.html" data-i18n="navLogin">Ingresar</a>
+  </nav>
+  <div class="lang-switcher" role="group" aria-label="Language selector">
+    <button type="button" class="lang-option" data-lang="en" aria-label="Switch to English"><img class="flag-emoji" src="../assets/flags/us.svg" alt="" aria-hidden="true"> EN</button>
+    <button type="button" class="lang-option" data-lang="es" aria-label="Cambiar a Español"><img class="flag-emoji" src="../assets/flags/es.svg" alt="" aria-hidden="true"> ES</button>
+  </div>
+</header>
+
+<main class="lp-main">
+<section class="lp-hero">
+<div>
+<p class="lp-eyebrow" data-es="Calculadora de propiedades de renta" data-en="Rental property calculator">Calculadora de propiedades de renta</p>
+<h1 data-es="¿Esta propiedad paga sola su hipoteca?" data-en="Does this rental pay for itself?">¿Esta propiedad paga sola su hipoteca?</h1>
+<p class="lp-lead" data-es="Flujo de caja mensual después de la hipoteca, ingreso operativo neto (NOI), cap rate y retorno sobre tu dinero." data-en="Monthly cash flow after the mortgage, net operating income (NOI), cap rate and cash-on-cash return.">Flujo de caja mensual después de la hipoteca, ingreso operativo neto (NOI), cap rate y retorno sobre tu dinero.</p>
+<div class="lp-actions"><a class="btn btn-primary" href="../login.html" data-cta-click="Landing request access" data-es="Solicitar acceso gratis" data-en="Request free access">Solicitar acceso gratis</a><a class="btn" href="../tools/rental-cash-flow.html" data-es="Abrir la calculadora completa" data-en="Open the full calculator">Abrir la calculadora completa</a></div>
+<p class="lp-trust" data-es="Cálculos verificados con casos resueltos a mano · En español e inglés · Sin tarjeta" data-en="Math checked against hand-worked cases · Spanish and English · No card required">Cálculos verificados con casos resueltos a mano · En español e inglés · Sin tarjeta</p>
+</div>
+<form class="lp-quick" data-quick-calc="rentas" novalidate aria-labelledby="quick-title">
+<h2 id="quick-title" data-es="Pruébala ahora, sin cuenta" data-en="Try it now, no account needed">Pruébala ahora, sin cuenta</h2>
+<div class="lp-fields"><label for="q-rent"><span data-es="Renta mensual" data-en="Monthly rent">Renta mensual</span><input id="q-rent" name="rent" type="text" inputmode="decimal" autocomplete="off" value="2400"><small aria-live="polite"></small></label><label for="q-vacancyRate"><span data-es="Vacancia (%)" data-en="Vacancy (%)">Vacancia (%)</span><input id="q-vacancyRate" name="vacancyRate" type="text" inputmode="decimal" autocomplete="off" value="5"><small aria-live="polite"></small></label><label for="q-expenses"><span data-es="Gastos mensuales" data-en="Monthly expenses">Gastos mensuales</span><input id="q-expenses" name="expenses" type="text" inputmode="decimal" autocomplete="off" value="710"><small aria-live="polite"></small></label><label for="q-mortgage"><span data-es="Pago de hipoteca mensual" data-en="Monthly mortgage payment">Pago de hipoteca mensual</span><input id="q-mortgage" name="mortgage" type="text" inputmode="decimal" autocomplete="off" value="1200"><small aria-live="polite"></small></label></div>
+<div id="quick-result" class="lp-result" aria-live="polite"></div>
+<p class="lp-quick-note" data-es="Gastos mensuales = impuestos, seguro, mantenimiento y administración. La versión completa los separa y agrega HOA, servicios, reserva de capital, cap rate y cash-on-cash." data-en="Monthly expenses = taxes, insurance, maintenance and management. The full version itemizes them and adds HOA, utilities, capital reserve, cap rate and cash-on-cash.">Gastos mensuales = impuestos, seguro, mantenimiento y administración. La versión completa los separa y agrega HOA, servicios, reserva de capital, cap rate y cash-on-cash.</p>
+</form>
+</section>
+<section class="lp-section"><h2 data-es="Lo que resuelve" data-en="What it solves">Lo que resuelve</h2><div class="lp-grid"><article class="lp-card"><h3 data-es="Flujo real, después de la hipoteca" data-en="Real cash flow, after the mortgage">Flujo real, después de la hipoteca</h3><p data-es="No te quedas con la renta bruta: ves lo que de verdad entra cada mes." data-en="Not the gross rent: what actually comes in each month.">No te quedas con la renta bruta: ves lo que de verdad entra cada mes.</p></article><article class="lp-card"><h3 data-es="Métricas que usan los bancos" data-en="Metrics lenders use">Métricas que usan los bancos</h3><p data-es="NOI y cap rate para comparar propiedades entre sí." data-en="NOI and cap rate to compare properties.">NOI y cap rate para comparar propiedades entre sí.</p></article><article class="lp-card"><h3 data-es="Retorno sobre tu dinero" data-en="Return on your cash">Retorno sobre tu dinero</h3><p data-es="Cash-on-cash según lo que realmente invertiste." data-en="Cash-on-cash based on what you actually invested.">Cash-on-cash según lo que realmente invertiste.</p></article></div></section>
+<section class="lp-section"><h2 data-es="Cómo funciona" data-en="How it works">Cómo funciona</h2><div class="lp-grid"><article class="lp-card"><span class="lp-step">1</span><p data-es="Escribe la renta y la vacancia." data-en="Enter rent and vacancy.">Escribe la renta y la vacancia.</p></article><article class="lp-card"><span class="lp-step">2</span><p data-es="Agrega gastos e hipoteca." data-en="Add expenses and the mortgage.">Agrega gastos e hipoteca.</p></article><article class="lp-card"><span class="lp-step">3</span><p data-es="Compara flujo, NOI y cap rate." data-en="Compare cash flow, NOI and cap rate.">Compara flujo, NOI y cap rate.</p></article></div></section>
+<section class="lp-section"><h2 data-es="La versión completa incluye" data-en="The full version includes">La versión completa incluye</h2><ul class="lp-includes"><li data-es="Gastos separados: impuestos, seguro, mantenimiento, administración, HOA y servicios" data-en="Itemized costs: taxes, insurance, maintenance, management, HOA and utilities">Gastos separados: impuestos, seguro, mantenimiento, administración, HOA y servicios</li><li data-es="Reserva para reemplazos de capital" data-en="Capital replacement reserve">Reserva para reemplazos de capital</li><li data-es="Cap rate y cash-on-cash" data-en="Cap rate and cash-on-cash">Cap rate y cash-on-cash</li><li data-es="PDF con tus datos" data-en="PDF with your inputs">PDF con tus datos</li></ul></section>
+<section class="lp-section"><h2 data-es="Preguntas frecuentes" data-en="Frequently asked questions">Preguntas frecuentes</h2><div class="lp-faq"><details><summary data-es="¿Qué es el NOI?" data-en="What is NOI?">¿Qué es el NOI?</summary><p data-es="Ingresos menos gastos operativos, antes de la hipoteca. Es la base del cap rate." data-en="Income minus operating expenses, before the mortgage. It drives the cap rate.">Ingresos menos gastos operativos, antes de la hipoteca. Es la base del cap rate.</p></details><details><summary data-es="¿Qué es cash-on-cash?" data-en="What is cash-on-cash?">¿Qué es cash-on-cash?</summary><p data-es="El flujo anual dividido entre el dinero que pusiste tú." data-en="Annual cash flow divided by the cash you put in.">El flujo anual dividido entre el dinero que pusiste tú.</p></details><details><summary data-es="¿Por qué una reserva de capital?" data-en="Why a capital reserve?">¿Por qué una reserva de capital?</summary><p data-es="Techos, calentadores y aires se reemplazan. Apartar cada mes evita sorpresas." data-en="Roofs, heaters and AC units get replaced. Setting money aside each month avoids surprises.">Techos, calentadores y aires se reemplazan. Apartar cada mes evita sorpresas.</p></details></div></section>
+<section class="lp-cta"><div><h2 data-es="Analiza tu próxima propiedad con números claros" data-en="Analyze your next property with clear numbers">Analiza tu próxima propiedad con números claros</h2><p data-es="Solicita acceso y usa todas las calculadoras, con PDF para tus clientes." data-en="Request access and use every calculator, with PDFs for your clients.">Solicita acceso y usa todas las calculadoras, con PDF para tus clientes.</p></div><a class="btn btn-primary" href="../login.html" data-es="Solicitar acceso gratis" data-en="Request free access">Solicitar acceso gratis</a></section>
+<nav class="lp-related" aria-label="Otras calculadoras"><a href="venta.html" data-es="Calculadora de venta · neto del vendedor" data-en="Seller net calculator">Calculadora de venta · neto del vendedor</a><a href="flip.html" data-es="Calculadora de flip" data-en="Flip calculator">Calculadora de flip</a><a href="arv.html" data-es="Calculadora de ARV" data-en="ARV calculator">Calculadora de ARV</a><a href="hard-money.html" data-es="Calculadora de préstamo hard money" data-en="Hard money loan calculator">Calculadora de préstamo hard money</a></nav>
+</main>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/cookie-banner-component.js"></script>
+<script src="../assets/js/consent.js"></script>
+<script src="../assets/js/analytics-ga4.js"></script>
+<script src="../assets/js/meta-pixel.js"></script>
+<script src="../assets/js/analytics.js"></script>
+<script src="../assets/js/track-events.js"></script>
+<script src="../lang.js"></script>
+<script src="../assets/js/member-i18n.js"></script>
+<script src="../script.js"></script>
+<script src="../tools/tool-script.js?v=20261021"></script>
+<script src="../assets/js/landing.js?v=20261021"></script>
+<script src="../assets/js/site-theme.js?v=20261018"></script>
+</body>
+</html>
