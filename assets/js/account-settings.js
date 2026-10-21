@@ -51,10 +51,19 @@
      return !error&&(!data?.terms_accepted_at||data.terms_version!==cfg.termsVersion);
    }catch(error){return false}
  }
+ async function signOut(client){
+   await client.auth.signOut();
+   for(const key of ['ib_document_language','ib_report_detail','ib_notes_detail','ib_display_name','ib_company_name','preferredLanguage']){
+     try{localStorage.removeItem(key)}catch(error){}
+   }
+   window.location.assign('login.html?reason=login');
+ }
  // Resolves once the database has recorded the acceptance (server time).
+ // Signing out stays available, e.g. when the wrong account is open on a shared computer.
  function acceptTerms(client){
    const card=$('account-terms'),form=$('account-terms-form'),box=$('account-terms-accept'),button=$('account-terms-submit');
    card.hidden=false;
+   $('account-terms-signout')?.addEventListener('click',()=>signOut(client));
    return new Promise(resolve=>{
      form.addEventListener('submit',async event=>{
        event.preventDefault();
@@ -145,13 +154,7 @@
        }catch(error){message(t('No se pudo guardar: ','Could not save: ')+(error?.message||'Error'),'error')}
        finally{button.disabled=false;button.setAttribute('aria-busy','false')}
      });
-     $('account-signout').addEventListener('click',async()=>{
-       await client.auth.signOut();
-       for(const key of ['ib_document_language','ib_report_detail','ib_notes_detail','ib_display_name','ib_company_name','preferredLanguage']){
-         try{localStorage.removeItem(key)}catch(error){}
-       }
-       window.location.assign('login.html?reason=login');
-     });
+     $('account-signout').addEventListener('click',()=>signOut(client));
    }catch(error){
      $('account-loading').hidden=true;
      $('account-login-needed').hidden=false;

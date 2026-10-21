@@ -8,12 +8,12 @@ const tick=()=>new Promise(resolve=>setTimeout(resolve,10));
 
 async function openAccount({terms={terms_accepted_at:null,terms_version:null},termsError=null,rpcError=null,search=''}={}){
   const dom=new JSDOM(page,{url:'https://jecaaudio.github.io/InvestorBlueprint/account.html'+search,runScripts:'outside-only'});
-  const w=dom.window,calls=[],visits=[];
+  const w=dom.window,calls=[],visits=[],signOuts=[];
   const user={id:'member-id',email:'member@example.invalid'};
   w.IB_AUTH_CONFIG={supabaseUrl:'https://example.supabase.co',supabaseAnonKey:'sb_publishable_fixture_key_long_enough',termsVersion:'2026-10-21'};
   w.IBNavigate=url=>visits.push(url);
   w.supabase={createClient:()=>({
-    auth:{getUser:async()=>({data:{user},error:null}),signOut:async()=>({error:null})},
+    auth:{getUser:async()=>({data:{user},error:null}),signOut:async()=>{signOuts.push(1);return {error:null}}},
     rpc:async(name,args)=>{calls.push({name,args});return rpcError?{data:null,error:rpcError}:{data:'2026-10-21T16:00:00Z',error:null}},
     from(table){
       let columns='';
@@ -26,7 +26,7 @@ async function openAccount({terms={terms_accepted_at:null,terms_version:null},te
   })};
   w.eval(fs.readFileSync('assets/js/account-settings.js','utf8'));
   await tick();
-  return {dom,d:w.document,w,calls,visits};
+  return {dom,d:w.document,w,calls,visits,signOuts};
 }
 const submit=async(w,d)=>{d.getElementById('account-terms-form').dispatchEvent(new w.Event('submit',{cancelable:true}));await tick()};
 
@@ -82,4 +82,14 @@ test('the terms version is the same in the configuration and the signup form fal
   const configured=/termsVersion:\s*"(\d{4}-\d{2}-\d{2})"/.exec(fs.readFileSync('assets/js/member-auth-config.js','utf8'))?.[1];
   const fallback=/cfg\.termsVersion\|\|'(\d{4}-\d{2}-\d{2})'/.exec(fs.readFileSync('assets/js/member-access.js','utf8'))?.[1];
   assert.ok(configured);assert.equal(configured,fallback);
+});
+
+test('a member can sign out from the acceptance step without accepting',async()=>{
+  const {dom,d,calls,signOuts}=await openAccount();
+  const button=d.getElementById('account-terms-signout');
+  assert.ok(button&&!button.closest('[hidden]'),'sign out is visible while the account is hidden');
+  button.click();await tick();
+  assert.equal(signOuts.length,1);
+  assert.equal(calls.length,0,'signing out never records an acceptance');
+  dom.window.close();
 });

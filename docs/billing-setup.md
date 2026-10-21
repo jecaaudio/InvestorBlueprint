@@ -79,4 +79,9 @@ Haz commit y PR. Al publicarse, la página de precios muestra "Probar 7 días gr
   - salvo para el administrador o los beta testers.
 
   La función `private.has_paid_access()` resume esa regla en SQL.
+- **Exigir la aceptación del aviso y los Términos.** El sitio ya manda a Mi perfil a quien no ha aceptado, pero alguien podría pedir la calculadora directo a la función. En `ib-protected-tools`, después de comprobar `access_status`, lee también `terms_accepted_at` y `terms_version` del mismo perfil y responde **403** si:
+  - `terms_accepted_at` está vacío, o
+  - `terms_version` no es la versión actual (`termsVersion` en `assets/js/member-auth-config.js`, hoy `2026-10-21`).
+
+  Guarda la versión actual como secreto de la función (por ejemplo `TERMS_VERSION`) y actualízala junto con el sitio cada vez que cambien los Términos. Antes de aplicar la migración `20261021150000_terms_acceptance.sql`, esas columnas no existen: aplica primero la migración.
 - **Impuesto de venta.** Algunos estados lo cobran sobre software por suscripción. Consulta con tu contador; Stripe Tax lo calcula por un costo adicional.
