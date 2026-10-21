@@ -25,7 +25,9 @@ try {
         })
       })};
     });
-    await page.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+    // Match any pinned SDK version; the mock body fails the page's integrity check,
+    // so the browser skips it and the window.supabase fixture above stays in place.
+    await page.route(/^https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@/,
       route=>route.fulfill({status:200,contentType:'application/javascript',body:'/* SDK mocked in CI */'}));
     await page.route('**/functions/v1/ib-protected-tools?tool=*',route=>{
       const cors={'access-control-allow-origin':'*',
