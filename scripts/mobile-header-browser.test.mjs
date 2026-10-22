@@ -41,6 +41,7 @@ try {
           assert.ok(await input.evaluate(node=>parseFloat(getComputedStyle(node).fontSize)>=16));
           await input.fill('400.000');await input.press('Tab');assert.equal(await input.inputValue(),'400,000');
           await page.locator('.lp-scenario-actions button').first().click();
+          await page.locator('.lp-comparison article').first().waitFor({state:'visible',timeout:5000});
           assert.equal(await page.locator('.lp-comparison article').count(),1);
           await input.fill('');assert.equal(await input.getAttribute('aria-invalid'),'true');
           assert.equal(await page.locator('.lp-scenario-actions button').first().isDisabled(),true);

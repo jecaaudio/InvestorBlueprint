@@ -100,7 +100,13 @@
     const response=await fetch(endpoint,{method:'GET',cache:'no-store',
       headers:{Authorization:'Bearer '+session.access_token,apikey:cfg.supabaseAnonKey,Accept:'text/html'}});
     if(response.status===401){await client.auth.signOut();window.location.replace(loginURL.href);return;}
-    if(response.status===403){fail('Tu cuenta necesita aprobación antes de abrir esta calculadora.');return;}
+    if(response.status===403){
+      const denied=await response.json().catch(()=>({}));
+      if(denied.error==='beta_required'){
+        say(document.documentElement.lang==='en'?'This tool requires an invitation to the beta.':'Esta herramienta requiere una invitación a la beta.');
+      }else fail('Tu cuenta necesita aprobación antes de abrir esta calculadora.');
+      return;
+    }
     if(!response.ok)throw Error('Server returned '+response.status);
     // Reset the previous member's report metadata *before* fetching settings.
     // A failed RLS/network lookup must not leak a former user's name/company.
