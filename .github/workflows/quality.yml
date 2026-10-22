@@ -78,6 +78,14 @@ jobs:
           path: tmp/report-render-qa/
           retention-days: 7
 
+      - name: Preserve public mobile previews
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mobile-polish-chromium
+          path: tmp/mobile-polish-qa/
+          retention-days: 7
+
   mobile-webkit:
     runs-on: ubuntu-latest
     steps:
@@ -103,3 +111,11 @@ jobs:
           done
           curl -fsS http://127.0.0.1:4173/InvestorBlueprint/account.html >/dev/null
           node scripts/member-webkit.test.mjs
+          MOBILE_ENGINE=webkit node scripts/mobile-header-browser.test.mjs
+      - name: Preserve public Safari mobile previews
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mobile-polish-webkit
+          path: tmp/mobile-polish-qa/
+          retention-days: 7

@@ -24,8 +24,12 @@ test('during the beta the page explains free access and requests it',async()=>{
   assert.equal(d.getElementById('pricing-beta-note').hidden,false);
   assert.equal(cta.getAttribute('href'),'login.html');assert.equal(cta.textContent,'Solicitar acceso gratis');
   assert.equal(d.getElementById('pro-price').textContent,'$19');
+  assert.equal(d.getElementById('pro-price').hidden,true);
+  assert.equal(d.querySelector('.pr-toggle').hidden,true);
+  assert.match(d.getElementById('pro-heading').textContent,/beta/);
+  assert.ok([...d.querySelectorAll('[data-paid-only]')].every(node=>node.hidden));
   d.getElementById('billing-yearly').click();
-  assert.equal(d.getElementById('pro-price').textContent,'$190');assert.equal(d.getElementById('pro-save').hidden,false);
+  assert.equal(d.getElementById('pro-price').textContent,'$190');assert.equal(d.getElementById('pro-save').hidden,true);
   assert.equal(d.getElementById('pro-period').dataset.en,'/ year');
   dom.window.close();
 });
@@ -34,6 +38,8 @@ test('with billing on, a signed-in member goes to Stripe with their id and email
   const dom=await open({billing:live,session:{user:{id:'30000000-0000-4000-8000-000000000001',email:'ana+test@example.com'}}});
   const d=dom.window.document,cta=d.getElementById('pro-cta');
   assert.equal(d.getElementById('pricing-beta-note').hidden,true);
+  assert.equal(d.getElementById('pro-price').hidden,false);
+  assert.equal(d.querySelector('.pr-toggle').hidden,false);
   assert.equal(cta.textContent,'Probar 7 días gratis');
   let url=new URL(cta.href);
   assert.equal(url.origin+url.pathname,'https://buy.stripe.com/test_month');

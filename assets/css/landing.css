@@ -11,7 +11,7 @@
 .lp-quick-note{margin:0;font-size:.82rem;color:var(--muted)}
 .lp-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .lp-fields label{display:grid;gap:4px;font-size:.84rem;font-weight:650;color:var(--text);min-width:0}
-.lp-fields input{width:100%;box-sizing:border-box;padding:9px 10px;border:1px solid var(--site-border);border-radius:9px;background:var(--site-input);color:var(--text);font:inherit;font-weight:500}
+.lp-fields input{width:100%;min-height:48px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--site-border);border-radius:9px;background:var(--site-input);color:var(--text);font:inherit;font-size:16px;font-weight:500}
 .lp-fields small{font-weight:600;color:var(--primary);min-height:1em}
 .lp-result{border-radius:14px;background:#0f2a47;color:#e8f1fb;padding:16px;display:grid;gap:8px}
 .lp-result-main{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -74,3 +74,30 @@ html[data-theme="dark"] .pr-beta{background:#3a2c0e;color:#f5d48f;border-color:#
 .ib-disclaimer{margin:0;padding:10px 12px;border-left:4px solid #e3a008;border-radius:8px;background:#fdf6e3;color:#4a3a0f;font-size:.84rem;line-height:1.5}
 .ib-disclaimer strong{display:block;margin-bottom:2px}
 html[data-theme="dark"] .ib-disclaimer{background:#2f260d;color:#f3dfa6}
+
+/* Keep the working form close to its question on phones. */
+@media(max-width:600px){
+ .lp-main{padding-top:18px;gap:28px}
+ .lp-hero{gap:18px}
+ .lp-hero h1{font-size:1.8rem}
+ .lp-hero .lp-lead{font-size:1rem;margin-top:10px}
+ .lp-hero>div:first-child{display:contents}
+ .lp-hero .lp-eyebrow{margin:0}
+ .lp-hero .lp-quick{grid-row:4;padding:16px}
+ .lp-hero .lp-actions{margin-top:0}
+ .lp-hero .lp-trust{margin:0}
+}
+.lp-scenario-actions{display:flex;flex-wrap:wrap;gap:8px}
+.lp-scenario-actions .btn,.lp-comparison .btn,.pr-toggle button{min-height:44px}
+.lp-scenario-actions .btn:disabled{opacity:.65;cursor:default}
+.lp-comparison{display:grid;gap:12px;min-width:0}
+.lp-comparison:empty{display:none}
+.lp-comparison h3,.lp-comparison h4,.lp-comparison p{margin:0}
+.lp-comparison p{font-size:.85rem}
+.lp-comparison article{padding:12px;border:1px solid var(--site-border);border-radius:10px;min-width:0}
+.lp-comparison dl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;font-size:.88rem}
+.lp-comparison dt{overflow-wrap:anywhere}
+.lp-comparison dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.lp-comparison .btn{margin:4px 6px 0 0}
+[hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

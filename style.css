@@ -87,7 +87,7 @@ body {
   transform: translateY(0);
 }
 
-nav {
+.navbar > nav {
   display: flex;
   gap: 1rem;
   margin-left: auto;
@@ -350,7 +350,7 @@ main {
     margin-left: auto;
   }
 
-  nav {
+  .navbar > nav {
     order: 3;
     width: 100%;
     margin-left: 0;
@@ -362,7 +362,7 @@ main {
     transition: max-height 0.2s ease, opacity 0.2s ease;
   }
 
-  nav.is-open {
+  .navbar > nav.is-open {
     max-height: 240px;
     opacity: 1;
     padding-top: 0.3rem;

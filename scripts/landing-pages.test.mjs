@@ -72,3 +72,33 @@ test('landing pages are linked from the catalog, deployed and listed in the site
   }
   for(const tool of tools.filter(tool=>tool.access==='beta'))assert.equal(tool.landing,undefined,'beta tools have no public landing page');
 });
+
+test('scenario comparison snapshots inputs, restores them, removes entries and resets the example',async()=>{
+ const dom=await open('venta'),w=dom.window,d=w.document,price=d.getElementById('q-price');
+ const compare=d.querySelector('.lp-scenario-actions button');
+ assert.equal(price.value,'385,000');
+ compare.click();
+ price.value='400.000';price.dispatchEvent(new w.Event('input',{bubbles:true}));
+ compare.click();
+ const cards=()=>[...d.querySelectorAll('.lp-comparison article')];
+ assert.match(cards()[0].textContent,/204,200/);assert.match(cards()[1].textContent,/218,000/);
+ cards()[0].querySelector('button').click();assert.equal(price.value,'385,000');assert.match(result(dom),/204,200/);
+ cards()[1].querySelectorAll('button')[1].click();assert.equal(cards().length,1);
+ price.value='';price.dispatchEvent(new w.Event('input',{bubbles:true}));
+ assert.equal(price.getAttribute('aria-invalid'),'true');assert.equal(compare.disabled,true);assert.doesNotMatch(result(dom),/204,200/);
+ d.querySelectorAll('.lp-scenario-actions button')[1].click();assert.equal(price.value,'385,000');assert.match(result(dom),/204,200/);
+ compare.click();compare.click();assert.equal(cards().length,3);assert.equal(compare.disabled,true);
+ assert.equal(w.localStorage.length,0,'public scenarios are memory-only');
+ d.documentElement.lang='en';d.dispatchEvent(new w.Event('ib:language-changed'));
+ assert.match(d.querySelector('.lp-comparison').textContent,/Scenario 1/);
+ dom.window.close();
+});
+
+test('quick inputs reject out-of-range vacancy and preserve cents on blur',async()=>{
+ const dom=await open('rentas'),w=dom.window,d=w.document,rate=d.getElementById('q-vacancyRate');
+ rate.value='101';rate.dispatchEvent(new w.Event('input',{bubbles:true}));
+ assert.equal(rate.getAttribute('aria-invalid'),'true');assert.doesNotMatch(result(dom),/370/);
+ rate.value='5';const rent=d.getElementById('q-rent');rent.value='2.450,75';rent.dispatchEvent(new w.Event('focusout',{bubbles:true}));
+ assert.equal(rent.value,'2,450.75');assert.equal(rate.value,'5');assert.match(result(dom),/418/);
+ dom.window.close();
+});

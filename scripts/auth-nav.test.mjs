@@ -23,7 +23,7 @@ test('without a saved session the header keeps "Ingresar"',()=>{
   for(const page of ['index.html','pricing.html','terms.html','calculadoras/flip.html']){
     const {dom,links}=open(page);
     assert.ok(links.length>=1,page);
-    for(const link of links){assert.match(link.getAttribute('href'),/login\.html$/);assert.equal(link.textContent.trim(),'Ingresar')}
+    for(const link of links){assert.match(link.getAttribute('href'),/login\.html\?reason=login$/);assert.equal(link.textContent.trim(),'Ingresar')}
     dom.window.close();
   }
 });
@@ -46,7 +46,7 @@ test('with a saved session the header shows "Mi perfil", so a signed-in person c
 test('an expired or unreadable saved session does not count as signed in',()=>{
   for(const saved of ['not json',{...session,refresh_token:'',expires_at:1},{access_token:'x'}]){
     const {dom,links}=open('index.html',{saved});
-    assert.match(links[0].getAttribute('href'),/login\.html$/);
+    assert.match(links[0].getAttribute('href'),/login\.html\?reason=login$/);
     dom.window.close();
   }
 });
@@ -59,7 +59,7 @@ test('every public page with "Ingresar" in the header loads the session check',(
 
 test('a session from another Supabase project on the same github.io origin is ignored',()=>{
   const {dom,links}=open('index.html',{saved:session,storageKey:'sb-someotherproject-auth-token'});
-  assert.match(links[0].getAttribute('href'),/login\.html$/);
+  assert.match(links[0].getAttribute('href'),/login\.html\?reason=login$/);
   dom.window.close();
 });
 

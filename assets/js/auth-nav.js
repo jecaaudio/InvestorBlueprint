@@ -20,7 +20,12 @@
     } catch (error) { return false; /* Blocked storage or unreadable data: keep "Ingresar". */ }
   };
   const update = () => {
-    if (!signedIn()) return;
+    if (!signedIn()) {
+      document.querySelectorAll('.navbar a[data-i18n="navLogin"]').forEach(link=>{
+        link.href=link.getAttribute('href').replace(/login\.html.*$/, 'login.html?reason=login');
+      });
+      return;
+    }
     const english = (document.documentElement.lang || '').toLowerCase().startsWith('en');
     document.querySelectorAll('.navbar a[data-i18n="navLogin"], .navbar a[data-i18n="navAccount"][data-auth-nav]').forEach((link) => {
       // A menu that already links to My profile just drops "Ingresar" instead of repeating it.

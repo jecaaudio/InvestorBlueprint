@@ -30,6 +30,19 @@
    if($('pro-save'))$('pro-save').hidden=!yearly;
    const cta=$('pro-cta'),note=$('pricing-beta-note');
    const link=billing.enabled?linkFor('pro'+period):'';
+   const available=Boolean(link);
+   document.querySelector('.pr-toggle').hidden=!available;
+   $('pro-price').hidden=!available;
+   $('pro-period').hidden=!available;
+   $('pro-save').hidden=!available||!yearly;
+   document.querySelectorAll('[data-paid-only]').forEach(node=>{node.hidden=!available});
+   if(!available){
+     setText($('pro-heading'),'Acceso completo · beta','Full access · beta');
+     setText($('pro-fine'),'Sin cobros durante la beta. El acceso requiere aprobación. Las herramientas experimentales requieren invitación.','No charges during beta. Access requires approval. Experimental tools require an invitation.');
+   }else{
+     setText($('pro-heading'),'Pro','Pro');
+     setText($('pro-fine'),'El pago lo procesa Stripe. No guardamos los datos de tu tarjeta.','Payments are processed by Stripe. We never store your card details.');
+   }
    if(!link){
      if(note)note.hidden=false;
      cta.href='login.html';
