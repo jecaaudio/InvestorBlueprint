@@ -45,8 +45,14 @@ try {
           await input.fill('');assert.equal(await input.getAttribute('aria-invalid'),'true');
           assert.equal(await page.locator('.lp-scenario-actions button').first().isDisabled(),true);
           await page.locator('.lp-scenario-actions button').nth(1).click();
-        }else{assert.equal(await page.locator('#pro-price').isVisible(),false)}
+        }else{
+          assert.equal(await page.locator('#pro-price').isVisible(),false);
+          await page.locator('.site-footer-cookies').click();
+          await page.locator('#cookie-banner').waitFor({state:'visible'});
+          await page.locator('#cookie-reject-all').click();
+        }
         if(width===393&&lang==='es'){
+          if(await page.locator('html').getAttribute('data-theme')!=='light')await page.locator('#siteThemeToggle').click();
           await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-light.png`,fullPage:true});
           await page.locator('#siteThemeToggle').click();
           await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-dark.png`,fullPage:true});
