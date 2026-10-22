@@ -73,15 +73,8 @@ Haz commit y PR. Al publicarse, la página de precios muestra "Probar 7 días gr
 
 ## Pendiente antes de cobrar en serio
 
-- **Exigir el plan en las calculadoras.** Hoy la función `ib-protected-tools` solo exige una cuenta aprobada. Para que una suscripción cancelada pierda el acceso, esa función debe consultar `member_subscription_state` con el token del miembro y exigir:
-  - `billing_status` en (`active`, `trialing`);
-  - `valid_until` en el futuro;
-  - salvo para el administrador o los beta testers.
-
-  La función `private.has_paid_access()` resume esa regla en SQL.
-- **Exigir la aceptación del aviso y los Términos.** El sitio ya manda a Mi perfil a quien no ha aceptado, pero alguien podría pedir la calculadora directo a la función. En `ib-protected-tools`, después de comprobar `access_status`, lee también `terms_accepted_at` y `terms_version` del mismo perfil y responde **403** si:
-  - `terms_accepted_at` está vacío, o
-  - `terms_version` no es la versión actual (`termsVersion` en `assets/js/member-auth-config.js`, hoy `2026-10-21`).
-
-  Guarda la versión actual como secreto de la función (por ejemplo `TERMS_VERSION`) y actualízala junto con el sitio cada vez que cambien los Términos. Antes de aplicar la migración `20261021150000_terms_acceptance.sql`, esas columnas no existen: aplica primero la migración.
+- **Activar la comprobación del plan en el servidor.** El endpoint ya la implementa, pero la beta sigue gratis mientras `IB_BILLING_ENABLED` no sea exactamente `true`. Tras aplicar la migración de Stripe y verificar el webhook, configura esa variable en la función y habilita también `enabled` en `assets/js/billing-config.js`. Un miembro aprobado necesita estado `active` o `trialing` y `valid_until` válido en el futuro. El administrador y los probadores autorizados conservan su excepción. Una consulta fallida no concede acceso. No basta con cambiar el indicador del navegador.
+- **Mantener la versión de los Términos sincronizada.** El endpoint ya exige aceptación registrada de la versión actual, incluso en llamadas directas. La versión predeterminada es `2026-10-21`; `TERMS_VERSION`, si está configurada en la función, debe coincidir con `termsVersion` del sitio. Un miembro sin aceptación vigente vuelve a Mi perfil; nadie acepta automáticamente por él. La migración de aceptación debe estar aplicada antes del despliegue del endpoint.
+- **Comprobar el cobro real en modo de prueba.** Antes de habilitar ventas, verifica con tus productos de Stripe: checkout, webhook firmado, renovación, cancelación, vencimiento y acceso del mismo miembro. Las pruebas automatizadas cubren esas reglas con datos ficticios, pero no sustituyen esa integración con tus credenciales.
+- **Configurar soporte y contraseñas.** Publica un correo atendido en `assets/js/site-config.js` y activa la protección de contraseñas filtradas de Supabase. El auditor la señala desactivada: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
 - **Impuesto de venta.** Algunos estados lo cobran sobre software por suscripción. Consulta con tu contador; Stripe Tax lo calcula por un costo adicional.

@@ -103,7 +103,16 @@
     if(response.status===403){
       let denied={};
       try{denied=await response.json()}catch(denialParseError){}
-      if(denied.error==='beta_required'){
+      if(denied.error==='terms_required'){
+        const account=new URL(rootPath+'account.html',window.location.href);
+        account.searchParams.set('returnTo',window.location.pathname);
+        window.location.replace(account.href);
+      }else if(denied.error==='subscription_required'){
+        const english=document.documentElement.lang==='en';
+        say(english?'An active plan is required to open this calculator.':'Necesitas un plan activo para abrir esta calculadora.');
+        const link=document.getElementById('secure-login-link');
+        if(link){link.href=new URL(rootPath+'pricing.html',window.location.href).href;link.textContent=english?'View plans':'Ver planes';link.hidden=false;}
+      }else if(denied.error==='beta_required'){
         say(document.documentElement.lang==='en'?'This tool requires an invitation to the beta.':'Esta herramienta requiere una invitación a la beta.');
       }else fail('Tu cuenta necesita aprobación antes de abrir esta calculadora.');
       return;

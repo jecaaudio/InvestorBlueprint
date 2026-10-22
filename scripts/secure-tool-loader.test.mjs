@@ -8,7 +8,7 @@ const validHtml='<!doctype html><html><head><title>Protected</title></head><body
   '<a class="tool-logo" href="../index.html">InvestorBlueprint</a><header class="top"><div>Sale report</div></header>'+
   '<main>'+('Secure content '.repeat(95))+'</main></body></html>';
 
-async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool='flip',userId='user_2',responseHtml=validHtml,blockedStorage=false,sessionChangedBeforeRender=false,eventAfterRender=null,beta=false,profile={role:'member',access_status:'approved'},betaTester=false,betaColumn=true,language=null,termsVersion='',terms=undefined,termsError=null}={}){
+async function run({signedIn=true,httpStatus=200,denialCode=null,prefError=false,prefs=null,tool='flip',userId='user_2',responseHtml=validHtml,blockedStorage=false,sessionChangedBeforeRender=false,eventAfterRender=null,beta=false,profile={role:'member',access_status:'approved'},betaTester=false,betaColumn=true,language=null,termsVersion='',terms=undefined,termsError=null}={}){
   let html='',redirect='',signedOut=0,requests=0;
   let shownMessage='',loginLinkHidden=true,authHeader='';
   const cache=new Map([
@@ -68,7 +68,7 @@ async function run({signedIn=true,httpStatus=200,prefError=false,prefs=null,tool
     assert.ok(url.endsWith('ib-protected-tools?tool='+tool));
     return {
       status:httpStatus,ok:httpStatus===200,
-      async text(){return responseHtml}
+      async text(){return responseHtml},async json(){return {error:denialCode}}
     };
   };
   await vm.runInNewContext(script,{window,document,fetch,URL,localStorage,
@@ -97,6 +97,16 @@ test('a revoked JWT logs out and redirects before rendering',async()=>{
   assert.equal(r.signedOut,1);
   assert.equal(r.html,'');
   assert.match(r.redirect,/login.html/);
+});
+
+test('server terms and subscription denials lead to the matching recovery page without signing out',async()=>{
+ const terms=await run({httpStatus:403,denialCode:'terms_required'});
+ assert.equal(terms.html,'');assert.match(terms.redirect,/account.html\?returnTo=/);assert.equal(terms.signedOut,0);
+ const subscription=await run({httpStatus:403,denialCode:'subscription_required'});
+ assert.equal(subscription.html,'');assert.match(subscription.shownMessage,/plan activo/);
+ assert.equal(subscription.loginLinkHidden,false);assert.equal(subscription.signedOut,0);
+ const beta=await run({httpStatus:403,denialCode:'beta_required'});
+ assert.equal(beta.html,'');assert.match(beta.shownMessage,/invitación/);assert.equal(beta.loginLinkHidden,true);
 });
 test('failed preference lookup never reuses a previous member name or company',async()=>{
   const r=await run({prefError:true});
