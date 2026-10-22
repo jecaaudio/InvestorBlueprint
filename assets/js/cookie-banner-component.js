@@ -29,7 +29,7 @@
     if (path.includes('/tools/arv/')) {
       return '../../privacy.html';
     }
-    if (path.includes('/tools/')) {
+    if (path.includes('/tools/') || path.includes('/calculadoras/') || path.includes('/calculadora-venta/')) {
       return '../privacy.html';
     }
     return 'privacy.html';

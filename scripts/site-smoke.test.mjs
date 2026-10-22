@@ -140,3 +140,15 @@ test('every page with the footer can reopen cookie settings',()=>{
     assert.match(html,/consent\.js/,page+' must load consent controls');
   }
 });
+
+test('cookie privacy link resolves to the legal page from every nesting depth',async()=>{
+ const {JSDOM}=await import('jsdom');
+ const source=read('assets/js/cookie-banner-component.js');
+ for(const path of ['index.html','calculadoras/venta.html','calculadora-venta/','tools/flip-calculator.html','tools/arv/','review/fake/calculadoras/venta.html']){
+  const root=path.startsWith('review/')?'/InvestorBlueprint/review/fake/':'/InvestorBlueprint/';
+  const dom=new JSDOM('<!doctype html><body></body>',{url:'https://example.invalid/InvestorBlueprint/'+path,runScripts:'outside-only'});
+  dom.window.eval(source);dom.window.document.dispatchEvent(new dom.window.Event('DOMContentLoaded'));
+  assert.equal(new URL(dom.window.document.querySelector('#cookie-banner a').href).pathname,root+'privacy.html',path);
+  dom.window.close();
+ }
+});
