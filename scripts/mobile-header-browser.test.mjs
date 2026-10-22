@@ -33,6 +33,7 @@ try {
       for(const path of ['calculadoras/venta.html','calculadoras/flip.html','calculadoras/rentas.html','calculadoras/arv.html','calculadoras/hard-money.html','pricing.html']){
         await page.goto(base+'/InvestorBlueprint/'+path,{waitUntil:'load'});
         await page.locator('#site-footer').waitFor();
+        assert.equal(new URL(await page.locator('#cookie-banner a').getAttribute('href'),page.url()).pathname,'/InvestorBlueprint/privacy.html','Cookie policy link must resolve from nested pages');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Overflow ${path} ${width}`);
         assert.ok(await page.locator('.site-footer a[href$="privacy.html"]').isVisible(),'Mobile footer privacy link');
         assert.ok(await page.locator('.site-footer-cookies').isVisible(),'Mobile cookie settings');

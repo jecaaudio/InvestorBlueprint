@@ -39,12 +39,22 @@ Deno.serve(async(req:Request):Promise<Response>=>{
   const token=auth.replace(/^Bearer\s+/i,"");
   const {data:{user},error:userError}=await sb.auth.getUser(token);
   if(userError||!user||!user.email_confirmed_at)return reply(401,JSON.stringify({error:"login_required"}));
-  const {data:profile,error:profileError}=await sb.from("member_profiles").select("access_status").eq("id",user.id).single();
-  if(profileError||profile?.access_status!=="approved")return reply(403,JSON.stringify({error:"approval_required"}));
+  const {data:profile,error:profileError}=await sb.from("member_profiles").select("access_status,role,beta_tester,terms_accepted_at,terms_version").eq("id",user.id).single();
+  if(profileError)return reply(503,JSON.stringify({error:"verification_unavailable"}));
+  if(profile?.access_status!=="approved")return reply(403,JSON.stringify({error:"approval_required"}));
+  const termsVersion=Deno.env.get("TERMS_VERSION")||"2026-10-21";
+  if(!profile.terms_accepted_at||profile.terms_version!==termsVersion)return reply(403,JSON.stringify({error:"terms_required"}));
+  const betaAllowed=profile.role==="admin"||profile.beta_tester===true;
   // Enforce the same tester permissions at the server, including direct endpoint requests.
   if(["rent","roi-search","automated-arv"].includes(tool)){
-    const {data:betaProfile,error:betaError}=await sb.from("member_profiles").select("role,beta_tester").eq("id",user.id).single();
-    if(betaError||(betaProfile?.role!=="admin"&&betaProfile?.beta_tester!==true))return reply(403,JSON.stringify({error:"beta_required"}));
+    if(!betaAllowed)return reply(403,JSON.stringify({error:"beta_required"}));
+  }
+  // Billing is opt-in at the server. The free beta never depends on payment data.
+  if(Deno.env.get("IB_BILLING_ENABLED")==="true"&&!betaAllowed){
+    const {data:subscription,error:subscriptionError}=await sb.from("member_subscription_state").select("billing_status,valid_until").eq("user_id",user.id).maybeSingle();
+    if(subscriptionError)return reply(503,JSON.stringify({error:"verification_unavailable"}));
+    const until=Date.parse(subscription?.valid_until||"");
+    if(!["active","trialing"].includes(subscription?.billing_status)||!Number.isFinite(until)||until<=Date.now())return reply(403,JSON.stringify({error:"subscription_required"}));
   }
   const backToProfile='<a href="/InvestorBlueprint/account.html" aria-label="Mi perfil / My profile" '+ 
     'style="position:fixed;right:15px;bottom:15px;z-index:9999;background:#146d82;color:#fff;'+
