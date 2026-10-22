@@ -1,4 +1,4 @@
-// Phone header layout: logo, language, theme and menu stay on one row.
+// Public mobile layouts, accessible navigation and working quick calculations.
 import { chromium, webkit } from 'playwright';
 import { mkdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
@@ -16,6 +16,7 @@ try {
       // The SDK is not needed for layout; skip the network call.
       await page.route(/^https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@/,route=>route.fulfill({status:200,contentType:'application/javascript',body:''}));
       await page.goto(base+'/InvestorBlueprint/index.html',{waitUntil:'load'});
+      await page.locator('#cookie-reject-all').click();
       await page.locator('#siteThemeToggle').waitFor({state:'visible'});
       for(const selector of ['.lang-option','#siteThemeToggle',...(width<600?['.menu-toggle']:[])]){
         assert.ok(await page.locator(selector).evaluateAll(nodes=>nodes.every(node=>{
@@ -25,7 +26,10 @@ try {
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Horizontal overflow at ${width}px`);
       if(width<600){await page.locator('.menu-toggle').click();
       assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'),'true');
-      assert.ok(await page.locator('#primary-nav a').first().isVisible(),'Menu links visible after opening');}
+      assert.ok(await page.locator('#primary-nav a').first().isVisible(),'Menu links visible after opening');
+      await page.keyboard.press('Escape');
+      assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'),'false');
+      assert.equal(await page.locator('#primary-nav a').first().isVisible(),false);}
       for(const path of ['calculadoras/venta.html','calculadoras/flip.html','calculadoras/rentas.html','calculadoras/arv.html','calculadoras/hard-money.html','pricing.html']){
         await page.goto(base+'/InvestorBlueprint/'+path,{waitUntil:'load'});
         await page.locator('#site-footer').waitFor();

@@ -357,6 +357,7 @@ main {
     flex-direction: column;
     align-items: center;
     max-height: 0;
+    visibility: hidden;
     overflow: hidden;
     opacity: 0;
     transition: max-height 0.2s ease, opacity 0.2s ease;
@@ -364,6 +365,7 @@ main {
 
   .navbar > nav.is-open {
     max-height: 240px;
+    visibility: visible;
     opacity: 1;
     padding-top: 0.3rem;
   }

@@ -90,6 +90,9 @@ html[data-theme="dark"] .badge.free.beta-tester{background:#3a2c0e!important;col
 .comparison-table td,.comparison-table th{border-bottom-color:var(--site-border)!important}
 .auth-form input,.auth-form select,input,select,textarea{background:var(--site-input);color:var(--text);border-color:var(--site-border)}
 .auth-form input:focus,.auth-form select:focus{border-color:var(--primary)}
+input:is([type="text"],[type="number"],[type="email"],[type="password"],[type="tel"],[type="search"],[type="url"]),select,textarea{font-size:16px;min-height:44px;min-width:0;box-sizing:border-box}
+.tool-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))}
+@media(max-width:840px){.navbar nav a{display:inline-flex;align-items:center;min-height:44px}}
 .saved-calculations-list a{color:var(--primary)}
 #auth-message{color:var(--primary)}
 #auth-message,.auth-success{font-weight:700}
@@ -172,6 +175,7 @@ body[data-tool] .fc-row label{color:var(--text)}
 .site-footer nav{display:block;margin:0;min-width:0}
 .site-footer li a,.site-footer-cookies{display:inline-flex;align-items:center;min-height:44px}
 .site-footer strong{color:var(--text)}
+.site-footer-brand{min-width:0;overflow-wrap:anywhere}
 .site-footer p{margin:6px 0 0;font-size:.9rem}
 .site-footer h2{margin:0 0 8px;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
 .site-footer ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}

@@ -92,7 +92,7 @@
     const value=parse(input.name,input.value);
     const echo=input.parentElement.querySelector('small');
     const plain=Number(String(input.value).replace(/[$,\s%]/g,''));
-    if(!input.value.trim()||!Number.isFinite(value)||value<0||(/(Pct|Rate)$/.test(input.name)&&value>100)){
+    if(!input.value.trim()||!Number.isFinite(value)||value<0||value>Number.MAX_SAFE_INTEGER||(/(Pct|Rate)$/.test(input.name)&&value>100)){
      invalid=true;input.setAttribute('aria-invalid','true');if(echo)echo.textContent=L('Número no válido','Not a valid number');continue}
     input.removeAttribute('aria-invalid');
     if(echo)echo.textContent=value!==plain?L('Se lee como ','Read as ')+new Intl.NumberFormat('en-US',{maximumFractionDigits:4}).format(value):'';
