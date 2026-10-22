@@ -10,7 +10,7 @@ await mkdir('tmp/mobile-polish-qa',{recursive:true});
 try {
   for (const width of [320,360,393,430,1280]) {
     for (const lang of ['es','en']) {
-      const context=await browser.newContext({viewport:{width,height:800},isMobile:true,hasTouch:true});
+      const context=await browser.newContext({viewport:{width,height:800},isMobile:width<600,hasTouch:width<600,reducedMotion:'reduce'});
       await context.addInitScript(value=>{try{localStorage.setItem('preferredLanguage',value)}catch{}},lang);
       const page=await context.newPage();
       // The SDK is not needed for layout; skip the network call.
@@ -38,6 +38,7 @@ try {
         assert.ok(await page.locator('.site-footer-cookies').isVisible(),'Mobile cookie settings');
         if(path.startsWith('calculadoras/')){
           const input=page.locator('.lp-fields input').first();
+          const initial=await input.inputValue();
           assert.ok(await input.evaluate(node=>parseFloat(getComputedStyle(node).fontSize)>=16));
           await input.fill('400.000');await input.press('Tab');assert.equal(await input.inputValue(),'400,000');
           await page.locator('.lp-scenario-actions button').first().click();
@@ -46,6 +47,8 @@ try {
           await input.fill('');assert.equal(await input.getAttribute('aria-invalid'),'true');
           assert.equal(await page.locator('.lp-scenario-actions button').first().isDisabled(),true);
           await page.locator('.lp-scenario-actions button').nth(1).click();
+          assert.equal(await input.inputValue(),initial,'Reset must restore the original input on the first tap');
+          assert.equal(await input.getAttribute('aria-invalid'),null);
         }else{
           assert.equal(await page.locator('#pro-price').isVisible(),false);
           await page.locator('.site-footer-cookies').click();
@@ -53,10 +56,11 @@ try {
           await page.locator('#cookie-reject-all').click();
         }
         if(width===393&&lang==='es'){
+          await page.evaluate(()=>window.scrollTo(0,0));
           if(await page.locator('html').getAttribute('data-theme')!=='light')await page.locator('#siteThemeToggle').click();
-          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-light.png`,fullPage:true});
+          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-light.png`,fullPage:true,animations:'disabled'});
           await page.locator('#siteThemeToggle').click();
-          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-dark.png`,fullPage:true});
+          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-dark.png`,fullPage:true,animations:'disabled'});
         }
       }
       await page.goto(base+'/InvestorBlueprint/index.html#tools');

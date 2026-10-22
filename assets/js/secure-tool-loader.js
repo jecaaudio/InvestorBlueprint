@@ -101,7 +101,8 @@
       headers:{Authorization:'Bearer '+session.access_token,apikey:cfg.supabaseAnonKey,Accept:'text/html'}});
     if(response.status===401){await client.auth.signOut();window.location.replace(loginURL.href);return;}
     if(response.status===403){
-      const denied=await response.json().catch(()=>({}));
+      let denied={};
+      try{denied=await response.json()}catch(denialParseError){}
       if(denied.error==='beta_required'){
         say(document.documentElement.lang==='en'?'This tool requires an invitation to the beta.':'Esta herramienta requiere una invitación a la beta.');
       }else fail('Tu cuenta necesita aprobación antes de abrir esta calculadora.');

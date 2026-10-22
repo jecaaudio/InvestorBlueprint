@@ -52,10 +52,11 @@
   const parse=(name,value)=>window.IBParseFieldNumber?window.IBParseFieldNumber(name,value):Number(value);
   const inputs=[...form.querySelectorAll('input[name]')];
   const moneyField=input=>!/(Pct|Rate|points|months|Months)$/.test(input.name);
-  const formatInputs=()=>inputs.forEach(input=>{
+  const formatInput=input=>{
    const value=parse(input.name,input.value);
-   if(moneyField(input)&&Number.isFinite(value)&&value>=0)input.value=new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(value);
-  });
+   if(input.value.trim()&&moneyField(input)&&Number.isFinite(value)&&value>=0&&value<=Number.MAX_SAFE_INTEGER)input.value=new Intl.NumberFormat('en-US',{maximumFractionDigits:20}).format(value);
+  };
+  const formatInputs=()=>inputs.forEach(formatInput);
   const scenarios=[];
   let current=null;
   const actions=document.createElement('div');actions.className='lp-scenario-actions';
@@ -110,7 +111,9 @@
   };
   compare.addEventListener('click',()=>{if(current&&scenarios.length<3){scenarios.push({...current});renderComparison()}});
   reset.addEventListener('click',()=>{form.reset();formatInputs();render()});
-  form.addEventListener('focusout',event=>{if(inputs.includes(event.target)){formatInputs();render()}});
+  // Do not rerender on blur: moving the next button between touch-down and click
+  // cancels the first tap in Safari. Input events already keep the result current.
+  form.addEventListener('focusout',event=>{if(inputs.includes(event.target))formatInput(event.target)});
   form.addEventListener('input',render);
   form.addEventListener('submit',event=>{event.preventDefault();render()});
   document.addEventListener('ib:language-changed',render);
