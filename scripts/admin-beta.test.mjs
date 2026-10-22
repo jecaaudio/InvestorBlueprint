@@ -1,11 +1,38 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
 import {JSDOM} from 'jsdom';
 
 const page=fs.readFileSync('admin.html','utf8').replace(/<script\b[\s\S]*?<\/script>/gi,'');
 const source=fs.readFileSync('assets/js/member-access.js','utf8');
 const tick=()=>new Promise(resolve=>setTimeout(resolve,10));
+
+test('protected server refuses direct beta requests from regular members and suspended testers',async()=>{
+ const raw=fs.readFileSync('supabase/functions/ib-protected-tools/index.ts','utf8');
+ const js=raw.replace(/^import .*;\n/gm,'').replace('pages: Record<string,string>','pages')
+  .replace('status:number, body:string','status, body').replace('):Response{','){')
+  .replace('(req:Request):Promise<Response>','(req)');
+ for(const fixture of [
+  {role:'member',access_status:'approved',beta_tester:false,status:403},
+  {role:'member',access_status:'approved',beta_tester:true,status:200},
+  {role:'admin',access_status:'approved',beta_tester:false,status:200},
+  {role:'member',access_status:'suspended',beta_tester:true,status:403},
+  {role:'member',access_status:'approved',beta_tester:true,readError:true,status:403}
+ ]){
+  let handler;
+  const sb={auth:{getUser:async()=>({data:{user:{id:'fixture',email_confirmed_at:'2026-01-01'}},error:null})},
+   from(){const q={select(columns){q.columns=columns;return q},eq(column,value){assert.equal(value,'fixture');return q},
+    single:async()=>({data:fixture,error:fixture.readError&&q.columns.includes('beta_tester')?{}:null})};return q}};
+  vm.runInNewContext(js,{createClient:()=>sb,Deno:{env:{get:()=> 'fixture'},serve:fn=>{handler=fn}},Response,URL,
+   flip:'fixture',rental:'fixture',rent:'fixture',arvEstimator:'fixture',hardMoney:'fixture',roiSearch:'fixture',automatedArv:'fixture',sellerNet:'fixture'});
+  for(const tool of ['rent','roi-search','automated-arv']){
+   const response=await handler(new Request('https://fixture.invalid/?tool='+tool,{headers:{Authorization:'Bearer fixture'}}));
+   assert.equal(response.status,fixture.status,JSON.stringify({fixture,tool}));
+  }
+  if(fixture.access_status==='approved')assert.equal((await handler(new Request('https://fixture.invalid/?tool=flip',{headers:{Authorization:'Bearer fixture'}}))).status,200);
+ }
+});
 const owner={id:'owner-id',email:'owner@example.invalid',full_name:'Owner',role:'admin',access_status:'approved',requested_at:'2026-10-01T00:00:00Z'};
 const member={id:'member-id',email:'tester@example.invalid',full_name:'Tester',role:'member',access_status:'approved',requested_at:'2026-10-02T00:00:00Z'};
 

@@ -195,7 +195,7 @@
 
 .fc-card-label { font-size: 12px; opacity: .8; }
 .fc-card-value { font-size: 24px; margin-top: 6px; font-weight: 700; }
-.fc-card-value.is-negative { color: #ff6b6b; }
+.fc-card-value.is-negative { color: var(--error-text, #b91c1c); }
 .fc-card-subvalue { font-size: 12px; opacity: .75; margin-top: 4px; }
 
 .fc-score {
@@ -233,7 +233,7 @@
 .fc-warnings {
   margin-top: 8px;
   font-size: 12px;
-  color: #f7b731;
+  color: var(--warning-text, #854d0e);
 }
 
 .fc-breakdown h3,
@@ -421,5 +421,5 @@
   transform:translateY(0);
 }
 
-#outDecision[data-state="ok"] { color: #00d084; }
-#outDecision[data-state="bad"] { color: #ff6b6b; }
+#outDecision[data-state="ok"] { color: var(--success-text, #166534); }
+#outDecision[data-state="bad"] { color: var(--error-text, #b91c1c); }

@@ -1,27 +1,72 @@
-// Phone header layout: logo, language, theme and menu stay on one row.
-import { chromium } from 'playwright';
+// Public mobile layouts, accessible navigation and working quick calculations.
+import { chromium, webkit } from 'playwright';
+import { mkdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 
 const base=process.env.HEADER_BASE_URL||'http://127.0.0.1:4173';
-const browser=await chromium.launch({headless:true});
+const engine=process.env.MOBILE_ENGINE==='webkit'?'webkit':'chromium';
+const browser=await ({chromium,webkit}[engine]).launch({headless:true});
+await mkdir('tmp/mobile-polish-qa',{recursive:true});
 try {
-  for (const width of [393,375,360]) {
+  for (const width of [320,360,393,430,1280]) {
     for (const lang of ['es','en']) {
-      const context=await browser.newContext({viewport:{width,height:800},isMobile:true,hasTouch:true});
+      const context=await browser.newContext({viewport:{width,height:800},isMobile:width<600,hasTouch:width<600,reducedMotion:'reduce'});
       await context.addInitScript(value=>{try{localStorage.setItem('preferredLanguage',value)}catch{}},lang);
       const page=await context.newPage();
       // The SDK is not needed for layout; skip the network call.
       await page.route(/^https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@/,route=>route.fulfill({status:200,contentType:'application/javascript',body:''}));
       await page.goto(base+'/InvestorBlueprint/index.html',{waitUntil:'load'});
+      await page.locator('#cookie-reject-all').click();
       await page.locator('#siteThemeToggle').waitFor({state:'visible'});
-      const rows=await page.evaluate(()=>['.brand-menu','.lang-switcher','#siteThemeToggle','.menu-toggle']
-        .map(selector=>{const box=document.querySelector(selector).getBoundingClientRect();return Math.round(box.top+box.height/2);}));
-      assert.ok(Math.max(...rows)-Math.min(...rows)<=4,`Header wraps at ${width}px (${lang}): ${rows.join(', ')}`);
+      for(const selector of ['.lang-option','#siteThemeToggle',...(width<600?['.menu-toggle']:[])]){
+        assert.ok(await page.locator(selector).evaluateAll(nodes=>nodes.every(node=>{
+          const box=node.getBoundingClientRect();return box.width>=44&&box.height>=44;
+        })),`Touch target ${selector} at ${width}px`);
+      }
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Horizontal overflow at ${width}px`);
-      await page.locator('.menu-toggle').click();
+      if(width<600){await page.locator('.menu-toggle').click();
       assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'),'true');
       assert.ok(await page.locator('#primary-nav a').first().isVisible(),'Menu links visible after opening');
-      console.log(`[header/mobile] ${width}px ${lang}: one row, menu opens`);
+      await page.keyboard.press('Escape');
+      assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'),'false');
+      assert.equal(await page.locator('#primary-nav a').first().isVisible(),false);}
+      for(const path of ['calculadoras/venta.html','calculadoras/flip.html','calculadoras/rentas.html','calculadoras/arv.html','calculadoras/hard-money.html','pricing.html']){
+        await page.goto(base+'/InvestorBlueprint/'+path,{waitUntil:'load'});
+        await page.locator('#site-footer').waitFor();
+        assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Overflow ${path} ${width}`);
+        assert.ok(await page.locator('.site-footer a[href$="privacy.html"]').isVisible(),'Mobile footer privacy link');
+        assert.ok(await page.locator('.site-footer-cookies').isVisible(),'Mobile cookie settings');
+        if(path.startsWith('calculadoras/')){
+          const input=page.locator('.lp-fields input').first();
+          const initial=await input.inputValue();
+          assert.ok(await input.evaluate(node=>parseFloat(getComputedStyle(node).fontSize)>=16));
+          await input.fill('400.000');await input.press('Tab');assert.equal(await input.inputValue(),'400,000');
+          await page.locator('.lp-scenario-actions button').first().click();
+          await page.locator('.lp-comparison article').first().waitFor({state:'visible',timeout:5000});
+          assert.equal(await page.locator('.lp-comparison article').count(),1);
+          await input.fill('');assert.equal(await input.getAttribute('aria-invalid'),'true');
+          assert.equal(await page.locator('.lp-scenario-actions button').first().isDisabled(),true);
+          await page.locator('.lp-scenario-actions button').nth(1).click();
+          assert.equal(await input.inputValue(),initial,'Reset must restore the original input on the first tap');
+          assert.equal(await input.getAttribute('aria-invalid'),null);
+        }else{
+          assert.equal(await page.locator('#pro-price').isVisible(),false);
+          await page.locator('.site-footer-cookies').click();
+          await page.locator('#cookie-banner').waitFor({state:'visible'});
+          await page.locator('#cookie-reject-all').click();
+        }
+        if(width===393&&lang==='es'){
+          await page.evaluate(()=>window.scrollTo(0,0));
+          if(await page.locator('html').getAttribute('data-theme')!=='light')await page.locator('#siteThemeToggle').click();
+          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-light.png`,fullPage:true,animations:'disabled'});
+          await page.locator('#siteThemeToggle').click();
+          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-dark.png`,fullPage:true,animations:'disabled'});
+        }
+      }
+      await page.goto(base+'/InvestorBlueprint/index.html#tools');
+      const anchor=await page.locator('#tools').evaluate(node=>({top:node.getBoundingClientRect().top,header:document.querySelector('.navbar').getBoundingClientRect().bottom}));
+      assert.ok(anchor.top>=anchor.header-2,`Header covers tools at ${width}px: ${JSON.stringify(anchor)}`);
+      console.log(`[mobile/${engine}] ${width}px ${lang}: public calculators, comparison, footer and anchors`);
       await context.close();
     }
   }

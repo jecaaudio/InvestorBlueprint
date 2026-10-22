@@ -205,7 +205,7 @@ def page(p):
     out.append(t('Cálculos verificados con casos resueltos a mano · En español e inglés · Sin tarjeta', 'Math checked against hand-worked cases · Spanish and English · No card required', tag='p', cls='lp-trust'))
     out.append('</div>')
     out.append(f'<form class="lp-quick" data-quick-calc="{p["calc"]}" novalidate aria-labelledby="quick-title">')
-    out.append(t('Pruébala ahora, sin cuenta', 'Try it now, no account needed', tag='h2', attrs=' id="quick-title"'))
+    out.append(t('Pruébala ahora, sin cuenta · USD', 'Try it now, no account needed · USD', tag='h2', attrs=' id="quick-title"'))
     out.append(f'<div class="lp-fields">{fields}</div>')
     out.append('<div id="quick-result" class="lp-result" aria-live="polite"></div>')
     out.append(t(*p['note'], tag='p', cls='lp-quick-note'))

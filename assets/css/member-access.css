@@ -67,6 +67,7 @@
     max-height:none!important;
     overflow:visible!important;
     opacity:1!important;
+    visibility:visible!important;
     gap:10px!important;
     width:100%!important;
     order:5!important;
