@@ -45,6 +45,9 @@ try {
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Horizontal overflow at ${width}px`);
       if(width===393&&lang==='es')await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${width}-menu.png`,animations:'disabled'});
       if(width<=840){
+      await page.locator('#siteThemeToggle').press('Tab');
+      assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'),'false','Tabbing into page content must close the overlay');
+      await page.locator('.menu-toggle').click();
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'),'false');
       assert.equal(await page.locator('#primary-nav a').first().isVisible(),false);}

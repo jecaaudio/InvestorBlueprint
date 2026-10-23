@@ -40,6 +40,9 @@
       }
     });
     document.addEventListener('click',event=>{if(!header.contains(event.target))closeMenu();});
+    header.addEventListener('focusout',event=>{
+      if(event.relatedTarget&&!header.contains(event.relatedTarget))closeMenu();
+    });
   }
   // A translated hero can change height after the browser positions a deep link.
   // Keep an already-visible anchor below the sticky header; never jump back when
