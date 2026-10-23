@@ -107,7 +107,14 @@ jobs:
         run: npm ci
       - name: Install Safari WebKit engine and system dependencies
         timeout-minutes: 5
-        run: npx playwright install --with-deps webkit
+        run: |
+          # The hosted runner's Azure mirror can throttle 117 MB of WebKit packages
+          # for many minutes. Use Ubuntu's primary HTTPS archive instead, retaining
+          # the same signed packages, suites and every browser assertion.
+          if [ -f /etc/apt/apt-mirrors.txt ]; then
+            sudo sed -i 's|https\?://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
+          fi
+          npx playwright install --with-deps webkit
       - name: Verify member profile persistence in mobile WebKit
         run: |
           python3 -u -m http.server 4173 --bind 127.0.0.1 --directory .. &
