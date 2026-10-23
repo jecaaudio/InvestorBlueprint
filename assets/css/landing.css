@@ -88,6 +88,18 @@ html[data-theme="dark"] .ib-disclaimer{background:#2f260d;color:#f3dfa6}
  .lp-hero .lp-trust{margin:0}
 }
 .lp-scenario-actions{display:flex;flex-wrap:wrap;gap:8px}
+.lp-quick>.ib-viz-host{min-height:0}
+.lp-result-main strong{overflow-wrap:anywhere;max-width:100%}
+.lp-result dl{grid-template-columns:minmax(0,1fr) minmax(0,auto)}
+.lp-result dd{overflow-wrap:anywhere}
+.lp-related a{min-height:44px;display:inline-flex;align-items:center;box-sizing:border-box}
+.lp-faq summary{min-height:44px;align-content:center}
+@media(prefers-reduced-motion:no-preference){
+ .lp-hero h1,.lp-hero .lp-quick{animation:lp-enter .4s ease both}
+ .lp-card,.pr-plan{transition:box-shadow .2s ease,border-color .2s ease}
+ @keyframes lp-enter{from{opacity:.65;transform:translateY(6px)}to{opacity:1;transform:none}}
+}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){.lp-card:hover,.pr-plan:hover{border-color:var(--primary);box-shadow:var(--site-shadow)}}
 .lp-scenario-actions .btn,.lp-comparison .btn,.pr-toggle button{min-height:44px}
 .lp-scenario-actions .btn:disabled{opacity:.65;cursor:default}
 .lp-comparison{display:grid;gap:12px;min-width:0}

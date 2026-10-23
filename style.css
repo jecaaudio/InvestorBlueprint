@@ -191,6 +191,7 @@ main {
 }
 
 .btn {
+  transition:background-color .18s ease,box-shadow .18s ease,border-color .18s ease;
   text-decoration: none;
   padding: 0.75rem 1.2rem;
   border-radius: 0.7rem;
@@ -262,6 +263,7 @@ main {
 }
 
 .card-btn {
+  min-height:44px;
   display: inline-block;
   margin-top: 0.7rem;
   background: transparent;
@@ -559,3 +561,4 @@ main {
   color: #86efac;
   font-weight: 600;
 }
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

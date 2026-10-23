@@ -136,7 +136,8 @@ HEAD = '''<!DOCTYPE html>
 <link rel="stylesheet" href="../assets/css/cookie-banner.css">
 <link rel="stylesheet" href="../assets/css/site-theme.css?v=20261018">
 <link rel="stylesheet" href="../assets/css/brand.css?v=20261019">
-<link rel="stylesheet" href="../assets/css/landing.css?v=20261021b">
+<link rel="stylesheet" href="../assets/css/landing.css?v=20261023">
+<link rel="stylesheet" href="../assets/css/finance-visuals.css?v=20261023">
 <link rel="icon" type="image/svg+xml" href="../assets/brand/favicon.svg?v=1">
 <link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/favicon-32.png?v=1">
 <link rel="apple-touch-icon" sizes="180x180" href="../assets/brand/apple-touch-icon.png?v=1">
@@ -173,8 +174,9 @@ FOOT_SCRIPTS = '''<script src="../assets/js/config.js"></script>
 <script src="../lang.js"></script>
 <script src="../assets/js/member-i18n.js"></script>
 <script src="../script.js"></script>
-<script src="../tools/tool-script.js?v=20261021"></script>
-<script src="../assets/js/landing.js?v=20261021"></script>
+<script src="../assets/js/finance-visuals.js?v=20261023"></script>
+<script src="../tools/tool-script.js?v=20261023"></script>
+<script src="../assets/js/landing.js?v=20261023"></script>
 <script src="../assets/js/site-config.js?v=20261021b"></script>
 <script src="../assets/js/site-footer.js?v=20261021"></script>
 <script src="../assets/js/auth-nav.js?v=20261021"></script>

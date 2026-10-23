@@ -10,13 +10,16 @@ async function setup(fetch,blocked=false){
  const dom=new JSDOM('<html><body><form id="arv-form"><input name="address" id="address"></form><input id="worker-url">'+ids.map(id=>id.includes('btn')?'<button id="'+id+'"></button>':'<div id="'+id+'"></div>').join('')+'</body></html>',{url:'https://fixture.invalid/tools/arv/',runScripts:'outside-only'});
  const w=dom.window;w.fetch=fetch;w.print=()=>{};
  if(blocked)Object.defineProperty(w,'localStorage',{get(){throw Error('blocked storage')}});
- w.eval(code);await tick();return dom;
+ w.eval(fs.readFileSync('assets/js/finance-visuals.js','utf8'));w.eval(code);await tick();return dom;
 }
 test('blocked storage preserves demo and temporary HTTPS configuration; saving clears prior report',async()=>{
  const dom=await setup(async()=>({ok:true,json:async()=>fixture}),true),d=dom.window.document;
  assert.equal(d.getElementById('calculate-btn').disabled,true);
  d.getElementById('run-demo-btn').click();await tick();assert.equal(d.getElementById('results').hidden,false);
+ assert.match(d.getElementById('ib-arv-chart').textContent,/DEMO/);
+ assert.equal(d.querySelectorAll('#ib-arv-chart .ib-viz-list li').length,3);
  d.getElementById('worker-url').value='http://unsafe.invalid';d.getElementById('save-worker-url-btn').click();assert.equal(d.getElementById('calculate-btn').disabled,true);assert.equal(d.getElementById('action-row').hidden,true);
+ assert.equal(d.getElementById('ib-arv-chart').children.length,0);
  d.getElementById('worker-url').value='https://valuation.example';d.getElementById('save-worker-url-btn').click();assert.equal(d.getElementById('calculate-btn').disabled,false);assert.match(d.getElementById('status').textContent,/Temporary configuration/);
  dom.window.close();
 });

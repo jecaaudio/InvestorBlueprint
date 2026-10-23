@@ -15,7 +15,7 @@ async function setup(type,fields,extra='',inputAttrs=''){
  w.IB_REPORT_PREFERENCES=Object.freeze({ib_document_language:'en',ib_report_detail:'detailed',ib_display_name:'Current user',ib_company_name:'Current company',preferredLanguage:'es'});
  w.print=()=>{w.didPrint=true};
  w.fetch=async()=>({ok:true,json:async()=>en});
- w.eval(source);w.eval(report);await tick();
+ w.eval(fs.readFileSync('assets/js/finance-visuals.js','utf8'));w.eval(source);w.eval(report);await tick();
  return dom;
 }
 test('rental form includes validated costs, computes NOI and exports document-scoped metadata',async()=>{
@@ -25,6 +25,7 @@ test('rental form includes validated costs, computes NOI and exports document-sc
  assert.match(d.querySelector('label[for="debtService"]').textContent,/Pago mensual/);
  f.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();
  assert.match(d.getElementById('result-cards').textContent,/\$570/);
+ assert.match(d.getElementById('ib-tool-chart').textContent,/\$570/);
  const button=d.getElementById('ib-finance-print');assert.equal(button.disabled,false);
  w.localStorage.setItem('ib_display_name','Another account');
  d.getElementById('ib-finance-notes').value='<script>steal()</script>';
@@ -34,6 +35,7 @@ test('rental form includes validated costs, computes NOI and exports document-sc
  assert.equal(printed.querySelector('script'),null);assert.match(printed.textContent,/Monthly debt service/);
  assert.match(printed.querySelector('img').src,/\/InvestorBlueprint\/assets\/brand\/favicon.svg$/);
  f.elements.monthlyRent.dispatchEvent(new w.Event('input',{bubbles:true}));assert.equal(button.disabled,true);
+ assert.equal(d.getElementById('ib-tool-chart').children.length,0,'An edited calculation cannot leave an old chart visible');
  f.elements.debtService.value='-1';f.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();
  assert.equal(button.disabled,true);dom.window.close();
 });

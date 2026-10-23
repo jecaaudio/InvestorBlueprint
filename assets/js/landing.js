@@ -12,7 +12,7 @@
   venta(v){
    const fees=v.price*(v.commissionPct+v.closingPct)/100;
    const net=v.price-v.mortgage-fees;
-   return {main:[L('Neto estimado para el vendedor','Estimated seller net'),money(net)],
+   return {value:net,graph:{title:L('Tu venta, de un vistazo','Your sale at a glance'),rows:[[L('Precio de venta','Sale price'),v.price],[L('Hipoteca pagada','Mortgage payoff'),v.mortgage],[L('Comisiones y cierre','Commissions and closing'),fees],[L('Neto estimado','Estimated net'),net]]},main:[L('Neto estimado para el vendedor','Estimated seller net'),money(net)],
     rows:[[L('Comisiones y cierre','Commissions and closing'),money(fees)],[L('Hipoteca pagada','Mortgage payoff'),money(v.mortgage)]]};
   },
   flip(v){
@@ -21,23 +21,23 @@
     titleFees:0,prorations:0,inspectionCost:0,monthlyHolding:v.monthly,holdingMonths:v.holdingMonths,realtorPct:6,concessionPct:0,
     sellerClosingPct:1,stagingCost:0,transferTax:0,isPro:false,financingType:'cash',loanAmount:0,loanPurchasePct:0,loanRehabPct:0,
     pointsPct:0,interestRate:0,drawFee:0,drawInspectionFee:0,drawCount:0,originationFees:0,loanClosingCosts:0,prepayPenalty:0,taxRate:0});
-   return {main:[L('Ganancia estimada','Estimated profit'),money(r.netProfit)],
+   return {value:r.netProfit,graph:{title:L('Costos frente a ganancia','Costs versus profit'),rows:[[L('Compra y cierre','Purchase and closing'),r.acquisition],[L('Reparaciones','Rehab'),r.rehabTotal],[L('Mantenimiento y venta','Holding and selling'),r.holdingTotal+r.sellingTotal],[L('Ganancia estimada','Estimated profit'),r.netProfit]]},main:[L('Ganancia estimada','Estimated profit'),money(r.netProfit)],
     rows:[[L('ROI sobre tu dinero','ROI on your cash'),pct(r.roi)],[L('Precio mínimo de venta','Break-even sale price'),money(r.breakEven)],
      [L('Oferta máxima (regla del 70%)','Max offer (70% rule)'),money(r.mao70)]]};
   },
   rentas(v){
    const r=window.IBSimpleFinanceModels.rentalModel(v.rent,v.vacancyRate,[v.expenses],{debtService:v.mortgage});
-   return {main:[L('Flujo de caja mensual','Monthly cash flow'),money(r.monthlyCashFlow)],
+   return {value:r.monthlyCashFlow,graph:{title:L('Tu renta mensual, desglosada','Your monthly rent breakdown'),rows:[[L('Ingreso tras vacancia','Income after vacancy'),r.effectiveIncome],[L('Gastos operativos','Operating expenses'),r.operatingExpenses],[L('Hipoteca','Mortgage'),v.mortgage],[L('Flujo de caja','Cash flow'),r.monthlyCashFlow]]},main:[L('Flujo de caja mensual','Monthly cash flow'),money(r.monthlyCashFlow)],
     rows:[[L('Flujo anual','Annual cash flow'),money(r.annualCashFlow)],[L('Ingreso operativo neto (NOI) anual','Annual net operating income (NOI)'),money(r.annualNoi)]]};
   },
   arv(v){
    const r=window.IBSimpleFinanceModels.arvModel([v.comp1,v.comp2,v.comp3],v.repairs);
-   return {main:[L('ARV estimado','Estimated ARV'),money(r.average)],
+   return {value:r.average,graph:{title:L('Comparables frente al ARV','Comparables versus ARV'),rows:[[L('Comparable 1','Comparable 1'),v.comp1],[L('Comparable 2','Comparable 2'),v.comp2],[L('Comparable 3','Comparable 3'),v.comp3],[L('ARV estimado','Estimated ARV'),r.average]]},main:[L('ARV estimado','Estimated ARV'),money(r.average)],
     rows:[[L('Rango de comparables','Comparable range'),money(r.minimum)+' – '+money(r.maximum)],[L('Oferta máxima (regla del 70%)','Max offer (70% rule)'),money(r.maxOffer)]]};
   },
   'hard-money'(v){
    const r=window.IBSimpleFinanceModels.hardMoneyModel(v.loan,v.interestRate,v.points,v.months);
-   return {main:[L('Costo total del préstamo','Total financing cost'),money(r.totalCost)],
+   return {value:r.totalCost,graph:{title:L('De dónde viene el costo','Where the financing cost comes from'),rows:[[L('Intereses','Interest'),r.interestCost],[L('Puntos','Points'),r.pointsCost],[L('Costo total','Total cost'),r.totalCost]]},main:[L('Costo total del préstamo','Total financing cost'),money(r.totalCost)],
     rows:[[L('Intereses','Interest'),money(r.interestCost)],[L('Puntos','Points'),money(r.pointsCost)],[L('Interés mensual promedio','Average monthly interest'),money(r.monthlyInterest)]]};
   }
  };
@@ -58,12 +58,13 @@
   };
   const formatInputs=()=>inputs.forEach(formatInput);
   const scenarios=[];
+  const graph=document.createElement('div');graph.className='ib-viz-host';result.after(graph);
   let current=null;
   const actions=document.createElement('div');actions.className='lp-scenario-actions';
   const compare=document.createElement('button');compare.type='button';compare.className='btn';
   const reset=document.createElement('button');reset.type='button';reset.className='btn';
   const comparison=document.createElement('section');comparison.className='lp-comparison';comparison.setAttribute('aria-live','polite');
-  actions.append(compare,reset);result.after(actions,comparison);
+  actions.append(compare,reset);graph.after(actions,comparison);
   const renderComparison=()=>{
    compare.textContent=L('Comparar este escenario','Compare this scenario');
    compare.disabled=!current||scenarios.length>=3;
@@ -72,6 +73,10 @@
    if(!scenarios.length)return;
    const title=document.createElement('h3');title.textContent=L('Comparación en esta página','Comparison on this page');comparison.append(title);
    const note=document.createElement('p');note.textContent=L('Hasta 3 escenarios. Se borran al cerrar o recargar; no se guardan en tu cuenta. Importes en USD.','Up to 3 scenarios. Cleared when closing or reloading; not saved to your account. Amounts in USD.');comparison.append(note);
+   if(scenarios.length>1&&window.IBFinanceVisuals){
+    const host=document.createElement('div');host.className='ib-viz-host';comparison.append(host);
+    window.IBFinanceVisuals.chart(host,{title:calc(scenarios[0]).main[0],rows:scenarios.map((values,index)=>({label:L('Escenario ','Scenario ')+(index+1),value:calc(values).value}))});
+   }
    scenarios.forEach((values,index)=>{
     const out=calc(values),card=document.createElement('article'),heading=document.createElement('h4');
     heading.textContent=L('Escenario ','Scenario ')+(index+1);card.append(heading);
@@ -100,10 +105,13 @@
     values[input.name]=value;
    }
    result.classList.toggle('is-invalid',invalid);
+   graph.hidden=invalid;
+   if(invalid)graph.replaceChildren();
    if(invalid){result.innerHTML='<div class="lp-result-main"><strong>'+L('Revisa los números marcados','Check the marked numbers')+'</strong></div>';renderComparison();return}
    let out;
-   try{out=calc(values)}catch(error){result.classList.add('is-invalid');result.innerHTML='<div class="lp-result-main"><strong>'+L('Revisa los números y los rangos','Check numbers and ranges')+'</strong></div>';renderComparison();return}
+   try{out=calc(values)}catch(error){graph.hidden=true;graph.replaceChildren();result.classList.add('is-invalid');result.innerHTML='<div class="lp-result-main"><strong>'+L('Revisa los números y los rangos','Check numbers and ranges')+'</strong></div>';renderComparison();return}
    current={...values};
+   if(window.IBFinanceVisuals)window.IBFinanceVisuals.chart(graph,{title:out.graph.title,rows:out.graph.rows.map(([label,value])=>({label,value}))});
    const esc=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
    result.innerHTML='<div class="lp-result-main"><span>'+esc(out.main[0])+'</span><strong>'+esc(out.main[1])+'</strong></div><dl>'+
     out.rows.map(([label,value])=>'<dt>'+esc(label)+'</dt><dd>'+esc(value)+'</dd>').join('')+'</dl>';

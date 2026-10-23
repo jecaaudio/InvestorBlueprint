@@ -8,7 +8,7 @@ const engine=process.env.MOBILE_ENGINE==='webkit'?'webkit':'chromium';
 const browser=await ({chromium,webkit}[engine]).launch({headless:true});
 await mkdir('tmp/mobile-polish-qa',{recursive:true});
 try {
-  for (const width of [320,360,393,430,1280]) {
+  for (const width of [320,360,393,430,768,1280,1440]) {
     for (const lang of ['es','en']) {
       const context=await browser.newContext({viewport:{width,height:800},isMobile:width<600,hasTouch:width<600,reducedMotion:'reduce'});
       await context.addInitScript(value=>{try{localStorage.setItem('preferredLanguage',value)}catch{}},lang);
@@ -30,7 +30,7 @@ try {
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'),'false');
       assert.equal(await page.locator('#primary-nav a').first().isVisible(),false);}
-      for(const path of ['calculadoras/venta.html','calculadoras/flip.html','calculadoras/rentas.html','calculadoras/arv.html','calculadoras/hard-money.html','pricing.html']){
+      for(const path of ['calculadoras/venta.html','calculadoras/flip.html','calculadoras/rentas.html','calculadoras/arv.html','calculadoras/hard-money.html','pricing.html','login.html','privacy.html','terms.html','404.html']){
         await page.goto(base+'/InvestorBlueprint/'+path,{waitUntil:'load'});
         await page.locator('#site-footer').waitFor();
         assert.equal(new URL(await page.locator('#cookie-banner a').getAttribute('href'),page.url()).pathname,'/InvestorBlueprint/privacy.html','Cookie policy link must resolve from nested pages');
@@ -38,6 +38,9 @@ try {
         assert.ok(await page.locator('.site-footer a[href$="privacy.html"]').isVisible(),'Mobile footer privacy link');
         assert.ok(await page.locator('.site-footer-cookies').isVisible(),'Mobile cookie settings');
         if(path.startsWith('calculadoras/')){
+          await page.locator('.lp-quick>.ib-viz-host figure').waitFor({state:'visible'});
+          assert.ok(await page.locator('.ib-viz-bar').evaluateAll(nodes=>nodes.every(node=>Number.isFinite(parseFloat(node.style.width))&&parseFloat(node.style.width)>=0&&parseFloat(node.style.width)<=100)),'Finite, bounded chart bars');
+          assert.equal(await page.locator('.ib-viz-bar').first().evaluate(node=>getComputedStyle(node).transitionDuration),'0s','Reduced motion disables chart transitions');
           const input=page.locator('.lp-fields input').first();
           const initial=await input.inputValue();
           assert.ok(await input.evaluate(node=>parseFloat(getComputedStyle(node).fontSize)>=16));
@@ -46,11 +49,17 @@ try {
           await page.locator('.lp-comparison article').first().waitFor({state:'visible',timeout:5000});
           assert.equal(await page.locator('.lp-comparison article').count(),1);
           await input.fill('');assert.equal(await input.getAttribute('aria-invalid'),'true');
+          assert.equal(await page.locator('.lp-quick>.ib-viz-host figure').count(),0,'Invalid values remove the old graph');
           assert.equal(await page.locator('.lp-scenario-actions button').first().isDisabled(),true);
           await page.locator('.lp-scenario-actions button').nth(1).click();
           assert.equal(await input.inputValue(),initial,'Reset must restore the original input on the first tap');
           assert.equal(await input.getAttribute('aria-invalid'),null);
-        }else{
+          if(path==='calculadoras/venta.html'){
+            await input.fill('100000');
+            assert.match(await page.locator('.lp-quick>.ib-viz-host .is-negative').textContent(),/-\$58,000/);
+            await page.locator('.lp-scenario-actions button').nth(1).click();
+          }
+        }else if(path==='pricing.html'){
           assert.equal(await page.locator('#pro-price').isVisible(),false);
           await page.locator('.site-footer-cookies').click();
           await page.locator('#cookie-banner').waitFor({state:'visible'});
@@ -62,6 +71,14 @@ try {
           await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-light.png`,fullPage:true,animations:'disabled'});
           await page.locator('#siteThemeToggle').click();
           await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-dark.png`,fullPage:true,animations:'disabled'});
+          if(path.startsWith('calculadoras/')){
+            await page.emulateMedia({reducedMotion:'no-preference'});
+            assert.notEqual(await page.locator('.ib-viz-bar').first().evaluate(node=>getComputedStyle(node).transitionDuration),'0s','Normal motion keeps subtle transitions');
+            await page.locator('.lp-fields input').first().fill('450000');
+            assert.ok((await page.locator('#quick-result strong').textContent()).includes('$'),'Exact currency remains visible during animation');
+            assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'No overflow during an animated update');
+            await page.emulateMedia({reducedMotion:'reduce'});
+          }
         }
       }
       await page.goto(base+'/InvestorBlueprint/index.html#tools');

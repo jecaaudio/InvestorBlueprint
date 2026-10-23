@@ -29,6 +29,7 @@ function invalidateReport(){
   latestReport=null;latestReportIsDemo=false;
   resultsEl.hidden=true;compsWrap.hidden=true;actionRow.hidden=true;
   document.getElementById('arv-printable-report')?.replaceChildren();
+  document.getElementById('ib-arv-chart')?.replaceChildren();
   return reportGeneration;
 }
 form.addEventListener('input',invalidateReport);
@@ -191,6 +192,14 @@ function render(payload, isDemo = false) {
   ]);
 
   renderComps(comps);
+  if(typeof window!=='undefined'&&window.IBFinanceVisuals){
+    let host=document.getElementById('ib-arv-chart');
+    if(!host){host=document.createElement('div');host.id='ib-arv-chart';host.className='ib-viz-host';resultsEl.append(host);}
+    const en=document.documentElement.lang==='en';
+    window.IBFinanceVisuals.chart(host,{title:en?'Valuation range at a glance':'Rango de valoración, de un vistazo',rows:[
+      {label:en?'Low estimate':'Estimación baja',value:arv.low},{label:en?'Estimated ARV':'ARV estimado',value:arv.estimate},{label:en?'High estimate':'Estimación alta',value:arv.high}
+    ],note:isDemo?(en?'DEMO: sample data, not a valuation of your address.':'DEMO: datos ficticios, no es una valoración de tu dirección.'):(en?'Unverified estimate range; not a confidence interval.':'Rango estimado sin verificar; no es un intervalo de confianza.')});
+  }
 
   if (meta?.warnings?.length) {
     setStatus(`${isDemo ? "DEMO — sample data. " : ""}Done with warnings: ${meta.warnings.join(" | ")}`);
