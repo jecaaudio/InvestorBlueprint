@@ -65,6 +65,11 @@ try {
           await page.locator('#cookie-banner').waitFor({state:'visible'});
           await page.locator('#cookie-reject-all').click();
         }
+        for(const theme of ['dark','light']){
+          if(await page.locator('html').getAttribute('data-theme')!==theme)await page.locator('#siteThemeToggle').click();
+          assert.equal(await page.locator('html').getAttribute('data-theme'),theme);
+          assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Overflow in ${theme}: ${path} ${width}`);
+        }
         if(width===393&&lang==='es'){
           await page.evaluate(()=>window.scrollTo(0,0));
           if(await page.locator('html').getAttribute('data-theme')!=='light')await page.locator('#siteThemeToggle').click();

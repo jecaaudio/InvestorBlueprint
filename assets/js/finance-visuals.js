@@ -47,6 +47,7 @@
   value.closest('.result-card')?.append(host);
   const amount=id=>{const raw=document.getElementById(id)?.textContent||'';if(!raw.trim()||/PENDIENTE|PENDING|—/.test(raw))return NaN;return Number(raw.replace(/[^\d.+-]/g,'').replace(/\+.*/,''));};
   const update=()=>{
+   if(!host.isConnected)return;
    if(document.body.dataset.sellerValid==='false'){host.replaceChildren();return;}
    const partial=/PENDIENTE|PENDING/i.test(document.getElementById('rTax')?.textContent||'');
    chart(host,{title:L('Tu venta, de un vistazo','Your sale at a glance'),rows:[
@@ -57,8 +58,10 @@
    ],note:(partial?L('Neto parcial: falta confirmar el impuesto. ','Partial net: tax confirmation is missing. '):'')+(document.getElementById('netDetail')?.textContent||'')});
   };
   // Seller validity fires before its own render; read the completed DOM afterwards.
-  document.addEventListener('ib:seller-validity',()=>queueMicrotask(update));
-  document.addEventListener('input',()=>queueMicrotask(update));document.addEventListener('change',()=>queueMicrotask(update));
+  let scheduled=false;
+  const schedule=()=>{if(scheduled)return;scheduled=true;queueMicrotask(()=>{scheduled=false;update();});};
+  document.addEventListener('ib:seller-validity',schedule);
+  document.addEventListener('input',schedule);document.addEventListener('change',schedule);
   update();
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',seller,{once:true});else seller();

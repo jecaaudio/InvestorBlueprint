@@ -21,7 +21,7 @@ for(const tool of ['flip','rental','rent','arv-estimator','hard-money','roi-sear
     w.eval(fs.readFileSync('assets/js/flip-calculator.js','utf8'));
     Object.defineProperty(d,'currentScript',{configurable:true,value:null});
   }
-  w.eval(fs.readFileSync('tools/tool-script.js','utf8'));w.eval(fs.readFileSync('tools/finance-report.js','utf8'));await tick();
+  w.eval(fs.readFileSync('assets/js/finance-visuals.js','utf8'));w.eval(fs.readFileSync('tools/tool-script.js','utf8'));w.eval(fs.readFileSync('tools/finance-report.js','utf8'));await tick();
   if(tool==='flip'){
     const f=d.getElementById('tool-form');
     for(const [key,value] of Object.entries({salePrice:320000,purchasePrice:200000,rehabCost:50000,holdingMonths:6,miscMonthly:1000,buyerClosing:5000,stagingCost:1000,realtorPct:7,loanAmount:100000,interestRate:12,pointsPct:2}))f.elements[key].value=value;
@@ -30,6 +30,7 @@ for(const tool of ['flip','rental','rent','arv-estimator','hard-money','roi-sear
   await tick();
   const validation=d.getElementById('tool-validation');assert.ok(!validation||validation.hidden,validation?.textContent);
   assert.ok(d.getElementById('result-cards').children.length>0,tool+' outputs');
+  if(tool!=='roi-search')assert.ok(d.querySelector('#ib-tool-chart figure'),tool+' financial chart');
   assert.equal(d.getElementById('ib-finance-print').disabled,false,tool+' report ready');
   if(tool==='rental')assert.ok(d.getElementById('debtService'));
   if(tool==='flip'||tool==='hard-money')assert.ok(d.getElementById('loanDraws'));
@@ -44,8 +45,10 @@ test('actual patched Seller Net HTML persists retained mortgage, rejects invalid
  const w=dom.window,d=w.document;
  w.matchMedia=()=>({matches:false,addEventListener(){}});w.print=()=>{};
  w.IB_REPORT_PREFERENCES=Object.freeze({ib_document_language:'en',ib_report_detail:'detailed'});
+ w.eval(fs.readFileSync('assets/js/finance-visuals.js','utf8'));
  for(const script of d.querySelectorAll('script:not([src])'))if(script.textContent.trim())w.eval(script.textContent);
  await tick();
+ assert.ok(d.querySelector('#ib-seller-chart figure'),'Actual Seller markup renders its chart');
  const change=(id,value)=>{d.getElementById(id).value=value;d.getElementById(id).dispatchEvent(new w.Event('change',{bubbles:true}))};
  change('state','IL');change('price','200000');change('ilRetainedMortgage','150000');change('mortgage1','0');
  assert.equal(d.getElementById('ilRetainedField').hidden,false);assert.match(d.getElementById('rTax').textContent,/50\.00/);
