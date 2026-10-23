@@ -184,3 +184,45 @@ body[data-tool] .fc-row label{color:var(--text)}
 .site-footer-legal{width:min(1100px,100%);margin:24px auto 0!important;padding-top:16px;border-top:1px solid var(--site-border);font-size:.82rem!important}
 @media(max-width:760px){.site-footer-inner{grid-template-columns:1fr 1fr}}
 @media print{.site-footer{display:none!important}}
+
+/* Compact phone navigation: a stable 64px header, with preferences in the menu.
+   The open panel overlays the page instead of pushing the hero below the fold. */
+.mobile-nav-preferences[hidden]{display:none!important}
+@media(max-width:840px){
+ .navbar:has(>.menu-toggle){display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:8px!important;padding:10px max(12px,4vw)!important}
+ .navbar:has(>.menu-toggle)>.brand-menu{grid-column:1;order:0;min-width:0;max-width:100%;margin:0}
+ .navbar:has(>.menu-toggle)>.menu-toggle{grid-column:2;order:1;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin:0!important;padding:0!important;font-size:0!important}
+ .navbar:has(>.menu-toggle)>.menu-toggle::before{content:"\2630";font-size:1.15rem;line-height:1}
+ .navbar:has(>.menu-toggle)>nav{position:absolute;top:100%;left:0;right:0;width:100%;order:2;display:flex;align-items:stretch;gap:2px;margin:0;padding:0 16px;max-height:0;overflow:hidden;background:var(--panel);border-bottom:0;box-shadow:none}
+ .navbar:has(>.menu-toggle)>nav.is-open{max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overflow-y:auto;padding:10px 16px 14px;border-bottom:1px solid var(--site-border);box-shadow:var(--site-shadow)}
+ .navbar>nav.is-open>a{padding:8px 12px;min-height:44px;border-radius:8px}
+ .navbar>nav.is-open>a:hover{background:var(--site-soft)}
+ .mobile-nav-preferences{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--site-border);margin-top:6px;padding-top:10px}
+ .navbar .mobile-nav-preferences .lang-switcher{margin:0!important;width:auto!important;order:0}
+ .navbar .mobile-nav-preferences .site-theme-button{margin:0!important;order:1}
+}
+@media(max-width:600px){
+ .hero{padding:22px 18px!important;margin:12px 0 8px;text-align:left}
+ .hero .eyebrow{font-size:.82rem;margin:0 0 8px}
+ .hero h1{font-size:clamp(1.65rem,7vw,1.9rem);line-height:1.14;margin:0 0 12px;text-wrap:balance}
+ .hero-copy{font-size:.95rem;line-height:1.5}
+ .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:16px;gap:8px}
+ .hero-actions .btn{width:100%;min-height:44px;padding:8px;font-size:.9rem;max-width:none}
+ .section{padding:18px 0 22px}
+ .section-heading h2{font-size:1.35rem;line-height:1.25;margin-top:0}
+ .section-heading p{font-size:.94rem;margin:8px 0 14px}
+ .price-card h3{margin:0 0 8px}
+ .price-card p{margin:0;font-size:.94rem}
+ .cta-final .price-card{padding:18px!important}
+ .site-footer{margin-top:24px;padding:20px 16px 18px}
+ .site-footer-inner{gap:16px}
+ .site-footer-brand{grid-column:1/-1}
+ .site-footer-brand p{font-size:.82rem;max-width:36ch;margin:2px 0 0}
+ .site-footer nav:first-of-type{grid-column:1/-1}
+ .site-footer nav:first-of-type ul{display:flex;flex-wrap:wrap;gap:0 12px}
+ .site-footer nav:first-of-type li a{padding:0 4px}
+ .site-footer ul{gap:0}
+ .site-footer h2{margin-bottom:2px;font-size:.74rem}
+ .site-footer a,.site-footer-cookies{font-size:.86rem}
+ .site-footer-legal{margin-top:16px!important;padding-top:12px;font-size:.76rem!important}
+}

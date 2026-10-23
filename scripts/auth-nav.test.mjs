@@ -77,3 +77,41 @@ test('a menu that already has My profile hides "Ingresar" instead of repeating i
   assert.ok(!visible.includes('Ingresar'));
   dom.window.close();
 });
+
+test('remembered sessions change public signup CTAs, never permissions, in both languages',()=>{
+  for(const lang of ['es','en'])for(const page of ['index.html','calculadoras/venta.html']){
+    const {dom}=open(page,{saved:session,lang});
+    const links=[...dom.window.document.querySelectorAll('main a[data-auth-nav="cta"]')];
+    assert.ok(links.length>=2,page);
+    for(const link of links){
+      assert.match(link.getAttribute('href'),/account\.html$/);
+      assert.equal(link.textContent,lang==='en'?'My profile':'Mi perfil');
+      assert.equal(link.hasAttribute('data-track'),false);
+      assert.equal(link.hasAttribute('data-cta-click'),false);
+    }
+    assert.equal(dom.window.IB_BETA_ACCESS,undefined,'Saved session cannot grant access');
+    dom.window.close();
+  }
+});
+
+test('logout restores signup labels, tracking and previously hidden header links',()=>{
+  const {dom}=open('index.html',{saved:session});
+  const doc=dom.window.document;
+  dom.window.localStorage.removeItem(key);
+  dom.window.dispatchEvent(new dom.window.Event('storage'));
+  assert.equal(doc.querySelectorAll('main [data-auth-nav="cta"]').length,0);
+  assert.equal(doc.querySelectorAll('main a[data-track="request_access"]').length,2);
+  for(const link of doc.querySelectorAll('.navbar a[data-i18n="navLogin"]')){
+    assert.equal(link.hidden,false);assert.equal(link.textContent,'Ingresar');
+    assert.match(link.getAttribute('href'),/login\.html\?reason=login$/);
+  }
+  const cta=doc.querySelector('.hero-actions a');
+  assert.equal(cta.dataset.ctaClick,'Request Access');
+  assert.equal(cta.dataset.i18n,'heroStart');
+  dom.window.localStorage.setItem(key,JSON.stringify(session));
+  dom.window.dispatchEvent(new dom.window.Event('pageshow'));
+  doc.documentElement.lang='en';
+  doc.dispatchEvent(new dom.window.Event('ib:language-changed'));
+  assert.equal(cta.textContent,'My profile');
+  dom.window.close();
+});
