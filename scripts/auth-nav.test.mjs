@@ -44,7 +44,7 @@ test('with a saved session the header shows "Mi perfil", so a signed-in person c
 });
 
 test('an expired or unreadable saved session does not count as signed in',()=>{
-  for(const saved of ['not json',{...session,refresh_token:'',expires_at:1},{access_token:'x'}]){
+  for(const saved of ['not json',{...session,expires_at:1},{...session,refresh_token:'',expires_at:1},{access_token:'x'}]){
     const {dom,links}=open('index.html',{saved});
     assert.match(links[0].getAttribute('href'),/login\.html\?reason=login$/);
     dom.window.close();

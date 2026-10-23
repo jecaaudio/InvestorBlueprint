@@ -27,6 +27,7 @@
       '<link rel="stylesheet" href="'+root+'assets/css/finance-visuals.css?v=20261023">',
       '<script src="'+root+'assets/js/finance-visuals.js?v=20261023"></script>',
       '<script src="'+root+'assets/js/site-config.js?v=20261021b"></script>',
+      '<script src="'+root+'assets/js/session-security.js?v=20261023session"></script>',
       // Result notice under the numbers; tool is checked against ^[a-z0-9-]+$ above.
       '<script src="'+root+'assets/js/disclaimers.js?v=20261021" data-tool="'+tool+'"></script>',
       '<style>.tool-logo{display:inline-flex!important;align-items:center;gap:9px;text-decoration:none}.ib-tool-brand-mark{display:inline-block;width:34px;height:34px;object-fit:contain;flex:none}.ib-seller-brand{display:flex;align-items:center;gap:9px;font:700 15px system-ui,sans-serif;margin-bottom:10px}.ib-seller-brand img{width:32px;height:32px;object-fit:contain}</style>'
@@ -60,8 +61,11 @@
   try{
     const client=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{
       auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    window.IBSessionSecurity?.attach(client);
     const {data:{session},error}=await client.auth.getSession();
     if(error||!session?.access_token){window.location.replace(loginURL.href);return;}
+    window.IBSessionSecurity?.observe(session);
+    if(window.IBSessionSecurity?.isLocked())return;
     // Members who have not accepted the current notice and Terms accept them in My profile first.
     // A missing column (migration not applied) or a failed read never blocks the calculators.
     if(cfg.termsVersion){
@@ -183,7 +187,7 @@
     });
     const {data:current,error:currentError}=await client.auth.getSession();
     if(currentError||!current?.session?.user||current.session.user.id!==session.user.id){closeOldDocument();return;}
-    if(accountChanged)return;
+    if(accountChanged||window.IBSessionSecurity?.isLocked())return;
     // The feedback form inside the tool reuses this signed-in client and tool id.
     window.IB_MEMBER_CLIENT=client;
     window.IB_TOOL_ID=tool;

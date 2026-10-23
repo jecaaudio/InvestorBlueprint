@@ -21,7 +21,7 @@ test('protected server refuses direct beta requests from regular members and sus
   {role:'member',access_status:'approved',beta_tester:true,readError:true,status:503}
  ]){
   let handler;
-  const sb={auth:{getUser:async()=>({data:{user:{id:'fixture',email_confirmed_at:'2026-01-01'}},error:null})},
+  const sb={rpc:async(name)=>{assert.equal(name,'ib_session_active');return {data:true,error:null}},auth:{getUser:async()=>({data:{user:{id:'fixture',email_confirmed_at:'2026-01-01'}},error:null})},
    from(){const q={select(columns){q.columns=columns;return q},eq(column,value){assert.equal(value,'fixture');return q},
     single:async()=>({data:{...fixture,terms_accepted_at:'2026-10-21',terms_version:'2026-10-21'},error:fixture.readError?{}:null})};return q}};
   vm.runInNewContext(js,{createClient:()=>sb,Deno:{env:{get:key=>['SUPABASE_URL','SUPABASE_ANON_KEY'].includes(key)?'fixture':undefined},serve:fn=>{handler=fn}},Response,URL,
@@ -34,6 +34,20 @@ test('protected server refuses direct beta requests from regular members and sus
  }
 });
 const owner={id:'owner-id',email:'owner@example.invalid',full_name:'Owner',role:'admin',access_status:'approved',requested_at:'2026-10-01T00:00:00Z'};
+
+test('a still-valid JWT from a closed session cannot fetch a tool, and verification failures fail closed',async()=>{
+ const raw=fs.readFileSync('supabase/functions/ib-protected-tools/index.ts','utf8');
+ const js=raw.replace(/^import .*;\n/gm,'').replace('pages: Record<string,string>','pages')
+  .replace('status:number, body:string','status, body').replace('):Response{','){').replace('(req:Request):Promise<Response>','(req)');
+ for(const fixture of [{data:false,error:null,status:401},{data:null,error:{message:'network'},status:503}]){
+  let handler;const sb={auth:{getUser:async()=>({data:{user:{id:'member',email_confirmed_at:'2026-01-01'}},error:null})},rpc:async()=>fixture,
+   from(){assert.fail('Session must be verified before any member data is read')}};
+  vm.runInNewContext(js,{createClient:()=>sb,Deno:{env:{get:()=> 'fixture'},serve:fn=>{handler=fn}},Response,URL,
+   flip:'private fixture',rental:'fixture',rent:'fixture',arvEstimator:'fixture',hardMoney:'fixture',roiSearch:'fixture',automatedArv:'fixture',sellerNet:'fixture'});
+  const response=await handler(new Request('https://fixture.invalid/?tool=flip',{headers:{Authorization:'Bearer fixture'}}));
+  assert.equal(response.status,fixture.status);assert.doesNotMatch(await response.text(),/private fixture/);
+ }
+});
 
 test('commercial delivery requires current terms and paid access only when server billing is enabled',async()=>{
  const raw=fs.readFileSync('supabase/functions/ib-protected-tools/index.ts','utf8');
@@ -56,7 +70,7 @@ test('commercial delivery requires current terms and paid access only when serve
   {profile:accepted,billing:true,readError:true,status:503,error:'verification_unavailable'}
  ]){
   let handler,subscriptionReads=0;
-  const sb={auth:{getUser:async()=>({data:{user:{id:'member',email_confirmed_at:'2026-01-01'}},error:null})},
+  const sb={rpc:async(name)=>{assert.equal(name,'ib_session_active');return {data:true,error:null}},auth:{getUser:async()=>({data:{user:{id:'member',email_confirmed_at:'2026-01-01'}},error:null})},
    from(table){if(table==='member_subscription_state')subscriptionReads++;const q={select(){return q},eq(column,value){assert.equal(value,'member');return q},single:async()=>({data:fixture.profile,error:null}),maybeSingle:async()=>({data:fixture.subscription,error:fixture.readError?{}:null})};return q}};
   vm.runInNewContext(js,{createClient:()=>sb,Deno:{env:{get:key=>key==='IB_BILLING_ENABLED'?(fixture.billing?'true':undefined):['SUPABASE_URL','SUPABASE_ANON_KEY'].includes(key)?'fixture':undefined},serve:fn=>{handler=fn}},Response,URL,
    flip:'fixture',rental:'fixture',rent:'fixture',arvEstimator:'fixture',hardMoney:'fixture',roiSearch:'fixture',automatedArv:'fixture',sellerNet:'fixture'});

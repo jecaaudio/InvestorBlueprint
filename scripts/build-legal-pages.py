@@ -8,6 +8,7 @@ def page(slug, title_es, title_en, desc, body, robots='', base=''):
     return f'''<!DOCTYPE html>
 <html lang="es">
 <head>
+<script src="assets/js/session-security.js?v=20261023session"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-es="{html.escape(title_es)} | InvestorBlueprint" data-en="{html.escape(title_en)} | InvestorBlueprint">{html.escape(title_es)} | InvestorBlueprint</title>
@@ -53,7 +54,7 @@ def page(slug, title_es, title_en, desc, body, robots='', base=''):
 <script src="script.js?v=20261023compact"></script>
 <script src="assets/js/site-config.js?v=20261021b"></script>
 <script src="assets/js/site-footer.js?v=20261021"></script>
-<script src="assets/js/auth-nav.js?v=20261023compact"></script>
+<script src="assets/js/auth-nav.js?v=20261023session"></script>
 <script src="assets/js/site-theme.js?v=20261023compact"></script>
 </body>
 </html>

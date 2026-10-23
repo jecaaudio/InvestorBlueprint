@@ -27,6 +27,7 @@
      const client=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{
        auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
      });
+     window.IBSessionSecurity?.attach(client);
      const {data:{session},error}=await client.auth.getSession();
      if(error||!session?.user)return;
      const {data:profile,error:profileError}=await client.from('member_profiles')
