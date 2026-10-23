@@ -19,7 +19,7 @@ const result=dom=>dom.window.document.getElementById('quick-result').textContent
 // Expected values worked by hand from each page's prefilled example.
 const expected={
   venta:['$204,200','$30,800'],            // 385,000 − 150,000 − 8% fees (30,800)
-  flip:['$37,600','14.5%','$279,570','$174,000'], // cash flip, 2% buy closing, 7% selling
+  flip:['$37,600','14.5%','$279,569.89','$174,000'], // break-even: $260,000 / (1 − 7%)
   rentas:['$370','$4,440','$18,840'],      // 2,400×95% − 710 − 1,200
   arv:['$314,000','$305,000 – $322,000','$181,800'],
   'hard-money':['$22,312.50','$18,112.50','$4,200','$2,012.50']
