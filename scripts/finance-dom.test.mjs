@@ -18,6 +18,18 @@ async function setup(type,fields,extra='',inputAttrs=''){
  w.eval(fs.readFileSync('assets/js/finance-visuals.js','utf8'));w.eval(source);w.eval(report);await tick();
  return dom;
 }
+test('changing language refreshes the current chart without recording a new calculation',async()=>{
+ const dom=await setup('rental',{monthlyRent:2400,taxes:220,insurance:120,maintenance:180,management:190,vacancyRate:5});
+ const w=dom.window,d=w.document;let runs=0,successes=0;
+ w.IBAnalytics={trackCalcRun(){runs++},trackCalcSuccess(){successes++}};
+ d.getElementById('tool-form').dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
+ assert.equal(runs,1);assert.equal(successes,1);
+ d.documentElement.lang='en';w.IBI18n={getCurrentMessages:()=>en};d.dispatchEvent(new w.Event('ib:language-changed'));
+ assert.match(d.getElementById('ib-tool-chart').textContent,/Your monthly rent breakdown/);
+ assert.match(d.getElementById('ib-tool-chart').textContent,/Income after vacancy/);
+ assert.equal(runs,1);assert.equal(successes,1);
+ dom.window.close();
+});
 test('rental form includes validated costs, computes NOI and exports document-scoped metadata',async()=>{
  const dom=await setup('rental',{monthlyRent:2400,taxes:220,insurance:120,maintenance:180,management:190,vacancyRate:5});
  const w=dom.window,d=w.document,f=d.getElementById('tool-form');
