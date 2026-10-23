@@ -223,11 +223,22 @@
   const form = document.getElementById('tool-form');
   const output = document.getElementById('result-detail') || document.getElementById('result');
   const cards = document.getElementById('result-cards');
+  const chartHost=document.createElement('div');chartHost.className='ib-viz-host';chartHost.id='ib-tool-chart';
+  cards?.after(chartHost);
+  let chartFresh=false,translationRefresh=false;
+  const visual=(es,en,rows)=>{chartFresh=true;window.IBFinanceVisuals?.chart(chartHost,{title:document.documentElement.lang==='en'?en:es,rows:rows.map(([label,value])=>({label,value}))});};
+  const clearVisual=()=>{chartFresh=false;chartHost.replaceChildren();};
   const type = document.body.dataset.tool;
   const planHint = document.getElementById('plan-hint');
   const sampleBtn = document.getElementById('load-sample');
 
   if (!form || !type) return;
+  form.addEventListener('input',clearVisual);form.addEventListener('change',clearVisual);form.addEventListener('reset',clearVisual);
+  document.addEventListener('ib:language-changed',()=>{
+    if(!chartFresh)return;
+    translationRefresh=true;
+    try{form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));}finally{translationRefresh=false;}
+  });
 
   if(type==='roi_search'){
     const group=document.createElement('fieldset');
@@ -378,6 +389,7 @@
   };
 
   const setCards = (items) => {
+    if(!items.length)clearVisual();
     if (!cards) return;
     cards.innerHTML = items
       .map((item) => `<div class="metric"><strong>${item.label}</strong><span>${item.value}</span></div>`)
@@ -637,7 +649,7 @@
     setCards([]);
     if(output)output.textContent='';
 
-    if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcRun === 'function') {
+    if (!translationRefresh && window.IBAnalytics && typeof window.IBAnalytics.trackCalcRun === 'function') {
       window.IBAnalytics.trackCalcRun(type);
     }
     const values = Object.fromEntries(new FormData(form).entries());
@@ -703,9 +715,10 @@
         `;
       }
 
-      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+      if (!translationRefresh && window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: netProfit > 0 ? 'profit' : 'loss' });
       }
+      visual('Costos frente a ganancia','Costs versus profit',[[messages.acquisition,acquisition],[messages.rehabContingency,rehabTotal],[messages.holding,holdingTotal],[messages.selling,sellingTotal],[messages.financing,financingTotal],[messages.profit,netProfit]]);
       return;
     }
 
@@ -736,7 +749,8 @@
         { label: t('rentalCapRate','Capitalization rate'), value:rental.capRate===null?'N/A':pct(rental.capRate) }
       ]);
       output.textContent = t('cashFlowCalculated', 'Cash flow calculated.')+' '+t('rentalAssumptions','NOI excludes debt service and capital reserves. Cash flow deducts both. Cash-on-cash uses entered equity; cap rate uses entered total property basis. All costs are user-entered; $0 means omitted.');
-      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+      visual('Tu renta mensual, desglosada','Your monthly rent breakdown',[[document.documentElement.lang==='en'?'Income after vacancy':'Ingreso tras vacancia',rental.effectiveIncome],[document.documentElement.lang==='en'?'Monthly NOI':'NOI mensual',rental.monthlyNoi],[t('rentalDebtService','Debt service'),rentalOptions.debtService],[messages.monthlyCashFlow,cashFlow]]);
+      if (!translationRefresh && window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'cash_flow' });
       }
       return;
@@ -765,7 +779,8 @@
         { label: messages.rentNetAfterExpenses, value: money(netAfterExpenses) }
       ]);
       output.textContent = t('rentProjectionCalculated', 'Rent projection calculated.')+' '+t('rentAssumptions','Target yield is GROSS; annual expenses are only deducted from the displayed net income.');
-      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+      visual('Ingresos y gastos anuales','Annual income and expenses',[[messages.rentAnnualIncome,annualIncome],[t('rentAnnualExpenses','Annual expenses'),annualExpenses],[messages.rentNetAfterExpenses,netAfterExpenses]]);
+      if (!translationRefresh && window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'rent_projection' });
       }
       return;
@@ -787,7 +802,8 @@
         { label: t('arvAdjustedRange','Adjusted comparable range (not a confidence interval)'),value:money(minimum)+' – '+money(maximum) }
       ]);
       output.textContent = t('arvEstimateCalculated', 'ARV estimate calculated.')+' '+t('arvAssumptions','Average of three prices plus user-entered signed adjustments. Sources and adjustments are not independently verified. The 70% offer rule is a screening heuristic; financing, holding and sale costs require a full deal model.');
-      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+      visual('Comparables ajustados frente al ARV','Adjusted comparables versus ARV',[...[1,2,3].map(i=>['Comparable '+i,num('comp'+i)+num('comp'+i+'Adjustment')]),[messages.estimatedArv,average]]);
+      if (!translationRefresh && window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'arv_estimate' });
       }
       return;
@@ -815,7 +831,8 @@
         { label: t('loanDrawnPrincipal','Total funded principal'), value:money(drawnPrincipal) }
       ]);
       output.textContent = t('financingEstimateCalculated', 'Financing estimate calculated.')+' '+t('hardMoneyAssumptions','Costs include entered fees, points on committed principal and interest on each entered draw. Principal repayment is not a financing expense. Confirm the accrual convention and capitalization with the lender.');
-      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+      visual('De dónde viene el costo','Where the financing cost comes from',[[t('loanAccruedInterest','Accrued interest'),interestCost],[t('loanPointsCost','Points'),pointsCost],[t('loanFeesCost','Fees'),fees],[messages.totalFinancingCost,totalCost]]);
+      if (!translationRefresh && window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: 'financing_estimate' });
       }
       return;
@@ -850,7 +867,7 @@
           : t('roiNoResults', 'No simulated properties matched your filters.');
       }
 
-      if (window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
+      if (!translationRefresh && window.IBAnalytics && typeof window.IBAnalytics.trackCalcSuccess === 'function') {
         window.IBAnalytics.trackCalcSuccess(type, { result: filteredRows.length ? 'matches_found' : 'no_matches' });
       }
     }

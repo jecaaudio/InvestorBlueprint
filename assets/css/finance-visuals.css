@@ -1,0 +1,23 @@
+.ib-viz-host{min-width:0}
+.ib-viz{position:relative;margin:0;padding:18px;border:1px solid var(--site-border,var(--border,#dce5ef));border-radius:14px;background:var(--panel,#fff);color:var(--text,#172b3d);min-width:0}
+.ib-viz-title{font-size:.94rem;font-weight:750;padding-right:38px;line-height:1.4}
+.ib-viz-unit{position:absolute;right:18px;top:19px;font-size:.7rem;font-weight:750;letter-spacing:.05em;color:var(--muted,#52667b)}
+.ib-viz-list{display:grid;gap:13px;list-style:none;margin:16px 0 0;padding:0}
+.ib-viz-list li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 12px;min-width:0}
+.ib-viz-label{font-size:.82rem;line-height:1.4;overflow-wrap:anywhere}
+.ib-viz-value{font-size:.86rem;font-variant-numeric:tabular-nums;line-height:1.4;text-align:right;overflow-wrap:anywhere;max-width:100%}
+.ib-viz-track{position:relative;grid-column:1/-1;height:9px;border-radius:5px;background:var(--site-soft,rgba(127,150,175,.16));overflow:hidden}
+.ib-viz-bar{position:absolute;top:0;height:100%;border-radius:4px;background:linear-gradient(90deg,#15758c,#299a9a);transition:width .25s ease,left .25s ease}
+.ib-viz-zero{position:absolute;top:0;height:100%;width:1px;background:var(--muted,#52667b)}
+.ib-viz-list .is-negative .ib-viz-bar{background:#bf4651}
+.ib-viz-list .is-negative .ib-viz-value{color:#ae2534}
+html[data-theme="dark"] .ib-viz-list .is-negative .ib-viz-value{color:#ffb3bc}
+.ib-viz-note{margin:14px 0 0;font-size:.76rem;line-height:1.5;color:var(--muted,#52667b)}
+.result-card .ib-viz{--text:#e8f1fb;--muted:#b8cde3;--panel:#0f2a47;--border:#45617c;margin-top:18px}
+.result-card .ib-viz .is-negative .ib-viz-value{color:#ffb3bc}
+body .mini-preferences .icon-pref,body .header-actions .btn{min-height:44px;min-width:44px}
+@media(max-width:520px){body .header-actions{gap:8px}body .header-actions .btn{font-size:.78rem}}
+@media(max-width:380px){.ib-viz{padding:14px}.ib-viz-list li{grid-template-columns:minmax(0,1fr)}.ib-viz-value{text-align:left}.ib-viz-unit{right:14px;top:15px}}
+@media(prefers-reduced-motion:no-preference){.ib-viz{animation:ib-viz-appear .32s ease both}@keyframes ib-viz-appear{from{opacity:.6}to{opacity:1}}}
+@media(prefers-reduced-motion:reduce){.ib-viz,.ib-viz *{animation:none!important;transition:none!important}}
+@media print{.ib-viz-host{display:none!important}}

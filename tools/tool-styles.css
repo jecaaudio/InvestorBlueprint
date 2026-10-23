@@ -14,6 +14,15 @@
 
 * { box-sizing: border-box; }
 
+/* Phone-first controls; no iOS auto-zoom on financial inputs. */
+input:not([type="radio"]):not([type="checkbox"]),select,textarea{font-size:16px;min-height:44px}
+button,.tool-actions a{min-height:44px}
+.result-panel{min-width:0}
+.result-panel .metric span{overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+#ib-tool-chart:not(:empty){margin:16px 0}
+@media(prefers-reduced-motion:no-preference){.metric{animation:ib-metric-in .28s ease both}@keyframes ib-metric-in{from{opacity:.65}to{opacity:1}}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
 body {
   margin: 0;
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;

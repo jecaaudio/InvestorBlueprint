@@ -24,6 +24,8 @@
       '<link rel="manifest" href="'+root+'manifest.webmanifest?v=20261019">',
       '<meta name="apple-mobile-web-app-title" content="InvestorBlueprint">',
       '<link rel="stylesheet" href="'+root+'assets/css/brand.css?v=20261019">',
+      '<link rel="stylesheet" href="'+root+'assets/css/finance-visuals.css?v=20261023">',
+      '<script src="'+root+'assets/js/finance-visuals.js?v=20261023"></script>',
       '<script src="'+root+'assets/js/site-config.js?v=20261021b"></script>',
       // Result notice under the numbers; tool is checked against ^[a-z0-9-]+$ above.
       '<script src="'+root+'assets/js/disclaimers.js?v=20261021" data-tool="'+tool+'"></script>',
