@@ -32,6 +32,7 @@
    }
    document.addEventListener('ib:language-changed',()=>apply(root.dataset.theme,false));
    apply(saved,false);
+   header.dispatchEvent(new CustomEvent('ib:theme-ready'));
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
  else init();
