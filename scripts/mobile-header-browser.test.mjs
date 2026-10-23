@@ -122,6 +122,8 @@ try {
         }
       }
       await page.goto(base+'/InvestorBlueprint/index.html#tools');
+      await page.waitForFunction(expected=>document.documentElement.lang===expected&&Boolean(window.translations?.[expected]?.heroTitle),lang);
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
       const anchor=await page.locator('#tools').evaluate(node=>({top:node.getBoundingClientRect().top,header:document.querySelector('.navbar').getBoundingClientRect().bottom}));
       assert.ok(anchor.top>=anchor.header-2,`Header covers tools at ${width}px: ${JSON.stringify(anchor)}`);
       console.log(`[mobile/${engine}] ${width}px ${lang}: public calculators, comparison, footer and anchors`);

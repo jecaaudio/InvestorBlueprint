@@ -41,4 +41,15 @@
     });
     document.addEventListener('click',event=>{if(!header.contains(event.target))closeMenu();});
   }
+  // A translated hero can change height after the browser positions a deep link.
+  // Keep an already-visible anchor below the sticky header; never jump back when
+  // the reader has moved further down the page.
+  document.addEventListener('ib:language-changed',()=>{
+    if(!location.hash)return;
+    let target;try{target=document.getElementById(decodeURIComponent(location.hash.slice(1)))}catch{return;}
+    if(!target)return;
+    const top=target.getBoundingClientRect().top;
+    const bottom=document.querySelector('.navbar')?.getBoundingClientRect().bottom||0;
+    if(top>=-100&&top<=bottom+80)requestAnimationFrame(()=>target.scrollIntoView({block:'start',behavior:'instant'}));
+  });
 })();
