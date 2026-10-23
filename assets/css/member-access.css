@@ -58,7 +58,7 @@
 /* The legacy mobile menu hides nav on pages without a hamburger control.
    Profile, login and admin use always-visible wrapped navigation instead. */
 @media(max-width:840px){
-  body.ib-membership-page .navbar nav{
+  body.ib-membership-page .navbar:not(:has(>.menu-toggle)) nav{
     display:flex!important;
     flex-direction:row!important;
     flex-wrap:wrap!important;
@@ -73,7 +73,7 @@
     order:5!important;
     padding:8px 0!important;
   }
-  body.ib-membership-page .navbar nav a{
+  body.ib-membership-page .navbar:not(:has(>.menu-toggle)) nav a{
     display:inline-flex;
     align-items:center;
     padding:7px 10px;

@@ -63,6 +63,12 @@ try {
       for(const path of ['calculadoras/venta.html','calculadoras/flip.html','calculadoras/rentas.html','calculadoras/arv.html','calculadoras/hard-money.html','pricing.html','login.html','privacy.html','terms.html','404.html']){
         await page.goto(base+'/InvestorBlueprint/'+path,{waitUntil:'load'});
         await page.locator('#site-footer').waitFor();
+        if(width<=840){
+          assert.ok((await page.locator('.navbar').boundingBox()).height<=66,`Compact header on ${path} at ${width}px`);
+          await page.locator('.menu-toggle').click();
+          assert.ok(await page.locator('#siteThemeToggle').isVisible(),`Menu preferences on ${path}`);
+          await page.keyboard.press('Escape');
+        }
         assert.equal(new URL(await page.locator('#cookie-banner a').getAttribute('href'),page.url()).pathname,'/InvestorBlueprint/privacy.html','Cookie policy link must resolve from nested pages');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Overflow ${path} ${width}`);
         assert.ok(await page.locator('.site-footer a[href$="privacy.html"]').isVisible(),'Mobile footer privacy link');
@@ -119,6 +125,22 @@ try {
             assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'No overflow during an animated update');
             await page.emulateMedia({reducedMotion:'reduce'});
           }
+        }
+      }
+      // Layout-only account/admin shells; this does not stand in for real-session E2E.
+      for(const path of ['account.html','admin.html']){
+        await page.goto(base+'/InvestorBlueprint/'+path,{waitUntil:'load'});
+        await page.locator('#siteThemeToggle').waitFor({state:'attached'});
+        assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Membership shell overflow ${path} ${width}`);
+        if(width<=840){
+          assert.ok((await page.locator('.navbar').boundingBox()).height<=66,`Membership header ${path} ${width}`);
+          await page.locator('.menu-toggle').click();
+          assert.ok(await page.locator('#siteThemeToggle').isVisible());
+          await page.keyboard.press('Escape');
+        }
+        if([393,1440].includes(width)&&lang==='es')for(const theme of ['light','dark']){
+          await setTheme(page,theme);
+          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${width}-${path}-shell-${theme}.png`,animations:'disabled'});
         }
       }
       await page.goto(base+'/InvestorBlueprint/index.html#tools');
