@@ -39,6 +39,9 @@ Deno.serve(async(req:Request):Promise<Response>=>{
   const token=auth.replace(/^Bearer\s+/i,"");
   const {data:{user},error:userError}=await sb.auth.getUser(token);
   if(userError||!user||!user.email_confirmed_at)return reply(401,JSON.stringify({error:"login_required"}));
+  const {data:sessionActive,error:sessionError}=await sb.rpc("ib_session_active");
+  if(sessionError)return reply(503,JSON.stringify({error:"verification_unavailable"}));
+  if(sessionActive!==true)return reply(401,JSON.stringify({error:"login_required"}));
   const {data:profile,error:profileError}=await sb.from("member_profiles").select("access_status,role,beta_tester,terms_accepted_at,terms_version").eq("id",user.id).single();
   if(profileError)return reply(503,JSON.stringify({error:"verification_unavailable"}));
   if(profile?.access_status!=="approved")return reply(403,JSON.stringify({error:"approval_required"}));

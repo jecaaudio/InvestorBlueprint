@@ -52,6 +52,7 @@
    }catch(error){return false}
  }
  async function signOut(client){
+   if(window.IBSessionSecurity)return window.IBSessionSecurity.signOut(client);
    await client.auth.signOut();
    for(const key of ['ib_document_language','ib_report_detail','ib_notes_detail','ib_display_name','ib_company_name','preferredLanguage']){
      try{localStorage.removeItem(key)}catch(error){}
@@ -100,9 +101,12 @@
    const client=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{
      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
    });
+   window.IBSessionSecurity?.attach(client);
    try{
      const {data:{user},error:authError}=await client.auth.getUser();
      if(authError||!user){showLogin();return}
+     window.IBSessionSecurity?.observe({user});
+     if(window.IBSessionSecurity?.isLocked())return;
      const {data:profile,error:profileError}=await client.from('member_profiles')
        .select('id,email,full_name,role,access_status').eq('id',user.id).single();
      if(profileError||!profile){showLogin();return}
@@ -121,6 +125,7 @@
        display_name:'',company_name:'',interface_language:'es',
        document_language:'es',report_detail:'detailed',notes_detail:'detailed'
      };
+     if(window.IBSessionSecurity?.isLocked())return;
      fill(effective);
      setCache(effective);
      $('account-email').textContent=user.email||profile.email||'';
