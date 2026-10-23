@@ -189,9 +189,9 @@ body[data-tool] .fc-row label{color:var(--text)}
    The open panel overlays the page instead of pushing the hero below the fold. */
 .mobile-nav-preferences[hidden]{display:none!important}
 @media(max-width:840px){
- html{scroll-padding-top:80px}
+ html:has(.navbar>.menu-toggle){scroll-padding-top:80px}
  .navbar:has(>.menu-toggle){display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:8px!important;padding:10px max(12px,4vw)!important}
- .navbar:has(>.menu-toggle)>.brand-menu{grid-column:1;order:0;min-width:0;max-width:100%;margin:0}
+ .navbar:has(>.menu-toggle)>.brand-menu{grid-column:1;order:0;display:flex;align-items:center;min-width:0;max-width:100%;margin:0}
  .navbar:has(>.menu-toggle)>.menu-toggle{grid-column:2;order:1;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin:0!important;padding:0!important;font-size:0!important}
  .navbar:has(>.menu-toggle)>.menu-toggle::before{content:"\2630";font-size:1.15rem;line-height:1}
  .navbar:has(>.menu-toggle)>nav{position:absolute;top:100%;left:0;right:0;width:100%;order:2;display:flex;align-items:stretch;gap:2px;margin:0;padding:0 16px;max-height:0;overflow:hidden;background:var(--panel);border-bottom:0;box-shadow:none}
