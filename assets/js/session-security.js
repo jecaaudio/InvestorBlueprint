@@ -4,24 +4,30 @@
  if(window.IBSessionSecurity){window.IBSessionSecurity.mount();return;}
  const root=new URL('../../',document.currentScript.src);
  const IDLE=15*60*1000,MAX=8*60*60*1000;
- let client=null,locked=false,ending=null,timer=null,controller=null,warning=null;
+ let client=null,identity=null,locked=false,ending=null,timer=null,controller=null,warning=null;
  const watched=new WeakSet();
  const ref=()=>/^https:\/\/([a-z0-9]+)\.supabase\.co/i.exec(window.IB_AUTH_CONFIG?.supabaseUrl||'')?.[1]||window.IB_SITE?.supabaseProjectRef||'';
  const key=()=>ref()?'sb-'+ref()+'-auth-token':'';
  const policyKey=()=>key()+'-ib-lifetime';
+ const closedKey=()=>key()+'-ib-closed';
  let memory=null;
  const read=(name)=>{try{return JSON.parse(localStorage.getItem(name)||'null')}catch{return null}};
  const record=()=>read(policyKey())||memory;
  function write(value){memory=value;try{if(value)localStorage.setItem(policyKey(),JSON.stringify(value));else localStorage.removeItem(policyKey())}catch{}}
  const saved=()=>{const value=key()?read(key()):null;return value?.currentSession||value};
+ const closed=()=>{const userId=saved()?.user?.id;return Boolean(userId&&read(closedKey())?.userId===userId)};
  const privatePage=()=>/\/(?:account|admin)\.html$|\/(?:tools|calculadora-venta)\//.test(location.pathname);
  const expired=(value=record())=>Boolean(value&&(Date.now()-value.lastActive>=IDLE||Date.now()-value.started>=MAX||Date.now()<value.started-60000));
  function emit(){document.dispatchEvent(new CustomEvent('ib:session-changed'));}
- function clearCache(){
-   for(const name of [key(),key()+'-code-verifier','ib_display_name','ib_company_name','ib_document_language','ib_report_detail','ib_notes_detail']){
-     if(name)try{localStorage.removeItem(name)}catch{}
+ function clearCache(userId){
+   const current=saved()?.user?.id;
+   if(!current||current===userId){
+     for(const name of [key(),key()+'-code-verifier','ib_display_name','ib_company_name','ib_document_language','ib_report_detail','ib_notes_detail']){
+       if(name)try{localStorage.removeItem(name)}catch{}
+     }
+     write(null);
    }
-   write(null);window.IB_REPORT_PREFERENCES=Object.freeze({});window.IB_BETA_ACCESS=false;
+   window.IB_REPORT_PREFERENCES=Object.freeze({});window.IB_BETA_ACCESS=false;
    document.dispatchEvent(new CustomEvent('ib:beta-access',{detail:{allowed:false}}));
  }
  function redact(){
@@ -37,6 +43,8 @@
  }
  async function signOut(activeClient=client,{reason='login',revoke=true}={}){
    if(ending)return ending;
+   const userId=identity||saved()?.user?.id||record()?.userId;
+   if(userId)try{localStorage.setItem(closedKey(),JSON.stringify({userId}))}catch{}
    locked=true;redact();warning?.remove();warning=null;
    ending=(async()=>{
      let timeout;
@@ -50,15 +58,20 @@
        }
      }catch{reason='local-signout'}
      finally{
-       clearTimeout(timeout);activeClient?.auth?.stopAutoRefresh?.();clearCache();emit();navigate(reason);
+       clearTimeout(timeout);activeClient?.auth?.stopAutoRefresh?.();clearCache(userId);emit();navigate(reason);
      }
    })();
    return ending;
  }
  function observe(session,{fresh=false}={}){
    if(!session?.user?.id||locked&&!fresh)return;
+   if(identity&&identity!==session.user.id&&privatePage()){
+     locked=true;redact();navigate('login');return;
+   }
+   identity=session.user.id;
    const old=record();
-   if(fresh){locked=false;ending=null;}
+   if(fresh){locked=false;ending=null;try{localStorage.removeItem(closedKey())}catch{}}
+   if(closed()){void signOut(client);return;}
    if(fresh||!old||old.userId!==session.user.id)write({userId:session.user.id,started:Date.now(),lastActive:Date.now()});
    check();emit();
  }
@@ -71,6 +84,7 @@
  }
  function check(){
    if(locked)return false;
+   if(closed()){void signOut(client);return false;}
    const value=record();if(!value)return true;
    if(expired(value)){void signOut(client,{reason:'expired'});return false;}
    if(IDLE-(Date.now()-value.lastActive)<=60000&&document.body&&!warning&&document.visibilityState!=='hidden'){
@@ -91,7 +105,7 @@
      if(event==='SIGNED_OUT'){
        // Never await SDK auth methods inside their own state callback.
        setTimeout(()=>{if(!locked)void signOut(value,{revoke:false})},0);
-     }else if(session?.user)observe(session);
+     }else if(session?.user)observe(session,{fresh:event==='PASSWORD_RECOVERY'});
    });
    value.auth.getSession?.().then(({data,error})=>{if(!error&&data?.session)observe(data.session)}).catch(()=>{});
  }
@@ -102,8 +116,8 @@
    window.addEventListener('storage',event=>{
      if(event.key===key()){
        const session=saved(),old=record();
-       if(!session?.user?.id&&old){void signOut(client,{revoke:false});}
-       else if(old&&session?.user?.id!==old.userId){redact();if(privatePage())navigate('login');}
+       if(!session?.user?.id&&(old||identity)){void signOut(client,{revoke:false});}
+       else if((identity||old?.userId)&&session?.user?.id!==(identity||old.userId)){redact();if(privatePage()){locked=true;navigate('login');}}
        emit();
      }else if(event.key===policyKey())check();
    },options);
@@ -123,6 +137,6 @@
    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',check,{once:true,...options});else check();
  }
  window.IBSessionSecurity={attach,observe,start:session=>observe(session,{fresh:true}),signOut,check,mount,
-   isLocked:()=>locked||expired(),isExpired:()=>expired(),limits:Object.freeze({idleMs:IDLE,maxMs:MAX})};
+   isLocked:()=>locked||expired()||closed(),isExpired:()=>expired(),limits:Object.freeze({idleMs:IDLE,maxMs:MAX})};
  mount();
 })();

@@ -48,7 +48,7 @@ test('refresh and navigation cannot reset the eight-hour absolute session limit'
  assert.match(r.visits.at(-1),/reason=expired$/);r.w.close();
 });
 test('logout in another tab removes this private view and never invokes another global logout',async()=>{
- const r=open();await tick();r.w.localStorage.removeItem(key);
+ const r=open();await tick();r.w.localStorage.removeItem(key);r.w.localStorage.removeItem(policy);
  r.w.dispatchEvent(new r.w.StorageEvent('storage',{key,newValue:null}));await tick();
  assert.doesNotMatch(r.w.document.body.textContent,/PRIVATE ACCOUNT DATA/);
  assert.equal(r.calls.filter(x=>typeof x==='object').length,0);assert.ok(r.visits.length);r.w.close();
@@ -62,6 +62,21 @@ test('an idle warning has a usable continue action before the deadline',async()=
  const r=open();await tick();r.advance(14*60*1000+1);r.guard.check();
  const button=r.w.document.querySelector('[role="alert"] button');assert.ok(button);
  button.click();r.advance(2*60*1000);assert.equal(r.guard.check(),true);assert.equal(r.visits.length,0);r.w.close();
+});
+test('switching accounts removes the old private view while preserving the new account token',async()=>{
+ const r=open();await tick();const next={user:{id:'member-b'},expires_at:2000000000};
+ r.w.localStorage.setItem(key,JSON.stringify(next));
+ r.event('SIGNED_IN',next);await tick();
+ assert.doesNotMatch(r.w.document.body.textContent,/PRIVATE ACCOUNT DATA/);
+ assert.equal(JSON.parse(r.w.localStorage.getItem(key)).user.id,'member-b');assert.ok(r.visits.length);r.w.close();
+});
+test('a late refresh cannot silently resurrect an explicitly closed session',async()=>{
+ const r=open();await tick();await r.guard.signOut();
+ const session={user:{id:'member-a'},expires_at:2000000000};
+ r.w.localStorage.setItem(key,JSON.stringify(session));
+ assert.equal(r.guard.isLocked(),true);
+ // A verified fresh password sign-in is the explicit way to open it again.
+ r.guard.start(session);assert.equal(r.guard.isLocked(),false);r.w.close();
 });
 test('all published entry pages load the guard before application authentication',()=>{
  for(const path of ['index.html','login.html','account.html','admin.html','pricing.html','calculadoras/venta.html','tools/flip-calculator.html','tools/arv/index.html','calculadora-venta/index.html']){
