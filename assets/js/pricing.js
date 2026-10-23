@@ -47,6 +47,7 @@
      if(note)note.hidden=false;
      cta.href='login.html';
      setText(cta,'Solicitar acceso gratis','Request free access');
+     document.dispatchEvent(new CustomEvent('ib:pricing-rendered'));
      return;
    }
    if(note)note.hidden=true;

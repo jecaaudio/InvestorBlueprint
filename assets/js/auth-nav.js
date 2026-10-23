@@ -60,7 +60,8 @@
       link.textContent = english ? 'My profile' : 'Mi perfil';
     });
     // Presentation only: a remembered session never grants tool or admin access.
-    document.querySelectorAll('main a[data-track="request_access"], .lp-actions a.btn[href*="login.html"], .lp-cta a.btn[href*="login.html"], main a[data-auth-nav="cta"]').forEach(link=>{
+    document.querySelectorAll('main a[data-track="request_access"], .lp-actions a.btn[href*="login.html"], .lp-cta a.btn[href*="login.html"], main a[data-auth-nav="cta"], #pro-cta').forEach(link=>{
+      if(link.id==='pro-cta'&&window.IB_BILLING?.enabled)return;
       const original=remember(link);
       if(!active){restore(link,original,english);return;}
       link.href=original.attrs.href.replace(/login\.html.*$/, 'account.html');
@@ -74,6 +75,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', update, { once: true });
   else update();
   document.addEventListener('ib:language-changed', update);
+  document.addEventListener('ib:pricing-rendered',update);
   window.addEventListener('storage',update);
   window.addEventListener('pageshow',update);
 })();

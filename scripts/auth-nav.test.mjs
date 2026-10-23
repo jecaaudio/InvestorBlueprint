@@ -115,3 +115,20 @@ test('logout restores signup labels, tracking and previously hidden header links
   assert.equal(cta.textContent,'My profile');
   dom.window.close();
 });
+
+test('beta pricing keeps the member CTA after a pricing render, without rewriting checkout',()=>{
+  const {dom}=open('pricing.html',{saved:session});
+  const w=dom.window,d=w.document,cta=d.getElementById('pro-cta');
+  w.IB_BILLING={enabled:false};
+  w.eval(fs.readFileSync('assets/js/pricing.js','utf8'));
+  d.dispatchEvent(new w.Event('DOMContentLoaded'));
+  w.IBPricing.render();
+  assert.match(cta.getAttribute('href'),/account\.html$/);
+  assert.equal(cta.textContent,'Mi perfil');
+  w.IB_BILLING.enabled=true;
+  cta.href='https://buy.stripe.com/test_fixture';cta.textContent='Subscribe';
+  d.dispatchEvent(new w.Event('ib:pricing-rendered'));
+  assert.equal(cta.href,'https://buy.stripe.com/test_fixture');
+  assert.equal(cta.textContent,'Subscribe');
+  w.close();
+});
