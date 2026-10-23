@@ -22,7 +22,7 @@ const expected={
   flip:['$37,600','14.5%','$279,570','$174,000'], // cash flip, 2% buy closing, 7% selling
   rentas:['$370','$4,440','$18,840'],      // 2,400×95% − 710 − 1,200
   arv:['$314,000','$305,000 – $322,000','$181,800'],
-  'hard-money':['$22,313','$18,113','$4,200','$2,013']
+  'hard-money':['$22,312.50','$18,112.50','$4,200','$2,012.50']
 };
 for(const slug of slugs){
   test(`${slug} landing shows a correct worked example without an account`,async()=>{

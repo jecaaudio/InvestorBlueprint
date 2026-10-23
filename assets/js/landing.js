@@ -2,7 +2,7 @@
  * engine in tools/tool-script.js; the full tools stay behind sign-in. */
 (function(){
  'use strict';
- const money=value=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(value);
+ const money=value=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:Number.isInteger(value)?0:2,maximumFractionDigits:2}).format(value);
  const pct=value=>value===null||!Number.isFinite(value)?'N/A':value.toFixed(1)+'%';
  const english=()=>document.documentElement.lang==='en';
  const L=(es,en)=>english()?en:es;
