@@ -63,6 +63,8 @@ try {
           if(path==='calculadoras/venta.html'){
             await input.fill('100000');
             assert.match(await page.locator('.lp-quick>.ib-viz-host .is-negative').textContent(),/-\$58,000/);
+            await input.fill('9007199254740991');
+            assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Large financial values must wrap without horizontal overflow');
             await page.locator('.lp-scenario-actions button').nth(1).click();
           }
         }else if(path==='pricing.html'){

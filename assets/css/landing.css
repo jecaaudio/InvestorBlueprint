@@ -91,7 +91,7 @@ html[data-theme="dark"] .ib-disclaimer{background:#2f260d;color:#f3dfa6}
 .lp-quick>.ib-viz-host{min-height:0}
 .lp-result-main strong{overflow-wrap:anywhere;max-width:100%}
 .lp-result dl{grid-template-columns:minmax(0,1fr) minmax(0,auto)}
-.lp-result dd{overflow-wrap:anywhere}
+.lp-result dt,.lp-result dd{overflow-wrap:anywhere}
 .lp-related a{min-height:44px;display:inline-flex;align-items:center;box-sizing:border-box}
 .lp-faq summary{min-height:44px;align-content:center}
 @media(prefers-reduced-motion:no-preference){
