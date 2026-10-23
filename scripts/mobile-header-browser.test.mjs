@@ -65,6 +65,7 @@ try {
         await page.locator('#site-footer').waitFor();
         if(width<=840){
           assert.ok((await page.locator('.navbar').boundingBox()).height<=66,`Compact header on ${path} at ${width}px`);
+          assert.ok(await page.locator('.ib-membership-page button').evaluateAll(nodes=>nodes.filter(node=>node.getClientRects().length).every(node=>node.getBoundingClientRect().height>=44)),`Membership touch targets on ${path}`);
           await page.locator('.menu-toggle').click();
           assert.ok(await page.locator('#siteThemeToggle').isVisible(),`Menu preferences on ${path}`);
           await page.keyboard.press('Escape');
@@ -134,6 +135,7 @@ try {
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Membership shell overflow ${path} ${width}`);
         if(width<=840){
           assert.ok((await page.locator('.navbar').boundingBox()).height<=66,`Membership header ${path} ${width}`);
+          assert.ok(await page.locator('.ib-membership-page button').evaluateAll(nodes=>nodes.filter(node=>node.getClientRects().length).every(node=>node.getBoundingClientRect().height>=44)),`Membership touch targets on ${path}`);
           await page.locator('.menu-toggle').click();
           assert.ok(await page.locator('#siteThemeToggle').isVisible());
           await page.keyboard.press('Escape');
