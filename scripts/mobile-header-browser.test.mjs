@@ -30,6 +30,12 @@ try {
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'),'false');
       assert.equal(await page.locator('#primary-nav a').first().isVisible(),false);}
+      if([393,1440].includes(width)&&lang==='es'){
+        for(const theme of ['light','dark']){
+          if(await page.locator('html').getAttribute('data-theme')!==theme)await page.locator('#siteThemeToggle').click();
+          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${width}-home-${theme}.png`,fullPage:true,animations:'disabled'});
+        }
+      }
       for(const path of ['calculadoras/venta.html','calculadoras/flip.html','calculadoras/rentas.html','calculadoras/arv.html','calculadoras/hard-money.html','pricing.html','login.html','privacy.html','terms.html','404.html']){
         await page.goto(base+'/InvestorBlueprint/'+path,{waitUntil:'load'});
         await page.locator('#site-footer').waitFor();
@@ -70,12 +76,14 @@ try {
           assert.equal(await page.locator('html').getAttribute('data-theme'),theme);
           assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Overflow in ${theme}: ${path} ${width}`);
         }
-        if(width===393&&lang==='es'){
+        if([393,1440].includes(width)&&lang==='es'){
           await page.evaluate(()=>window.scrollTo(0,0));
           if(await page.locator('html').getAttribute('data-theme')!=='light')await page.locator('#siteThemeToggle').click();
-          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-light.png`,fullPage:true,animations:'disabled'});
+          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${width}-${path.replaceAll('/','-')}-light.png`,fullPage:true,animations:'disabled'});
+          if(path.startsWith('calculadoras/'))await page.locator('.lp-quick').screenshot({path:`tmp/mobile-polish-qa/${engine}-${width}-${path.replaceAll('/','-')}-calculator-light.png`,animations:'disabled'});
           await page.locator('#siteThemeToggle').click();
-          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${path.replaceAll('/','-')}-dark.png`,fullPage:true,animations:'disabled'});
+          await page.screenshot({path:`tmp/mobile-polish-qa/${engine}-${width}-${path.replaceAll('/','-')}-dark.png`,fullPage:true,animations:'disabled'});
+          if(path.startsWith('calculadoras/'))await page.locator('.lp-quick').screenshot({path:`tmp/mobile-polish-qa/${engine}-${width}-${path.replaceAll('/','-')}-calculator-dark.png`,animations:'disabled'});
           if(path.startsWith('calculadoras/')){
             await page.emulateMedia({reducedMotion:'no-preference'});
             assert.notEqual(await page.locator('.ib-viz-bar').first().evaluate(node=>getComputedStyle(node).transitionDuration),'0s','Normal motion keeps subtle transitions');
