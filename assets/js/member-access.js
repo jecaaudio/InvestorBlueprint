@@ -12,6 +12,7 @@
   const cfg=window.IB_AUTH_CONFIG||{};
   const valid=typeof cfg.supabaseUrl==='string'&&/^https:\/\//i.test(cfg.supabaseUrl)&&typeof cfg.supabaseAnonKey==='string'&&cfg.supabaseAnonKey.length>25;
   const client=valid&&window.supabase?.createClient?window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+  if(client)window.IBSessionSecurity?.attach(client);
   const $=id=>document.getElementById(id);
   const lang=()=>document.documentElement.lang==='en'?'en':'es';
   const t=(es,en)=>lang()==='en'?en:es;
@@ -102,6 +103,8 @@
     recoveryEventCallback=showRecoveryPasswordForm;
     if(recoveryEventSeen)showRecoveryPasswordForm();
     const entryParams=new URLSearchParams(window.location.search);
+    if(entryParams.get('reason')==='expired')say('portal-message',t('Tu sesión venció por seguridad. Vuelve a iniciar sesión.','Your session expired for security. Please sign in again.'));
+    if(entryParams.get('reason')==='local-signout')say('portal-message',t('Se cerró el acceso en este navegador. No pudimos confirmar la revocación en el servidor; comprueba tu conexión.','Access was closed in this browser. Server revocation could not be confirmed; check your connection.'),'warning');
     if(entryParams.get('recover')==='1') showPanel('recover');
     else if(entryParams.has('returnTo')||entryParams.get('reason')==='login') showPanel('login');
     if(recoveryRedirectError){
@@ -154,8 +157,9 @@
     login?.addEventListener('submit',async e=>{
       e.preventDefault();setBusy(login,true);
       try{
-        const {error}=await client.auth.signInWithPassword({email:$('signin-email').value.trim().toLowerCase(),password:$('signin-password').value});
+        const {data,error}=await client.auth.signInWithPassword({email:$('signin-email').value.trim().toLowerCase(),password:$('signin-password').value});
         if(error)throw error;
+        window.IBSessionSecurity?.start(data?.session);
         say('portal-message',t('Sesión iniciada. Consulta el estado de tu solicitud.','Signed in. Your request status is shown below.'),'success');
         login.reset();
         const profile=await updateAccount();
@@ -236,6 +240,7 @@
       finally{setBusy(newPassword,false)}
     });
     $('signout-button')?.addEventListener('click',async()=>{
+      if(window.IBSessionSecurity){await window.IBSessionSecurity.signOut(client);return;}
       await client.auth.signOut();clearReportCache();$('account-summary').hidden=true;
       say('portal-message',t('Sesión cerrada.','Signed out.'),'success');
     });
@@ -259,12 +264,16 @@
       $('admin-root').hidden=true;$('admin-denied').hidden=false;
       return;
     }
+    if(window.IBSessionSecurity?.isLocked())return;
     if($('admin-checking'))$('admin-checking').hidden=true;
     if($('admin-hero'))$('admin-hero').hidden=false;
     $('admin-root').hidden=false;
     $('admin-denied').hidden=true;
     $('admin-identity').textContent=profile.email;
-    $('admin-logout')?.addEventListener('click',async()=>{await client.auth.signOut();clearReportCache();location.href=(document.body.dataset.memberLoginPath||'login.html')});
+    $('admin-logout')?.addEventListener('click',async()=>{
+      if(window.IBSessionSecurity){await window.IBSessionSecurity.signOut(client);return;}
+      await client.auth.signOut();clearReportCache();location.href=(document.body.dataset.memberLoginPath||'login.html');
+    });
     const list=$('member-list'),filter=$('member-filter'),reload=$('members-refresh');
     const allowed=['approved','rejected','suspended','pending'];
     async function loadMembers(){

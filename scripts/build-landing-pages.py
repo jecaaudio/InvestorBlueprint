@@ -115,6 +115,7 @@ PAGES = [
 HEAD = '''<!DOCTYPE html>
 <html lang="es">
 <head>
+<script src="../assets/js/session-security.js?v=20261023session"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-es="{title} | InvestorBlueprint" data-en="{title_en} | InvestorBlueprint">{title} | InvestorBlueprint</title>
@@ -179,7 +180,7 @@ FOOT_SCRIPTS = '''<script src="../assets/js/config.js"></script>
 <script src="../assets/js/landing.js?v=20261023"></script>
 <script src="../assets/js/site-config.js?v=20261021b"></script>
 <script src="../assets/js/site-footer.js?v=20261021"></script>
-<script src="../assets/js/auth-nav.js?v=20261023compact"></script>
+<script src="../assets/js/auth-nav.js?v=20261023session"></script>
 <script src="../assets/js/site-theme.js?v=20261023compact"></script>
 </body>
 </html>

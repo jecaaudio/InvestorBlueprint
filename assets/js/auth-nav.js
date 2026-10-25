@@ -16,7 +16,7 @@
     try {
       const saved = JSON.parse(localStorage.getItem('sb-' + ref + '-auth-token') || 'null');
       const session = saved?.currentSession || saved;
-      return Boolean(session?.user?.id && (session.refresh_token || Number(session.expires_at) * 1000 > Date.now()));
+      return Boolean(session?.user?.id && Number(session.expires_at)*1000>Date.now() && !window.IBSessionSecurity?.isLocked());
     } catch (error) { return false; /* Blocked storage or unreadable data: keep "Ingresar". */ }
   };
   const originals = new Map();
@@ -76,6 +76,7 @@
   else update();
   document.addEventListener('ib:language-changed', update);
   document.addEventListener('ib:pricing-rendered',update);
+  document.addEventListener('ib:session-changed',update);
   window.addEventListener('storage',update);
   window.addEventListener('pageshow',update);
 })();

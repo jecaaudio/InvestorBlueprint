@@ -9,12 +9,21 @@ const browser=await webkit.launch({headless:true});
 try {
   const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   const page=await context.newPage();
-  await page.exposeFunction('__readMemberPrefs',async()=>remotePreferences);
-  await page.exposeFunction('__saveMemberPrefs',async value=>{remotePreferences=value;return value;});
-  await page.addInitScript(()=>{
+  await context.exposeFunction('__readMemberPrefs',async()=>remotePreferences);
+  await context.exposeFunction('__saveMemberPrefs',async value=>{remotePreferences=value;return value;});
+  await context.addInitScript(()=>{
     const user={id:'browser-fixture-member',email:'browser-fixture@example.invalid'};
+    const key='sb-ppeyoovykxomxinumibk-auth-token';
+    if(!localStorage.getItem('qa-session-seeded')){
+      localStorage.setItem('qa-session-seeded','yes');
+      localStorage.setItem(key,JSON.stringify({user,access_token:'fixture-only',expires_at:Math.floor(Date.now()/1000)+3600}));
+    }
     window.supabase={createClient:()=>({
-      auth:{getUser:async()=>({data:{user},error:null}),signOut:async()=>({error:null})},
+      auth:{getUser:async()=>({data:{user:localStorage.getItem(key)?user:null},error:null}),
+        getSession:async()=>({data:{session:JSON.parse(localStorage.getItem(key)||'null')},error:null}),
+        onAuthStateChange(){return {data:{subscription:{unsubscribe(){}}}}},
+        // Exercise the offline/error logout path; the real guard must clear local access.
+        signOut:async()=>({error:{message:'Synthetic offline failure'}})},
       from(table){
         if(table==='member_profiles'){
           const q={select(){return q},eq(){return q},
@@ -34,7 +43,7 @@ try {
   });
   // Match any pinned SDK version; the mock body fails the page's integrity check,
   // so the browser skips it and the window.supabase fixture above stays in place.
-  await page.route(/^https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@/,
+  await context.route(/^https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@/,
     route=>route.fulfill({status:200,contentType:'application/javascript',body:'/* SDK mocked for WebKit CI */'}));
   await page.goto(base+'/InvestorBlueprint/account.html',{waitUntil:'domcontentloaded'});
   await page.locator('#account-content').waitFor({state:'visible',timeout:12000});
@@ -55,5 +64,18 @@ try {
   assert.equal(await page.locator('#setting-display-name').inputValue(),'Safari QA');
   assert.equal(await page.locator('#setting-document-language').inputValue(),'en');
   assert.equal(await page.locator('#setting-report-detail').inputValue(),'summary');
+  await page.goto(base+'/InvestorBlueprint/index.html',{waitUntil:'domcontentloaded'});
+  await page.goto(base+'/InvestorBlueprint/account.html',{waitUntil:'domcontentloaded'});
+  await page.locator('#account-content').waitFor({state:'visible'});
+  const other=await context.newPage();
+  await other.goto(base+'/InvestorBlueprint/account.html',{waitUntil:'domcontentloaded'});
+  await other.locator('#account-content').waitFor({state:'visible'});
+  await page.locator('#account-signout').click();
+  await page.waitForURL(/login\.html\?reason=local-signout/);
+  await other.waitForURL(/login\.html\?reason=login/);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('sb-ppeyoovykxomxinumibk-auth-token')),null);
+  await page.goBack({waitUntil:'domcontentloaded'});
+  await page.goBack({waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('#account-content').isVisible(),false,'Back must not reveal the previous member profile');
   console.log('[webkit/mobile] member profile saved and restored mocked preferences');
 }finally{await browser.close();}

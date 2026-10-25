@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
+<script src="assets/js/session-security.js?v=20261023session"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title data-es="Acceso y registro | InvestorBlueprint" data-en="Sign in and sign up | InvestorBlueprint">Acceso y registro | InvestorBlueprint</title>
@@ -41,6 +42,7 @@
    <button id="tab-recover" type="button" aria-pressed="false" data-es="Recuperar contraseña" data-en="Reset password">Recuperar contraseña</button>
   </div>
   <div id="portal-message" class="access-message" role="status" aria-live="polite" hidden></div>
+ <p class="access-note" data-es="Por seguridad, la sesión se cierra tras 15 minutos sin actividad y requiere un nuevo acceso después de 8 horas." data-en="For security, sessions close after 15 minutes of inactivity and require a new sign-in after 8 hours.">Por seguridad, la sesión se cierra tras 15 minutos sin actividad y requiere un nuevo acceso después de 8 horas.</p>
   <form id="registration-form" class="access-form">
    <label><span data-es="Nombre" data-en="Name">Nombre</span><input id="signup-name" name="name" autocomplete="name" maxlength="120" required></label>
    <label><span data-es="Correo electrónico" data-en="Email">Correo electrónico</span><input id="signup-email" type="email" name="email" autocomplete="email" required></label>
@@ -99,7 +101,7 @@
 <script src="assets/js/consent.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js" integrity="sha384-xPW3QHswsICVC2mW6BFNwMbhpLkbZ133fKOhxNx3QGGgAOJfL3O9t8r2aWn1aez6" crossorigin="anonymous"></script>
 <script src="assets/js/member-auth-config.js?v=20261021-terms"></script>
-<script src="assets/js/member-access.js?v=20261021-terms"></script>
+<script src="assets/js/member-access.js?v=20261023session"></script>
 <script src="lang.js"></script>
 <script src="assets/js/member-i18n.js"></script>
 <script src="script.js?v=20261023compact"></script>
