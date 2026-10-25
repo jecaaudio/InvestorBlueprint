@@ -49,7 +49,7 @@ test('a still-valid JWT from a closed session cannot fetch a tool, and verificat
  }
 });
 
-test('commercial delivery requires current terms and paid access only when server billing is enabled',async()=>{
+test('approved access is free regardless of billing configuration, while current terms remain required',async()=>{
  const raw=fs.readFileSync('supabase/functions/ib-protected-tools/index.ts','utf8');
  const js=raw.replace(/^import .*;\n/gm,'').replace('pages: Record<string,string>','pages')
   .replace('status:number, body:string','status, body').replace('):Response{','){').replace('(req:Request):Promise<Response>','(req)');
@@ -75,9 +75,10 @@ test('commercial delivery requires current terms and paid access only when serve
   vm.runInNewContext(js,{createClient:()=>sb,Deno:{env:{get:key=>key==='IB_BILLING_ENABLED'?(fixture.billing?'true':undefined):['SUPABASE_URL','SUPABASE_ANON_KEY'].includes(key)?'fixture':undefined},serve:fn=>{handler=fn}},Response,URL,
    flip:'fixture',rental:'fixture',rent:'fixture',arvEstimator:'fixture',hardMoney:'fixture',roiSearch:'fixture',automatedArv:'fixture',sellerNet:'fixture'});
   const response=await handler(new Request('https://fixture.invalid/?tool=flip',{headers:{Authorization:'Bearer fixture'}}));
-  assert.equal(response.status,fixture.status,JSON.stringify(fixture));
-  if(fixture.error)assert.equal((await response.json()).error,fixture.error);
-  if(!fixture.billing)assert.equal(subscriptionReads,0,'free beta must not query billing');
+  const expected=fixture.error==='terms_required'?403:200;
+  assert.equal(response.status,expected,JSON.stringify(fixture));
+  if(expected===403)assert.equal((await response.json()).error,'terms_required');
+  assert.equal(subscriptionReads,0,'free access must never query billing');
  }
  const config=fs.readFileSync('assets/js/member-auth-config.js','utf8');
  assert.equal(/termsVersion:\s*"([^"]+)"/.exec(config)[1],/TERMS_VERSION"\)\|\|"([^"]+)"/.exec(raw)[1]);

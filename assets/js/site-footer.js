@@ -10,7 +10,7 @@
      ['calculadoras/venta.html','Venta','Seller net'],['calculadoras/flip.html','Flip','Flip'],
      ['calculadoras/rentas.html','Rentas','Rentals'],['calculadoras/arv.html','ARV','ARV'],['calculadoras/hard-money.html','Hard money','Hard money']]],
    [[ 'InvestorBlueprint','InvestorBlueprint'],[
-     ['pricing.html','Precios','Pricing'],['login.html?reason=login','Ingresar','Sign in'],['account.html','Mi perfil','My profile']]],
+     ['pricing.html','Acceso gratis','Free access'],['login.html?reason=login','Ingresar','Sign in'],['account.html','Mi perfil','My profile']]],
    [[ 'Legal','Legal'],[
      ['privacy.html','Privacidad','Privacy'],['terms.html','Términos','Terms']]]
  ];

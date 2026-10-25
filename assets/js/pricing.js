@@ -38,7 +38,7 @@
    document.querySelectorAll('[data-paid-only]').forEach(node=>{node.hidden=!available});
    if(!available){
      setText($('pro-heading'),'Acceso completo · beta','Full access · beta');
-     setText($('pro-fine'),'Sin cobros durante la beta. El acceso requiere aprobación. Las herramientas experimentales requieren invitación.','No charges during beta. Access requires approval. Experimental tools require an invitation.');
+     setText($('pro-fine'),'Acceso gratuito, sin tarjeta ni suscripción. Requiere aprobación. Las herramientas experimentales requieren invitación.','Free access with no card or subscription. Approval is required. Experimental tools require an invitation.');
    }else{
      setText($('pro-heading'),'Pro','Pro');
      setText($('pro-fine'),'El pago lo procesa Stripe. No guardamos los datos de tu tarjeta.','Payments are processed by Stripe. We never store your card details.');

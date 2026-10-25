@@ -2,6 +2,7 @@
 // Uses a mocked Supabase client and keeps production member data untouched.
 import {webkit} from 'playwright';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 
 const base=process.env.WEBKIT_BASE_URL||'http://127.0.0.1:4173';
 let remotePreferences=null;
@@ -77,5 +78,19 @@ try {
   await page.goBack({waitUntil:'domcontentloaded'});
   await page.goBack({waitUntil:'domcontentloaded'});
   assert.equal(await page.locator('#account-content').isVisible(),false,'Back must not reveal the previous member profile');
+  const syntheticPassword='Browser-Fixture-Password-Only-2026!';
+  const hash=createHash('sha1').update(syntheticPassword).digest('hex').toUpperCase();
+  await context.route('https://api.pwnedpasswords.com/range/*',route=>{
+    assert.equal(new URL(route.request().url()).pathname,'/range/'+hash.slice(0,5));
+    if(route.request().method()==='OPTIONS')return route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'GET, OPTIONS','access-control-allow-headers':'add-padding'}});
+    return route.fulfill({status:200,contentType:'text/plain',headers:{'access-control-allow-origin':'*'},body:hash.slice(5)+':18\r\n'});
+  });
+  await page.goto(base+'/InvestorBlueprint/login.html',{waitUntil:'domcontentloaded'});
+  await page.locator('#signup-name').fill('Password QA');
+  await page.locator('#signup-email').fill('password-qa@example.invalid');
+  await page.locator('#signup-password').fill(syntheticPassword);
+  await page.locator('#signup-terms').check();
+  await page.locator('#registration-form button[type="submit"]').click();
+  await page.waitForFunction(()=>document.getElementById('portal-message')?.textContent.includes('filtraciones conocidas'));
   console.log('[webkit/mobile] member profile saved and restored mocked preferences');
 }finally{await browser.close();}
