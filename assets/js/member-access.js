@@ -27,6 +27,10 @@
     }
   };
   const setBusy=(form,busy)=>form?.querySelectorAll('button[type="submit"]').forEach(x=>{x.disabled=busy;x.setAttribute('aria-busy',String(busy));});
+  const checkNewPassword=async password=>{
+    if(!window.IBPasswordSafety?.assertSafe)throw Error(t('No se pudo cargar la comprobación de contraseñas. Actualiza la página.','Password screening could not load. Refresh the page.'));
+    await window.IBPasswordSafety.assertSafe(password);
+  };
   const readProfile=async()=>{
     if(!client)throw Error(t('El backend todavía no está conectado.','Backend is not connected yet.'));
     const {data:userData,error:userError}=await client.auth.getUser();
@@ -145,6 +149,7 @@
       try{
         if(password.length<12)throw Error(t('Usa una contraseña de al menos 12 caracteres.','Use a password of at least 12 characters.'));
         if(!$('signup-terms')?.checked)throw Error(t('Para crear la cuenta, acepta el aviso y los Términos de uso.','To create the account, accept the notice and the Terms of use.'));
+        await checkNewPassword(password);
         // Only the accepted version is sent; the database records it with the server time
         // (migration 20261021150000_terms_acceptance.sql) and nobody can change it later.
         const {error}=await client.auth.signUp({email,password,options:{data:{full_name:name,terms_version:TERMS_VERSION},emailRedirectTo:new URL('login.html',location.href).href}});
@@ -216,6 +221,7 @@
         }
         const {data:verified,error:verifyError}=await client.auth.getUser();
         if(verifyError||!verified?.user)throw Error(t('No pudimos verificar tu sesión. Solicita otro enlace y ábrelo en el mismo navegador donde cambiarás la contraseña.','We could not verify the session. Request another link and open it in the same browser where you will change the password.'));
+        await checkNewPassword(pw);
         let result=await client.auth.updateUser({password:pw});
         if(result.error&&(/jwt.*expir|token.*expir|session.*expir/i.test(result.error.message||'')||result.error.status===401)){
           const {error:refreshError}=await client.auth.refreshSession();

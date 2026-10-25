@@ -33,7 +33,7 @@ def page(slug, title_es, title_en, desc, body, robots='', base=''):
   <nav id="primary-nav">
     <a href="index.html#tools" data-i18n="navTools">Herramientas</a>
     <a href="index.html#learn" data-i18n="navLearn">Aprender</a>
-    <a href="pricing.html" data-i18n="navPricing">Precios</a>
+    <a href="pricing.html" data-i18n="navPricing">Acceso gratis</a>
     <a href="login.html" data-i18n="navLogin">Ingresar</a>
   </nav>
   <div class="lang-switcher" role="group" aria-label="Language selector">
@@ -53,7 +53,7 @@ def page(slug, title_es, title_en, desc, body, robots='', base=''):
 <script src="assets/js/member-i18n.js"></script>
 <script src="script.js?v=20261023compact"></script>
 <script src="assets/js/site-config.js?v=20261021b"></script>
-<script src="assets/js/site-footer.js?v=20261021"></script>
+<script src="assets/js/site-footer.js?v=20261025free"></script>
 <script src="assets/js/auth-nav.js?v=20261023session"></script>
 <script src="assets/js/site-theme.js?v=20261023compact"></script>
 </body>
@@ -76,18 +76,18 @@ contact_en = 'To exercise these rights or ask questions, contact us through '
 CONTACT = f'<p><span data-es="{contact_es}" data-en="{contact_en}">{contact_es}</span><span data-contact></span>.</p>'
 
 privacy = '\n'.join([
- t('Privacidad y cookies', 'Privacy and cookies', 'h1'), UPDATED,
+ t('Privacidad y cookies', 'Privacy and cookies', 'h1'), t('Última actualización: 24 de octubre de 2026', 'Last updated: October 24, 2026', attrs=' class="legal-date"'),
  t('Explicamos qué datos usa InvestorBlueprint, para qué y con quién se comparten. No vendemos tus datos.',
    'This explains which data InvestorBlueprint uses, why, and who it is shared with. We do not sell your data.', attrs=' class="lp-lead"'),
  section('Datos que usamos', 'Data we use', [
-   ('Cuenta: nombre, correo y estado de tu solicitud. La contraseña se guarda cifrada y nadie de InvestorBlueprint puede verla.',
-    'Account: name, email and request status. Your password is stored encrypted and nobody at InvestorBlueprint can see it.'),
+   ('Cuenta: nombre, correo y estado de tu solicitud. Supabase almacena un hash seguro de tu contraseña.',
+    'Account: name, email and request status. Supabase stores a secure hash of your password.'),
    ('Preferencias: nombre y empresa para los documentos, idiomas y nivel de detalle de los informes.',
     'Preferences: name and company for documents, languages and report detail.'),
    ('Cálculos: los números que escribes se procesan en tu navegador. La calculadora de venta guarda tu último escenario en tu navegador, separado por cuenta. Los PDF se generan en tu dispositivo.',
     'Calculations: the numbers you type are processed in your browser. The seller net calculator keeps your last scenario in your browser, separated by account. PDFs are created on your device.'),
-   ('Suscripción: si pagas un plan, Stripe procesa el pago. Recibimos el identificador de cliente, el plan y su estado; nunca los datos de tu tarjeta.',
-    'Subscription: if you pay for a plan, Stripe processes the payment. We receive the customer id, plan and status; never your card details.'),
+   ('Acceso gratuito: no solicitamos tarjeta ni procesamos pagos o suscripciones.',
+    'Free access: we do not request a card or process payments or subscriptions.'),
    ('Comentarios: lo que envías con «Enviar comentarios», junto con tu cuenta y la herramienta.',
     'Feedback: what you send with “Send feedback”, together with your account and the tool.')]),
  section('Cookies y medición', 'Cookies and measurement',
@@ -96,7 +96,8 @@ privacy = '\n'.join([
  section('Proveedores', 'Service providers', [
    ('Supabase: cuentas, preferencias y comentarios.', 'Supabase: accounts, preferences and feedback.'),
    ('GitHub Pages: alojamiento del sitio.', 'GitHub Pages: website hosting.'),
-   ('Stripe: pagos de suscripción, cuando estén activos.', 'Stripe: subscription payments, when enabled.'),
+   ('Have I Been Pwned: comprobación gratuita de contraseñas en los formularios de registro y cambio de contraseña. Recibe solo los primeros 5 caracteres de una huella SHA-1 y la dirección IP de la conexión; no recibe la contraseña, el correo ni la huella completa. La comparación se hace en tu navegador.',
+    'Have I Been Pwned: free password screening in signup and password-change forms. It receives only the first 5 characters of a SHA-1 fingerprint and the connection IP address; it does not receive your password, email or complete fingerprint. Matching happens in your browser.'),
    ('Google y Meta: medición, solo con tu consentimiento.', 'Google and Meta: measurement, only with your consent.')]),
  section('Cuánto tiempo y tus derechos', 'Retention and your rights',
    ('Conservamos los datos de tu cuenta mientras esté activa. Puedes pedir una copia, corregirlos o eliminar tu cuenta y sus datos.',

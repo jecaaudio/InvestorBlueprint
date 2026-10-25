@@ -155,7 +155,7 @@ HEAD = '''<!DOCTYPE html>
   <nav id="primary-nav">
     <a href="../index.html#tools" data-i18n="navTools">Herramientas</a>
     <a href="../index.html#learn" data-i18n="navLearn">Aprender</a>
-    <a href="../pricing.html" data-i18n="navPricing">Precios</a>
+    <a href="../pricing.html" data-i18n="navPricing">Acceso gratis</a>
     <a href="../login.html" data-i18n="navLogin">Ingresar</a>
   </nav>
   <div class="lang-switcher" role="group" aria-label="Language selector">
@@ -179,7 +179,7 @@ FOOT_SCRIPTS = '''<script src="../assets/js/config.js"></script>
 <script src="../tools/tool-script.js?v=20261023"></script>
 <script src="../assets/js/landing.js?v=20261023"></script>
 <script src="../assets/js/site-config.js?v=20261021b"></script>
-<script src="../assets/js/site-footer.js?v=20261021"></script>
+<script src="../assets/js/site-footer.js?v=20261025free"></script>
 <script src="../assets/js/auth-nav.js?v=20261023session"></script>
 <script src="../assets/js/site-theme.js?v=20261023compact"></script>
 </body>

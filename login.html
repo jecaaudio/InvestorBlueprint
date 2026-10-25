@@ -43,6 +43,7 @@
   </div>
   <div id="portal-message" class="access-message" role="status" aria-live="polite" hidden></div>
  <p class="access-note" data-es="Por seguridad, la sesión se cierra tras 15 minutos sin actividad y requiere un nuevo acceso después de 8 horas." data-en="For security, sessions close after 15 minutes of inactivity and require a new sign-in after 8 hours.">Por seguridad, la sesión se cierra tras 15 minutos sin actividad y requiere un nuevo acceso después de 8 horas.</p>
+ <p class="access-note" data-es="Al crear o cambiar tu contraseña, el formulario consulta gratis Pwned Passwords de Have I Been Pwned: envía solo los primeros 5 caracteres de su huella SHA-1, nunca tu contraseña, correo ni la huella completa." data-en="When creating or changing a password, the form checks the free Have I Been Pwned Pwned Passwords service: only the first 5 characters of its SHA-1 fingerprint are sent, never your password, email or complete fingerprint.">Al crear o cambiar tu contraseña, el formulario consulta gratis Pwned Passwords de Have I Been Pwned: envía solo los primeros 5 caracteres de su huella SHA-1, nunca tu contraseña, correo ni la huella completa.</p>
   <form id="registration-form" class="access-form">
    <label><span data-es="Nombre" data-en="Name">Nombre</span><input id="signup-name" name="name" autocomplete="name" maxlength="120" required></label>
    <label><span data-es="Correo electrónico" data-en="Email">Correo electrónico</span><input id="signup-email" type="email" name="email" autocomplete="email" required></label>
@@ -91,7 +92,7 @@
    <p id="member-detail"></p>
    <button id="signout-button" class="btn" type="button" hidden data-es="Cerrar sesión" data-en="Sign out">Cerrar sesión</button>
   </div>
-  <p class="access-note" data-es="Tu contraseña se guarda cifrada. Nadie de InvestorBlueprint puede verla." data-en="Your password is stored encrypted. Nobody at InvestorBlueprint can see it.">Tu contraseña se guarda cifrada. Nadie de InvestorBlueprint puede verla.</p>
+  <p class="access-note" data-es="Supabase almacena un hash seguro de tu contraseña." data-en="Supabase stores a secure hash of your password.">Supabase almacena un hash seguro de tu contraseña.</p>
   <p><a href="privacy.html" data-es="Política de privacidad" data-en="Privacy policy">Política de privacidad</a></p>
  </aside>
 </div>
@@ -101,12 +102,13 @@
 <script src="assets/js/consent.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js" integrity="sha384-xPW3QHswsICVC2mW6BFNwMbhpLkbZ133fKOhxNx3QGGgAOJfL3O9t8r2aWn1aez6" crossorigin="anonymous"></script>
 <script src="assets/js/member-auth-config.js?v=20261021-terms"></script>
-<script src="assets/js/member-access.js?v=20261023session"></script>
+<script src="assets/js/password-safety.js?v=20261025free"></script>
+<script src="assets/js/member-access.js?v=20261025free"></script>
 <script src="lang.js"></script>
 <script src="assets/js/member-i18n.js"></script>
 <script src="script.js?v=20261023compact"></script>
 <script src="assets/js/site-theme.js?v=20261023compact"></script>
 <script src="assets/js/site-config.js?v=20261021b"></script>
-<script src="assets/js/site-footer.js?v=20261021"></script>
+<script src="assets/js/site-footer.js?v=20261025free"></script>
 </body>
 </html>

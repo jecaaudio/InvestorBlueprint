@@ -41,7 +41,7 @@
   "freeHint": "Free mode: quick estimate with purchase, rehab, holding and sale costs only.",
   "navTools": "Tools",
   "navLearn": "Learn",
-  "navPricing": "Pricing",
+  "navPricing": "Free access",
   "navLogin": "Login",
   "navHome": "Home",
   "menuToggle": "☰ Menu",
@@ -343,5 +343,5 @@
   "article1Description": "The 70% rule, break-even price and ROI on your cash, with an example.",
   "article2Description": "Average, range and maximum offer from three nearby sales.",
   "article3Description": "Commissions, mortgage, closing costs and state transfer tax.",
-  "pricingCta": "See pricing"
+  "pricingCta": "See free access"
 }

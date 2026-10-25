@@ -52,13 +52,7 @@ Deno.serve(async(req:Request):Promise<Response>=>{
   if(["rent","roi-search","automated-arv"].includes(tool)){
     if(!betaAllowed)return reply(403,JSON.stringify({error:"beta_required"}));
   }
-  // Billing is opt-in at the server. The free beta never depends on payment data.
-  if(Deno.env.get("IB_BILLING_ENABLED")==="true"&&!betaAllowed){
-    const {data:subscription,error:subscriptionError}=await sb.from("member_subscription_state").select("billing_status,valid_until").eq("user_id",user.id).maybeSingle();
-    if(subscriptionError)return reply(503,JSON.stringify({error:"verification_unavailable"}));
-    const until=Date.parse(subscription?.valid_until||"");
-    if(!["active","trialing"].includes(subscription?.billing_status)||!Number.isFinite(until)||until<=Date.now())return reply(403,JSON.stringify({error:"subscription_required"}));
-  }
+  // Approved access is free; no subscription or payment state is required.
   const backToProfile='<a href="/InvestorBlueprint/account.html" aria-label="Mi perfil / My profile" '+ 
     'style="position:fixed;right:15px;bottom:15px;z-index:9999;background:#146d82;color:#fff;'+
     'padding:12px 16px;border-radius:30px;text-decoration:none;font:600 14px system-ui">'+

@@ -41,7 +41,7 @@
   "freeHint": "Modo gratis: estimacion rapida con compra, rehab, holding y costos de venta.",
   "navTools": "Herramientas",
   "navLearn": "Aprender",
-  "navPricing": "Precios",
+  "navPricing": "Acceso gratis",
   "navLogin": "Ingresar",
   "navHome": "Inicio",
   "menuToggle": "☰ Menú",
@@ -343,5 +343,5 @@
   "article1Description": "La regla del 70%, el precio mínimo de venta y el ROI sobre tu dinero, con un ejemplo.",
   "article2Description": "Promedio, rango y oferta máxima a partir de tres ventas cercanas.",
   "article3Description": "Comisiones, hipoteca, gastos de cierre e impuesto de transferencia por estado.",
-  "pricingCta": "Ver precios"
+  "pricingCta": "Ver acceso gratuito"
 }

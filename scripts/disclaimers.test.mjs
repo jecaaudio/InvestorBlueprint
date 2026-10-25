@@ -106,11 +106,12 @@ test('PDF reports and the loader carry the notice',async()=>{
   assert.match(fs.readFileSync('assets/js/secure-tool-loader.js','utf8'),/assets\/js\/disclaimers\.js\?v=[^"]+" data-tool="'\+tool\+'"/);
 });
 
-async function openSignup({checked}){
+async function openSignup({checked,passwordError=null}){
   const html=fs.readFileSync('login.html','utf8').replace(/<script\b[\s\S]*?<\/script>/gi,'');
   const dom=new JSDOM(html,{url:'https://jecaaudio.github.io/InvestorBlueprint/login.html',runScripts:'outside-only'});
   const w=dom.window,calls=[];
   w.IB_AUTH_CONFIG={supabaseUrl:'https://example.supabase.co',supabaseAnonKey:'sb_publishable_fixture_key_long_enough'};
+  w.IBPasswordSafety={assertSafe:async()=>{if(passwordError)throw Error(passwordError)}};
   const client={auth:{
     getUser:async()=>({data:{user:null},error:null}),getSession:async()=>({data:{session:null},error:null}),
     onAuthStateChange(){return {data:{subscription:{unsubscribe(){}}}}},
@@ -149,4 +150,10 @@ test('accepting sends which terms version was accepted, never a client timestamp
   assert.equal(data.terms_version,'2026-10-21');
   assert.equal(data.terms_accepted_at,undefined,'the server sets the time');
   dom.window.close();
+});
+test('unsafe or unverified passwords cannot reach the signup API',async()=>{
+ for(const passwordError of ['Esta contraseña aparece en filtraciones conocidas.','No pudimos comprobar la seguridad de la contraseña.']){
+  const {dom,d,calls}=await openSignup({checked:true,passwordError});
+  assert.equal(calls.length,0);assert.ok(d.getElementById('portal-message').textContent.includes(passwordError));dom.window.close();
+ }
 });

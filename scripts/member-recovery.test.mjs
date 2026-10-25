@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const source=fs.readFileSync('assets/js/member-access.js','utf8');
 
-async function runRecovery({secondsLeft=3600,updateErrors=[],missingSession=false,refreshError=null}={}){
+async function runRecovery({secondsLeft=3600,updateErrors=[],missingSession=false,refreshError=null,passwordCheckError=null}={}){
   const fields=new Map();
   function field(id){
     if(!fields.has(id)){
@@ -41,6 +41,7 @@ async function runRecovery({secondsLeft=3600,updateErrors=[],missingSession=fals
     from(){return {select(){return this},eq(){return this},async single(){return {data:{id:'example',email:'tester@example.com',role:'admin',access_status:'approved'},error:null}}}}
   };
   const window={
+    IBPasswordSafety:{assertSafe:async()=>{if(passwordCheckError)throw Error(passwordCheckError)}},
     IB_AUTH_CONFIG:{supabaseUrl:'https://example.supabase.co',supabaseAnonKey:'sb_publishable_mock_not_sensitive_key'},
     supabase:{createClient:()=>client},
     location:{href:'https://example.github.io/InvestorBlueprint/login.html#type=recovery',hash:'#type=recovery',search:'',pathname:'/InvestorBlueprint/login.html',origin:'https://example.github.io',assign(){}}
@@ -87,4 +88,10 @@ test('failed token refresh cannot change password and returns to recovery',async
   const r=await runRecovery({secondsLeft:15,refreshError:{message:'refresh token expired'}});
   assert.equal(r.stats.update,0);
   assert.equal(r.after.recover,true);
+});
+test('a leaked-password or unavailable-safety result prevents password changes',async()=>{
+ for(const message of ['Esta contraseña aparece en filtraciones conocidas.','No pudimos comprobar la seguridad de la contraseña.']){
+  const r=await runRecovery({passwordCheckError:message});
+  assert.equal(r.stats.update,0);assert.equal(r.stats.signedOut,0);assert.ok(r.after.message.includes(message));
+ }
 });
