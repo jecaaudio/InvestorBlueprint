@@ -16,7 +16,7 @@ def page(slug, title_es, title_en, desc, body, robots='', base=''):
 {robots}<link rel="canonical" href="https://jecaaudio.github.io/InvestorBlueprint/{slug}">
 {base}<link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="assets/css/cookie-banner.css">
-<link rel="stylesheet" href="assets/css/site-theme.css?v=20261023compact">
+<link rel="stylesheet" href="assets/css/site-theme.css?v=20261026polish">
 <link rel="stylesheet" href="assets/css/brand.css?v=20261019">
 <link rel="stylesheet" href="assets/css/landing.css?v=20261021b">
 <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg?v=1">

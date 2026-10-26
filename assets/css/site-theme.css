@@ -18,7 +18,7 @@ html{scroll-padding-top:110px}
 html,body{background:var(--bg)!important;color:var(--text)!important}
 body{background-image:radial-gradient(circle at top,rgba(48,150,173,.065),transparent 55%)!important;line-height:1.5}
 a{color:var(--primary)}
-a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
 .navbar,.tool-navbar{
   border-bottom:1px solid var(--site-border)!important;
   background:var(--site-nav)!important;color:var(--text);
@@ -62,8 +62,12 @@ nav a:hover,.brand-dropdown a:hover{color:var(--primary)!important}
   border:1px solid var(--site-border)!important;border-radius:10px!important;
   background:var(--panel)!important;color:var(--text)!important;
   text-decoration:none;font-weight:700;display:inline-flex;align-items:center;justify-content:center;
-  min-height:39px;padding:9px 15px;transition:background .17s,border-color .17s,transform .17s
+  min-height:44px;padding:9px 15px;transition:background .17s,border-color .17s,transform .17s
 }
+.btn:disabled,.card-btn:disabled{cursor:wait;opacity:.65}
+summary{cursor:pointer;border-radius:6px}
+input[type="number"],.lp-result strong,.access-status{font-variant-numeric:tabular-nums}
+textarea{max-width:100%;resize:vertical}
 .btn:hover,.card-btn:hover{background:var(--site-soft)!important;border-color:var(--primary)!important}
 .btn-primary{background:#146d82!important;border-color:#146d82!important;color:#fff!important}
 .btn-primary:hover{background:#0e5669!important;border-color:#0e5669!important}
