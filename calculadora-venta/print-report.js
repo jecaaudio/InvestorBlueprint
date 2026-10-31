@@ -128,13 +128,13 @@
     const button=$('printButton');
     if(button&&button.parentElement){
       const panel=document.createElement('div');panel.className='ib-report-notes-panel';
-      panel.style.cssText='margin:16px 0;padding:14px;border:1px solid #dce5ef;border-radius:12px;background:var(--panel,#fff)';
+      panel.style.cssText='margin:16px 0;padding:14px;border:1px solid var(--site-border,var(--line,#dce5ef));border-radius:12px;background:var(--panel,var(--white,#fff));color:var(--text,var(--ink,#18283b))';
       const label=document.createElement('label');
       label.setAttribute('for','ib-report-notes');
       label.textContent=L('Notas de análisis para el documento','Analysis notes for the document');
       label.style.cssText='display:block;font-weight:700;margin-bottom:8px';
       const area=document.createElement('textarea');area.id='ib-report-notes';area.rows=4;area.maxLength=3000;
-      area.style.cssText='box-sizing:border-box;width:100%;min-height:105px;border-radius:8px;padding:10px';
+      area.style.cssText='box-sizing:border-box;width:100%;min-height:105px;border-radius:8px;padding:10px;font:inherit;font-size:16px;background:var(--site-input,var(--white,#fff));color:var(--text,var(--ink,#18283b));border:1px solid var(--site-border,var(--line,#dce5ef))';
       area.placeholder=L('Supuestos, riesgos, condiciones del contrato y comprobaciones pendientes.','Assumptions, risks, contract terms and pending checks.');
       area.addEventListener('input',refresh);
       panel.append(label,area);button.parentElement.after(panel);

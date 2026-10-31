@@ -1,5 +1,6 @@
 /* InvestorBlueprint: stand-alone printable seller settlement report */
 #printReport {display:none}
+.ib-report-notes-panel textarea::placeholder{color:var(--muted,var(--sub,#5b6d80));opacity:1}
 @page {size:letter;margin:0.48in 0.60in 0.48in 0.60in}
 @media print {
  html,body,html[data-theme="dark"],html[data-theme="dark"] body {background:#fff!important;color:#152638!important;color-scheme:light!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
