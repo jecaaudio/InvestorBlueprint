@@ -18,6 +18,9 @@
   }
 
   function readStoredConsent() {
+    // A failed write must not restore an older persisted choice over this page's
+    // latest explicit choice (for example when storage becomes full).
+    if (sessionConsent) return sessionConsent;
     try {
       const raw = window.localStorage.getItem(storageKey);
       if (!raw) return sessionConsent;

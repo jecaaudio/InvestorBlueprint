@@ -155,18 +155,21 @@ test('cookie privacy link resolves to the legal page from every nesting depth',a
 
 test('cookie choices work for this page when browser storage reads or writes are blocked',async()=>{
  const {JSDOM}=await import('jsdom');
- for(const blocked of ['read','write'])for(const choice of ['reject','accept','save']){
+ for(const blocked of ['read','write','stale'])for(const choice of ['reject','accept','save']){
   const dom=new JSDOM('<!doctype html><body></body>',{url:'https://example.invalid/',runScripts:'outside-only'});
   const w=dom.window,d=w.document;
   Object.defineProperty(w,'localStorage',{get(){
    if(blocked==='read')throw new w.DOMException('Blocked','SecurityError');
-   return {getItem:()=>null,setItem(){throw new w.DOMException('Full','QuotaExceededError')}};
+   return {getItem:()=>blocked==='stale'?JSON.stringify({analytics:true,marketing:true}):null,setItem(){throw new w.DOMException('Full','QuotaExceededError')}};
   }});
   w.eval(read('assets/js/cookie-banner-component.js'));w.eval(read('assets/js/consent.js'));
   d.dispatchEvent(new w.Event('DOMContentLoaded'));
-  assert.equal(w.ConsentManager.getConsent(),null);
+  if(blocked==='stale'){
+   assert.equal(w.ConsentManager.getConsent().marketing,true);
+   w.IBOpenCookieSettings();
+  }else assert.equal(w.ConsentManager.getConsent(),null);
   const ids={reject:'cookie-reject-all',accept:'cookie-accept-all',save:'cookie-save-preferences'};
-  if(choice==='save')d.getElementById('cookie-analytics').checked=true;
+  if(choice==='save'){d.getElementById('cookie-analytics').checked=true;d.getElementById('cookie-marketing').checked=false;}
   d.getElementById(ids[choice]).click();
   assert.equal(d.getElementById('cookie-banner').hidden,true,blocked+' '+choice);
   const value=w.ConsentManager.getConsent();
