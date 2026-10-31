@@ -1,0 +1,19 @@
+# Defense in depth for GitHub's legacy branch/Jekyll publisher.
+# The authoritative release remains deploy-pages.yml with exact-SHA Quality.
+# Set Settings > Pages > Source to GitHub Actions to disable the legacy path.
+exclude:
+  - scripts
+  - supabase
+  - workers
+  - docs
+  - node_modules
+  - tmp
+  - public-site
+  - package.json
+  - package-lock.json
+  - lighthouserc.json
+  - README.md
+  - auth.js
+  - preview-login.html
+  - assets/js/login.js
+  - assets/js/tool-access-guard.js

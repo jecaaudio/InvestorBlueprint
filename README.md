@@ -4,6 +4,8 @@ Sitio estatico bilingue (EN/ES) para una plataforma de herramientas de inversion
 
 ## Publicar la pagina en la web (GitHub Pages)
 
+**Configuración pendiente detectada el 30 de octubre:** además del workflow, seguía activo un publicador Jekyll de rama. En Settings → Pages → Source, seleccionar **GitHub Actions** para que la publicación dependa únicamente del control de Quality. `_config.yml` excluye archivos internos si el publicador heredado llega a ejecutarse, pero no reemplaza ese cambio de configuración.
+
 Este repositorio incluye el workflow `.github/workflows/deploy-pages.yml` para publicar automaticamente en GitHub Pages.
 
 ### Pasos
