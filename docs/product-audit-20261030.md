@@ -63,4 +63,8 @@ El catálogo estático mejora el primer render y sigue disponible sin JavaScript
 
 ## Publicación y reversión
 
+**Hallazgo de prioridad alta durante la verificación de publicación:** además del flujo seleccionado por `deploy-pages.yml`, GitHub ejecutó `pages build and deployment` (run `41162555366`) con Jekyll desde la raíz del repositorio. El log del job `124423078652` muestra que generó páginas de `docs/` y `workers/`. Esa vía puede publicar antes de Quality y no usa el paquete `public-site/`; por tanto, la existencia del workflow no basta para garantizar el control de publicación.
+
+Se añadió `_config.yml` para excluir código de servidor, herramientas internas, documentación y archivos de desarrollo de ese publicador heredado. Es una mitigación de exposición accidental, no sustituye el control de Quality. **Falta cambiar en GitHub: Settings → Pages → Build and deployment → Source → GitHub Actions**, y verificar que solo se despliega el artefacto seleccionado. El conector disponible no permite editar esa configuración; la vista de Settings del navegador requiere iniciar sesión. No se considerará cerrado este hallazgo hasta comprobar ese cambio. El repositorio continúa público: esta exclusión no hace confidencial su código.
+
 No publicar un SHA con controles fallidos. #119 contiene la revisión y las comprobaciones; Pages exige Quality exitoso en el commit exacto de main. Conservar la base indicada y revertir los commits de esta entrega para restaurar catálogo/portada anteriores si hay una regresión. Esta entrega no migra esquemas ni modifica datos de negocio. Las verificaciones externas pendientes permanecen abiertas aunque el despliegue y sus pruebas automatizadas pasen.
