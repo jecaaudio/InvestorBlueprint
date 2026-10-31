@@ -55,4 +55,9 @@
  .ib-home .tool-grid>.card .card-btn{margin-top:6px}
 }
 @media(hover:hover) and (prefers-reduced-motion:no-preference){.home-example{transition:box-shadow .2s}.home-example:hover{box-shadow:var(--site-shadow)}}
+@media(max-width:360px){
+ .home-hero .hero-copy{font-size:.9rem}
+ .home-trust li:last-child{display:none}
+ .ib-home .home-hero h1{font-size:1.7rem}
+}
 @media print{.home-skip{display:none}}

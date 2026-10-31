@@ -1,6 +1,7 @@
 (function () {
   const config = window.TRACKING_CONFIG || {};
   const storageKey = config.CONSENT_STORAGE_KEY || 'ib_cookie_consent_v1';
+  let sessionConsent = null;
 
   window.dataLayer = window.dataLayer || [];
   window.gtag = window.gtag || function gtag() {
@@ -19,19 +20,21 @@
   function readStoredConsent() {
     try {
       const raw = window.localStorage.getItem(storageKey);
-      if (!raw) return null;
+      if (!raw) return sessionConsent;
       const parsed = JSON.parse(raw);
       if (typeof parsed.analytics !== 'boolean' || typeof parsed.marketing !== 'boolean') {
         return null;
       }
       return parsed;
     } catch (error) {
-      return null;
+      return sessionConsent;
     }
   }
 
   function writeStoredConsent(consent) {
-    window.localStorage.setItem(storageKey, JSON.stringify(consent));
+    sessionConsent = consent;
+    try { window.localStorage.setItem(storageKey, JSON.stringify(consent)); }
+    catch (_) { /* This page still honors the choice when persistence is blocked. */ }
   }
 
   function dispatchConsent(consent) {
