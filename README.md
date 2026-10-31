@@ -71,7 +71,8 @@ Todas las páginas cargan la misma versión fija del SDK (`@supabase/supabase-js
 ## Portadas públicas y precios
 
 - `calculadoras/` tiene una portada por herramienta pública (venta, flip, rentas, ARV, hard money), con una calculadora rápida que funciona sin cuenta. Los textos se editan en `scripts/build-landing-pages.py`; luego se ejecuta `python3 scripts/build-landing-pages.py`.
-- `pricing.html` muestra los planes Gratis y Pro. El cobro con Stripe está listo pero apagado; para encenderlo sigue `docs/billing-setup.md`.
+- `pricing.html` explica el acceso gratuito: calculadoras rápidas sin cuenta y versiones completas tras aprobación. El cobro está desactivado; no hace falta una suscripción para el acceso aprobado.
+- La portada usa `assets/css/home.css`. Su catálogo estático y su respaldo sin conexión se generan desde `assets/config/tools.json`: ejecutar `node scripts/build-home-catalog.mjs` después de editar el catálogo. Las pruebas detectan diferencias entre las tarjetas y su fuente.
 - Los PDF ponen arriba la empresa o el nombre del miembro, y al final una línea pequeña con el logo y "Preparado con InvestorBlueprint".
 
 ## Modo beta tester
@@ -81,7 +82,7 @@ Tres herramientas siguen en pruebas: **Búsqueda por ROI** (datos simulados), **
 - Solo las ven y las abren el administrador y los miembros marcados como **beta tester**. Para los demás no aparecen en el catálogo, y si abren el enlace ven un aviso en lugar de la herramienta.
 - El administrador marca o desmarca a cada miembro en `admin.html` con la casilla **Beta tester**.
 - **Paso único en Supabase:** aplicar `supabase/migrations/20261021120000_beta_testers.sql` (SQL Editor o `supabase db push`). Agrega la columna `beta_tester`, que solo el administrador puede cambiar, y la función `private.has_beta_access()`. Hasta aplicarla, el administrador ya tiene acceso beta y la casilla aparece desactivada con un aviso. Reversión: `supabase/rollback/beta_testers.sql`. Pruebas: `supabase/tests/beta-testers.sql`.
-- Para bloquear también desde el servidor, la Edge Function `ib-protected-tools` puede llamar a `private.has_beta_access()` antes de entregar `roi-search`, `rent` y `automated-arv`. Hoy esa comprobación la hace el navegador.
+- La Edge Function `ib-protected-tools` también exige permisos de beta en el servidor antes de entregar `roi-search`, `rent` y `automated-arv`. Comprobado en la versión 6 durante la auditoría del 30 de octubre.
 
 ## Acceso y seguridad (octubre de 2026)
 
@@ -91,8 +92,10 @@ Tres herramientas siguen en pruebas: **Búsqueda por ROI** (datos simulados), **
 - Las ocho direcciones de herramientas son *loaders*: el HTML de la calculadora llega desde la Edge Function `ib-protected-tools` únicamente tras validar una sesión y el permiso actualizado en Supabase.
 - El workflow publica un sitio seleccionado (`public-site/`) y no la raíz completa del repositorio; archivos internos, demos y scripts antiguos quedan excluidos de GitHub Pages.
 - **Limitación importante:** este repositorio continúa siendo público y su historial contiene versiones antiguas del código de las calculadoras. Las librerías JavaScript que ejecuta el navegador tampoco son secretas. Para proteger propiedad intelectual, migrar a un repositorio privado y mover la lógica confidencial al servidor.
-- La organización Supabase `JECA` continúa en el plan **Free**. La protección de contraseñas filtradas solo está disponible en Supabase Pro.
+- La organización Supabase `JECA` continúa en el plan **Free**. La comprobación nativa de contraseñas filtradas sigue desactivada; la aplicación añade una comprobación de nuevas contraseñas por rangos de hash, sin enviar la contraseña. Esa comprobación del navegador no sustituye una restricción nativa del servidor frente a clientes externos.
 - Pendiente en el panel de Supabase: **Authentication → URL Configuration**. Configurar **Site URL** como `https://jecaaudio.github.io/InvestorBlueprint/` y añadir `https://jecaaudio.github.io/InvestorBlueprint/login.html` en **Redirect URLs**. Esta configuración no se puede gestionar con las acciones del conector Supabase disponibles actualmente.
 - El flujo de recuperación por correo y el login desde iPhone requieren pruebas reales. El envío de correos a clientes externos exige configurar SMTP apropiado.
 - Una implementación solo con GitHub Pages **no** proporciona confidencialidad del código que se ejecute en el navegador.
+
+La [auditoría de producto del 30 de octubre](docs/product-audit-20261030.md) diferencia las correcciones, la evidencia actual y las verificaciones externas pendientes. Para reproducir las comprobaciones de las páginas privadas, exportar la función autorizada a archivos HTML temporales y ejecutar `IB_PRIVATE_PAGES=<directorio> node --test scripts/private-page-dom.test.mjs`; esos archivos no se publican.
 

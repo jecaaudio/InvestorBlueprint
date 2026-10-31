@@ -32,8 +32,9 @@
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-title" content="InvestorBlueprint">
 <link rel="stylesheet" href="assets/css/brand.css?v=20261019">
+<link rel="stylesheet" href="assets/css/home.css?v=20261030">
 </head>
-  <body>
+  <body class="ib-home">
     <header class="navbar">
       <div class="brand-menu has-primary-nav">
         <a class="logo home-link brand-lockup" href="index.html" aria-label="InvestorBlueprint - inicio"><img class="brand-icon" src="assets/brand/favicon.svg" width="45" height="45" alt="" aria-hidden="true"><span class="brand-name" aria-hidden="true"><span class="brand-name-investor">Investor</span><span class="brand-name-blueprint">Blueprint</span></span></a>
@@ -52,9 +53,7 @@
         aria-expanded="false"
         aria-controls="primary-nav"
         data-i18n="menuToggle"
-      >
-        ☰ Menú
-      </button>
+      >☰ Menú</button>
       <nav id="primary-nav">
         <a href="#tools" data-i18n="navTools">Herramientas</a>
         <a href="#learn" data-i18n="navLearn">Aprender</a>
@@ -74,24 +73,52 @@
     </header>
 
     <main>
-      <section class="hero">
-        <p class="eyebrow" data-i18n="heroTagline">Tus números. Decisiones claras.</p>
-        <h1 data-i18n="heroTitle">Analiza tu próxima inversión inmobiliaria.</h1>
-        <p class="hero-copy" data-i18n="heroDescription">
-          Venta, flip, rentas, ARV y financiamiento. Prueba las calculadoras gratis y compara tus opciones.
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="login.html" data-i18n="heroStart" data-track="request_access" data-cta-click="Request Access">Solicitar acceso</a>
-          <a class="btn btn-secondary" href="#tools" data-i18n="heroExplore" data-cta-click="Explore Tools">Calculadoras</a>
+      <a class="home-skip" href="#tools" data-es="Ir a las calculadoras" data-en="Skip to calculators">Ir a las calculadoras</a>
+      <section class="hero home-hero">
+        <div class="home-intro">
+          <p class="eyebrow" data-i18n="heroTagline">Números claros antes de invertir.</p>
+          <h1 data-i18n="heroTitle">Evalúa la propiedad. Entiende tu inversión.</h1>
+          <p class="hero-copy" data-i18n="heroDescription">Calcula cuánto te queda al vender, cuánto puede rendir una renta y qué margen deja un flip. Empieza gratis con tus propios números.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#tools" data-i18n="heroStart" data-cta-click="Explore Tools">Probar calculadoras</a>
+            <a class="btn btn-secondary" href="login.html" data-i18n="heroExplore" data-track="request_access" data-cta-click="Request Access">Solicitar acceso</a>
+          </div>
+          <ul class="home-trust" aria-label="Características / Features">
+            <li data-es="Gratis y sin tarjeta" data-en="Free, no card required">Gratis y sin tarjeta</li>
+            <li data-es="Español e inglés" data-en="Spanish and English">Español e inglés</li>
+            <li data-es="Diseñado para tu móvil" data-en="Designed for your phone">Diseñado para tu móvil</li>
+          </ul>
         </div>
+        <aside class="home-example" aria-labelledby="example-title">
+          <div class="home-example-heading"><span class="home-example-dot" aria-hidden="true"></span><h2 id="example-title" data-es="Así se ve un análisis de flip" data-en="A flip analysis at a glance">Así se ve un análisis de flip</h2></div>
+          <p class="home-example-tag" data-es="Ejemplo ilustrativo · compra en efectivo · USD" data-en="Illustrative example · cash purchase · USD">Ejemplo ilustrativo · compra en efectivo · USD</p>
+          <dl class="home-example-inputs">
+            <div><dt data-es="Compra" data-en="Purchase">Compra</dt><dd>$200,000</dd></div>
+            <div><dt data-es="Reparación" data-en="Rehab">Reparación</dt><dd>$50,000</dd></div>
+            <div><dt data-es="Venta estimada" data-en="Estimated sale">Venta estimada</dt><dd>$320,000</dd></div>
+          </dl>
+          <div class="home-example-result"><span data-es="Ganancia estimada" data-en="Estimated profit">Ganancia estimada</span><strong>$37,600</strong><p><span data-es="ROI sobre tu dinero" data-en="ROI on your cash">ROI sobre tu dinero</span><b>14.5%</b></p></div>
+          <div class="home-example-bar" aria-hidden="true"><span></span><span></span></div>
+          <p class="home-example-assumptions" data-es="Incluye 2% de cierre de compra, $6,000 de gastos durante 6 meses y 7% de gastos de venta. Sin préstamo ni impuesto sobre la ganancia. Es un escenario, no una promesa de resultados." data-en="Includes 2% buyer closing, $6,000 in costs over 6 months and 7% selling costs. No loan or profit tax. This is a scenario, not a promise of results.">Incluye 2% de cierre de compra, $6,000 de gastos durante 6 meses y 7% de gastos de venta. Sin préstamo ni impuesto sobre la ganancia. Es un escenario, no una promesa de resultados.</p>
+          <a class="home-example-link" href="calculadoras/flip.html" data-es="Cambiar estos números →" data-en="Change these numbers →">Cambiar estos números →</a>
+        </aside>
       </section>
 
       <section id="tools" class="section">
         <div class="section-heading">
-          <h2 data-i18n="toolsTitle">Herramientas avanzadas</h2>
-          <p data-i18n="toolsDescription">Pruébalas gratis sin cuenta y solicita acceso para usar la versión completa con PDF.</p>
+          <h2 data-i18n="toolsTitle">Una herramienta para cada decisión</h2>
+          <p data-i18n="toolsDescription">Cinco calculadoras rápidas sin cuenta. Acceso aprobado gratuito para las versiones completas y sus reportes.</p>
         </div>
-        <div class="tool-grid" data-tools-root></div>
+        <div class="tool-grid" data-tools-root>
+<!-- home-catalog:start -->
+<article class="card" data-tool-id="flip"><span class="badge free" data-tool-plan-badge data-es="BETA (GRATIS)" data-en="BETA (FREE)">BETA (GRATIS)</span><h3 data-es="Calculadora de Flip" data-en="Flip Calculator">Calculadora de Flip</h3><p data-es="Calcula compra, reparación, gastos de venta y ganancia. Compara escenarios antes de ofertar." data-en="Calculate purchase, rehab, selling costs and profit. Compare scenarios before you offer.">Calcula compra, reparación, gastos de venta y ganancia. Compara escenarios antes de ofertar.</p><a class="card-btn" href="calculadoras/flip.html" data-es="Abrir Herramienta" data-en="Open Tool" data-cta-click="Open Tool">Abrir Herramienta</a></article>
+<article class="card" data-tool-id="rental_cash_flow"><span class="badge free" data-tool-plan-badge data-es="BETA (GRATIS)" data-en="BETA (FREE)">BETA (GRATIS)</span><h3 data-es="Flujo de caja de renta" data-en="Rental Cash Flow">Flujo de caja de renta</h3><p data-es="Desglosa ingresos, vacancia, gastos operativos y deuda para estimar tu flujo de caja." data-en="Break down income, vacancy, operating expenses and debt to estimate cash flow.">Desglosa ingresos, vacancia, gastos operativos y deuda para estimar tu flujo de caja.</p><a class="card-btn" href="calculadoras/rentas.html" data-es="Abrir Herramienta" data-en="Open Tool" data-cta-click="Open Tool">Abrir Herramienta</a></article>
+<article class="card" data-tool-id="arv_estimator"><span class="badge free" data-tool-plan-badge data-es="BETA (GRATIS)" data-en="BETA (FREE)">BETA (GRATIS)</span><h3 data-es="ARV con comparables" data-en="ARV Estimator">ARV con comparables</h3><p data-es="Compara los precios que ingreses y calcula un promedio, rango y oferta con la regla del 70%." data-en="Compare the prices you enter and calculate an average, range and offer using the 70% rule.">Compara los precios que ingreses y calcula un promedio, rango y oferta con la regla del 70%.</p><a class="card-btn" href="calculadoras/arv.html" data-es="Abrir Herramienta" data-en="Open Tool" data-cta-click="Open Tool">Abrir Herramienta</a></article>
+<article class="card" data-tool-id="hard_money"><span class="badge free" data-tool-plan-badge data-es="BETA (GRATIS)" data-en="BETA (FREE)">BETA (GRATIS)</span><h3 data-es="Préstamo Hard Money" data-en="Hard Money Analyzer">Préstamo Hard Money</h3><p data-es="Estima intereses simples, puntos y costo del préstamo con los términos que ingreses." data-en="Estimate simple interest, points and financing costs using the terms you enter.">Estima intereses simples, puntos y costo del préstamo con los términos que ingreses.</p><a class="card-btn" href="calculadoras/hard-money.html" data-es="Abrir Herramienta" data-en="Open Tool" data-cta-click="Open Tool">Abrir Herramienta</a></article>
+<article class="card" data-tool-id="seller_net"><span class="badge free" data-tool-plan-badge data-es="BETA (GRATIS)" data-en="BETA (FREE)">BETA (GRATIS)</span><h3 data-es="Calculadora de Venta" data-en="Seller Net Calculator">Calculadora de Venta</h3><p data-es="Calcula los gastos de cierre y el dinero neto del vendedor. Selecciona estado y condado y consulta las fuentes legales disponibles." data-en="Calculate closing costs and seller net proceeds. Choose a state and county and review available legal sources.">Calcula los gastos de cierre y el dinero neto del vendedor. Selecciona estado y condado y consulta las fuentes legales disponibles.</p><a class="card-btn" href="calculadoras/venta.html" data-es="Abrir Herramienta" data-en="Open Tool" data-cta-click="Open Tool">Abrir Herramienta</a></article>
+<script type="application/json" id="home-tools-fallback">[{"id":"flip","name":"Flip Calculator","name_es":"Calculadora de Flip","name_en":"Flip Calculator","url":"tools/flip-calculator.html","status":"beta_free","description_es":"Calcula compra, reparación, gastos de venta y ganancia. Compara escenarios antes de ofertar.","description_en":"Calculate purchase, rehab, selling costs and profit. Compare scenarios before you offer.","landing":"calculadoras/flip.html"},{"id":"rental_cash_flow","name":"Rental Cash Flow","name_es":"Flujo de caja de renta","name_en":"Rental Cash Flow","url":"tools/rental-cash-flow.html","status":"beta_free","description_es":"Desglosa ingresos, vacancia, gastos operativos y deuda para estimar tu flujo de caja.","description_en":"Break down income, vacancy, operating expenses and debt to estimate cash flow.","landing":"calculadoras/rentas.html"},{"id":"arv_estimator","name":"ARV Estimator","name_es":"ARV con comparables","name_en":"ARV Estimator","url":"tools/arv-estimator.html","status":"beta_free","description_es":"Compara los precios que ingreses y calcula un promedio, rango y oferta con la regla del 70%.","description_en":"Compare the prices you enter and calculate an average, range and offer using the 70% rule.","landing":"calculadoras/arv.html"},{"id":"hard_money","name":"Hard Money Analyzer","name_es":"Préstamo Hard Money","name_en":"Hard Money Analyzer","url":"tools/hard-money-analyzer.html","status":"beta_free","description_es":"Estima intereses simples, puntos y costo del préstamo con los términos que ingreses.","description_en":"Estimate simple interest, points and financing costs using the terms you enter.","landing":"calculadoras/hard-money.html"},{"id":"seller_net","name":"Seller Net Calculator","name_es":"Calculadora de Venta","name_en":"Seller Net Calculator","url":"calculadora-venta/","status":"beta_free","description_es":"Calcula los gastos de cierre y el dinero neto del vendedor. Selecciona estado y condado y consulta las fuentes legales disponibles.","description_en":"Calculate closing costs and seller net proceeds. Choose a state and county and review available legal sources.","landing":"calculadoras/venta.html"}]</script>
+<!-- home-catalog:end -->
+        </div>
       </section>
 
       <section class="section" id="membership">
@@ -101,8 +128,8 @@
         </div>
         <div class="pricing-grid">
           <article class="price-card">
-            <h3 data-i18n="membershipStep1Title">1 · Conoce las herramientas</h3>
-            <p data-i18n="membershipStep1Description">Calculadoras para ventas, ARV, flips, rentas, ROI y financiamiento inmobiliario.</p>
+            <h3 data-i18n="membershipStep1Title">1 · Prueba sin cuenta</h3>
+            <p data-i18n="membershipStep1Description">Elige venta, flip, flujo de renta, comparables o préstamo. Cambia los datos y revisa el resultado.</p>
           </article>
           <article class="price-card">
             <h3 data-i18n="membershipStep2Title">2 · Solicita una cuenta</h3>
@@ -110,7 +137,7 @@
           </article>
           <article class="price-card">
             <h3 data-i18n="membershipStep3Title">3 · Analiza con confianza</h3>
-            <p data-i18n="membershipStep3Description">Cuando tu acceso esté habilitado, compara escenarios con cálculos detallados.</p>
+            <p data-i18n="membershipStep3Description">Con acceso aprobado, usa las versiones completas y prepara reportes con tus datos y supuestos.</p>
           </article>
         </div>
       </section>

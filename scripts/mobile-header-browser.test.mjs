@@ -53,7 +53,7 @@ try {
       assert.equal(await page.locator('#primary-nav a').first().isVisible(),false);}
       if(width<600){
         const toolsTop=await page.locator('#tools').evaluate(node=>node.getBoundingClientRect().top);
-        assert.ok(toolsTop<550,'Free tools must be discoverable in the first mobile viewport');
+        assert.ok(toolsTop<550,`Free tools must be discoverable in the first mobile viewport (${width}px, ${lang}: ${toolsTop}px)`);
         assert.ok(await page.locator('.hero-actions .btn').evaluateAll(nodes=>nodes.every(node=>node.scrollWidth<=node.clientWidth)),'Hero CTA labels must fit');
       }
       if([393,1440].includes(width)&&lang==='es'){

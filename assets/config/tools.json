@@ -6,8 +6,8 @@
     "name_en": "Flip Calculator",
     "url": "tools/flip-calculator.html",
     "status": "beta_free",
-    "description_es": "Analiza compra, rehab, holding y venta con escenarios de sensibilidad y checks de ROI.",
-    "description_en": "Analyze purchase, rehab, holding, and sale with sensitivity scenarios and ROI checks.",
+    "description_es": "Calcula compra, reparación, gastos de venta y ganancia. Compara escenarios antes de ofertar.",
+    "description_en": "Calculate purchase, rehab, selling costs and profit. Compare scenarios before you offer.",
     "landing": "calculadoras/flip.html"
   },
   {
@@ -17,8 +17,8 @@
     "name_en": "Rental Cash Flow",
     "url": "tools/rental-cash-flow.html",
     "status": "beta_free",
-    "description_es": "Modela flujo mensual/anual con vacancia y escenarios para análisis ROI de renta.",
-    "description_en": "Model monthly/annual cash flow with vacancy and scenario-based rental ROI analysis.",
+    "description_es": "Desglosa ingresos, vacancia, gastos operativos y deuda para estimar tu flujo de caja.",
+    "description_en": "Break down income, vacancy, operating expenses and debt to estimate cash flow.",
     "landing": "calculadoras/rentas.html"
   },
   {
@@ -40,8 +40,8 @@
     "name_en": "ARV Estimator",
     "url": "tools/arv-estimator.html",
     "status": "beta_free",
-    "description_es": "Calcula ARV con comparables, ajustes y margen de seguridad para decisiones avanzadas.",
-    "description_en": "Estimate ARV with comparables, adjustments, and safety buffers for advanced decisions.",
+    "description_es": "Compara los precios que ingreses y calcula un promedio, rango y oferta con la regla del 70%.",
+    "description_en": "Compare the prices you enter and calculate an average, range and offer using the 70% rule.",
     "landing": "calculadoras/arv.html"
   },
   {
@@ -63,8 +63,8 @@
     "name_en": "Hard Money Analyzer",
     "url": "tools/hard-money-analyzer.html",
     "status": "beta_free",
-    "description_es": "Evalúa intereses, puntos y costo total de hard money con enfoque en retorno neto.",
-    "description_en": "Evaluate interest, points, and total hard money cost with net-return focus.",
+    "description_es": "Estima intereses simples, puntos y costo del préstamo con los términos que ingreses.",
+    "description_en": "Estimate simple interest, points and financing costs using the terms you enter.",
     "landing": "calculadoras/hard-money.html"
   },
   {

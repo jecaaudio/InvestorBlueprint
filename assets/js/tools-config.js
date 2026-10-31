@@ -10,9 +10,26 @@
     beta_free: { className: 'free', isPro: false }
   };
 
-  const getCurrentLanguage = () => (localStorage.getItem('preferredLanguage') === 'en' ? 'en' : 'es');
+  const getCurrentLanguage = () => {
+    // The active document locale also works when Safari blocks persistent storage.
+    const lang=document.documentElement.lang;
+    if(lang==='en'||lang==='es')return lang;
+    try{return localStorage.getItem('preferredLanguage')==='en'?'en':'es';}catch{return 'es';}
+  };
+  const fallbackTools=()=>{
+    try{
+      const value=JSON.parse(document.getElementById('home-tools-fallback')?.textContent||'[]');
+      return Array.isArray(value)?value.filter(tool=>tool&&tool.access!=='beta'&&tool.landing):[];
+    }catch{return [];}
+  };
+  const offlineTools=fallbackTools();
 
-  const getMessages = () => window.IBI18n?.getCurrentMessages?.() || {};
+  const getMessages = () => ({
+    betaFreeLabel:getCurrentLanguage()==='en'?'BETA (FREE)':'BETA (GRATIS)',
+    betaTesterLabel:'BETA TESTER',
+    tryTool:getCurrentLanguage()==='en'?'Open Tool':'Abrir Herramienta',
+    ...(window.IBI18n?.getCurrentMessages?.() || {})
+  });
 
   const getLocalizedName = (tool) => {
     const lang = getCurrentLanguage();
@@ -33,14 +50,15 @@
       try {
         const response = await fetch(path, { cache: 'no-store' });
         if (response.ok) {
-          return response.json();
+          const tools=await response.json();
+          if(Array.isArray(tools)&&tools.length)return tools;
         }
       } catch {
         // try next path
       }
     }
 
-    return [];
+    return offlineTools;
   };
 
   const getStatusMeta = (status) => STATUS_CONFIG[String(status || '').toLowerCase()] || STATUS_CONFIG.beta_free;
@@ -85,6 +103,7 @@
     // Public tools open their landing page (quick calculator, no account); beta tools go straight in.
     link.href = tool.landing || tool.url;
     link.textContent = messages.tryTool || 'Open Tool';
+    link.setAttribute('aria-label',link.textContent+': '+getLocalizedName(tool));
     link.setAttribute('data-cta-click', 'Open Tool');
     if (statusMeta.isPro) {
       link.setAttribute('data-pro-tool', 'true');
@@ -139,21 +158,19 @@
   };
 
   const init = async () => {
-    const tools = await fetchToolsConfig();
-    if (!Array.isArray(tools) || !tools.length) {
-      return;
-    }
-
-    const toolsById = new Map(tools.map((tool) => [tool.id, tool]));
-
+    let tools=offlineTools;
     const render = () => {
+      if(!tools.length)return;
       applyHomeCards(tools);
-      applyToolPage(toolsById);
+      applyToolPage(new Map(tools.map((tool) => [tool.id, tool])));
     };
-
     render();
     document.addEventListener('ib:language-changed', render);
     document.addEventListener('ib:beta-access', render);
+    // Register language listeners before the request: the static fallback stays
+    // responsive even on slow connections and failed configuration requests.
+    const fetched=await fetchToolsConfig();
+    if(Array.isArray(fetched)&&fetched.length){tools=fetched;render();}
   };
 
   init();

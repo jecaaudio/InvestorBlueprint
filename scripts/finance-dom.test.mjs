@@ -28,6 +28,14 @@ test('changing language refreshes the current chart without recording a new calc
  assert.match(d.getElementById('ib-tool-chart').textContent,/Your monthly rent breakdown/);
  assert.match(d.getElementById('ib-tool-chart').textContent,/Income after vacancy/);
  assert.equal(runs,1);assert.equal(successes,1);
+ assert.equal(d.querySelector('label[for="ib-finance-notes"]').textContent,'Report notes');
+ assert.equal(d.getElementById('ib-finance-print').textContent,'Print / Save PDF');
+ assert.equal(d.getElementById('ib-finance-print').disabled,false,'Language changes preserve the valid report snapshot');
+ d.getElementById('monthlyRent').dispatchEvent(new w.Event('input',{bubbles:true}));
+ assert.equal(d.querySelector('.ib-finance-report-controls [role="status"]').textContent,'Calculate again before exporting.');
+ d.documentElement.lang='es';d.dispatchEvent(new w.Event('ib:language-changed'));
+ assert.equal(d.querySelector('label[for="ib-finance-notes"]').textContent,'Notas del informe');
+ assert.equal(d.querySelector('.ib-finance-report-controls [role="status"]').textContent,'Calcula de nuevo antes de exportar.');
  dom.window.close();
 });
 test('rental form includes validated costs, computes NOI and exports document-scoped metadata',async()=>{

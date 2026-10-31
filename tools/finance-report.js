@@ -42,15 +42,23 @@
    if(!form||!cards||document.getElementById('ib-finance-print'))return;
    const type=document.body.dataset.tool;
    if(!['flip','rental','rent','arv','hard-money','roi_search'].includes(type))return;
-   const english=()=>window.IB_REPORT_PREFERENCES?.preferredLanguage==='en';
+   const english=()=>document.documentElement.lang==='en';
    const panel=document.createElement('section');panel.className='ib-finance-report-controls';
    const label=document.createElement('label');label.htmlFor='ib-finance-notes';label.textContent=english()?'Report notes':'Notas del informe';
    const notes=document.createElement('textarea');notes.id='ib-finance-notes';notes.rows=3;notes.maxLength=3000;
    const button=document.createElement('button');button.type='button';button.id='ib-finance-print';button.disabled=true;
    button.textContent=english()?'Print / Save PDF':'Imprimir / Guardar PDF';
    const status=document.createElement('p');status.setAttribute('role','status');
-   let snapshot=null;
-   const invalidate=()=>{snapshot=null;document.getElementById('ib-finance-report')?.replaceChildren();button.disabled=true;status.textContent=english()?'Calculate again before exporting.':'Calcula de nuevo antes de exportar.';};
+   let snapshot=null,reportState='invalid';
+   const syncLabels=()=>{
+     label.textContent=english()?'Report notes':'Notas del informe';
+     button.textContent=english()?'Print / Save PDF':'Imprimir / Guardar PDF';
+     status.textContent=reportState==='ready'?'':reportState==='translation-error'
+       ?(english()?'Report translation unavailable; please retry.':'No se pudo cargar el idioma del informe. Inténtalo otra vez.')
+       :(english()?'Calculate again before exporting.':'Calcula de nuevo antes de exportar.');
+   };
+   document.addEventListener('ib:language-changed',syncLabels);
+   const invalidate=()=>{snapshot=null;reportState='invalid';document.getElementById('ib-finance-report')?.replaceChildren();button.disabled=true;syncLabels();};
    invalidate();panel.append(label,notes,button,status);form.after(panel);
    const report=document.createElement('section');report.id='ib-finance-report';report.hidden=true;document.body.append(report);
    const style=document.createElement('style');style.textContent='.ib-finance-report-controls{margin:20px 0;display:grid;gap:12px}.ib-finance-report-controls textarea{width:100%;box-sizing:border-box}'+
@@ -71,7 +79,7 @@
        date:new Date().toISOString(),logo:new URL('assets/brand/favicon.svg',reportRoot).href,inputs,
        metrics:[...cards.children].map((el,index)=>{const label=el.querySelector('strong')?.textContent||'';return {key:type==='flip'&&index===2?'cashCommittedLabel':keyFor(label),label,value:el.querySelector('span')?.textContent||''}}),
        details:(document.getElementById('result-detail')||document.getElementById('result'))?.innerText||'',demo:type==='roi_search'};
-     button.disabled=false;status.textContent='';
+     button.disabled=false;reportState='ready';syncLabels();
    });
    button.addEventListener('click',async()=>{
      if(button.disabled||!snapshot)return;
@@ -81,7 +89,7 @@
        const root=new URL(snapshot.logo).href.replace(/assets\/brand\/favicon\.svg$/,'');
        const response=await fetch(root+'assets/i18n/'+(prefs.ib_document_language==='en'?'en':'es')+'.json',{cache:'no-store'});
        if(!response.ok)throw Error('Translation unavailable');messages=await response.json();
-     }catch(error){status.textContent=english()?'Report translation unavailable; please retry.':'No se pudo cargar el idioma del informe. Inténtalo otra vez.';return;}
+     }catch(error){reportState='translation-error';syncLabels();return;}
      if(button.disabled||!document.body.contains(button))return;
      report.innerHTML=render({...snapshot,notes:notes.value},prefs,messages);
      report.lang=prefs.ib_document_language==='en'?'en':'es';window.print();
