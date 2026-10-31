@@ -105,9 +105,10 @@ test('logout restores signup labels, tracking and previously hidden header links
     assert.equal(link.hidden,false);assert.equal(link.textContent,'Ingresar');
     assert.match(link.getAttribute('href'),/login\.html\?reason=login$/);
   }
-  const cta=doc.querySelector('.hero-actions a');
+  const cta=doc.querySelector('.hero-actions a[data-track="request_access"]');
+  assert.equal(doc.querySelector('.hero-actions a').getAttribute('href'),'#tools','The free calculator action remains available after logout');
   assert.equal(cta.dataset.ctaClick,'Request Access');
-  assert.equal(cta.dataset.i18n,'heroStart');
+  assert.equal(cta.dataset.i18n,'heroExplore');
   dom.window.localStorage.setItem(key,JSON.stringify(session));
   dom.window.dispatchEvent(new dom.window.Event('pageshow'));
   doc.documentElement.lang='en';
