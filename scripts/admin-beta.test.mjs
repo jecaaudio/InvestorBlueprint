@@ -10,7 +10,7 @@ const tick=()=>new Promise(resolve=>setTimeout(resolve,10));
 
 test('protected server refuses direct beta requests from regular members and suspended testers',async()=>{
  const raw=fs.readFileSync('supabase/functions/ib-protected-tools/index.ts','utf8');
- const js=raw.replace(/^import .*;\n/gm,'').replace('pages: Record<string,string>','pages')
+ const js=raw.replace(/^import .*;\r?\n/gm,'').replace('pages: Record<string,string>','pages')
   .replace('status:number, body:string','status, body').replace('):Response{','){')
   .replace('(req:Request):Promise<Response>','(req)');
  for(const fixture of [
@@ -37,7 +37,7 @@ const owner={id:'owner-id',email:'owner@example.invalid',full_name:'Owner',role:
 
 test('a still-valid JWT from a closed session cannot fetch a tool, and verification failures fail closed',async()=>{
  const raw=fs.readFileSync('supabase/functions/ib-protected-tools/index.ts','utf8');
- const js=raw.replace(/^import .*;\n/gm,'').replace('pages: Record<string,string>','pages')
+ const js=raw.replace(/^import .*;\r?\n/gm,'').replace('pages: Record<string,string>','pages')
   .replace('status:number, body:string','status, body').replace('):Response{','){').replace('(req:Request):Promise<Response>','(req)');
  for(const fixture of [{data:false,error:null,status:401},{data:null,error:{message:'network'},status:503}]){
   let handler;const sb={auth:{getUser:async()=>({data:{user:{id:'member',email_confirmed_at:'2026-01-01'}},error:null})},rpc:async()=>fixture,
@@ -51,7 +51,7 @@ test('a still-valid JWT from a closed session cannot fetch a tool, and verificat
 
 test('approved access is free regardless of billing configuration, while current terms remain required',async()=>{
  const raw=fs.readFileSync('supabase/functions/ib-protected-tools/index.ts','utf8');
- const js=raw.replace(/^import .*;\n/gm,'').replace('pages: Record<string,string>','pages')
+ const js=raw.replace(/^import .*;\r?\n/gm,'').replace('pages: Record<string,string>','pages')
   .replace('status:number, body:string','status, body').replace('):Response{','){').replace('(req:Request):Promise<Response>','(req)');
  const future=new Date(Date.now()+86400000).toISOString(),past=new Date(Date.now()-86400000).toISOString();
  const accepted={access_status:'approved',role:'member',beta_tester:false,terms_accepted_at:'2026-10-21',terms_version:'2026-10-21'};

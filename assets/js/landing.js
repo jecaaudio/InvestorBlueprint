@@ -54,7 +54,9 @@
   const moneyField=input=>!/(Pct|Rate|points|months|Months)$/.test(input.name);
   const formatInput=input=>{
    const value=parse(input.name,input.value);
-   if(input.value.trim()&&moneyField(input)&&Number.isFinite(value)&&value>=0&&value<=Number.MAX_SAFE_INTEGER)input.value=new Intl.NumberFormat('en-US',{maximumFractionDigits:20}).format(value);
+   if(!input.value.trim()||!moneyField(input)||!Number.isFinite(value)||value<0||value>Number.MAX_SAFE_INTEGER)return;
+   const formatted=new Intl.NumberFormat('en-US',{maximumFractionDigits:20}).format(value);
+   if(parse(input.name,formatted)===value)input.value=formatted;
   };
   const formatInputs=()=>inputs.forEach(formatInput);
   const scenarios=[];
@@ -75,9 +77,9 @@
    const note=document.createElement('p');note.textContent=L('Hasta 3 escenarios. Se borran al cerrar o recargar; no se guardan en tu cuenta. Importes en USD.','Up to 3 scenarios. Cleared when closing or reloading; not saved to your account. Amounts in USD.');comparison.append(note);
    if(scenarios.length>1&&window.IBFinanceVisuals){
     const host=document.createElement('div');host.className='ib-viz-host';comparison.append(host);
-    window.IBFinanceVisuals.chart(host,{title:calc(scenarios[0]).main[0],rows:scenarios.map((values,index)=>({label:L('Escenario ','Scenario ')+(index+1),value:calc(values).value}))});
+    window.IBFinanceVisuals.chart(host,{title:calc(scenarios[0].values).main[0],rows:scenarios.map(({values},index)=>({label:L('Escenario ','Scenario ')+(index+1),value:calc(values).value}))});
    }
-   scenarios.forEach((values,index)=>{
+   scenarios.forEach(({values,fields},index)=>{
     const out=calc(values),card=document.createElement('article'),heading=document.createElement('h4');
     heading.textContent=L('Escenario ','Scenario ')+(index+1);card.append(heading);
     const details=document.createElement('dl');
@@ -85,7 +87,7 @@
      moneyField(input)?money(values[input.name]):String(values[input.name])])];
     rows.forEach(([label,value])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;details.append(dt,dd)});
     const restore=document.createElement('button');restore.type='button';restore.className='btn';restore.textContent=L('Usar escenario','Use scenario');
-    restore.addEventListener('click',()=>{inputs.forEach(input=>{input.value=String(values[input.name])});formatInputs();render()});
+    restore.addEventListener('click',()=>{inputs.forEach(input=>{input.value=fields[input.name]});formatInputs();render()});
     const remove=document.createElement('button');remove.type='button';remove.className='btn';remove.textContent=L('Quitar','Remove');
     remove.addEventListener('click',()=>{scenarios.splice(index,1);renderComparison()});
     card.append(details,restore,remove);comparison.append(card);
@@ -98,7 +100,7 @@
     const value=parse(input.name,input.value);
     const echo=input.parentElement.querySelector('small');
     const plain=Number(String(input.value).replace(/[$,\s%]/g,''));
-    if(!input.value.trim()||!Number.isFinite(value)||value<0||value>Number.MAX_SAFE_INTEGER||(/(Pct|Rate)$/.test(input.name)&&value>100)){
+    if(!input.value.trim()||!Number.isFinite(value)||value<0||value>Number.MAX_SAFE_INTEGER||(/(Pct|Rate|points)$/.test(input.name)&&value>100)){
      invalid=true;input.setAttribute('aria-invalid','true');if(echo)echo.textContent=L('Número no válido','Not a valid number');continue}
     input.removeAttribute('aria-invalid');
     if(echo)echo.textContent=value!==plain?L('Se lee como ','Read as ')+new Intl.NumberFormat('en-US',{maximumFractionDigits:4}).format(value):'';
@@ -117,7 +119,7 @@
     out.rows.map(([label,value])=>'<dt>'+esc(label)+'</dt><dd>'+esc(value)+'</dd>').join('')+'</dl>';
    renderComparison();
   };
-  compare.addEventListener('click',()=>{if(current&&scenarios.length<3){scenarios.push({...current});renderComparison()}});
+  compare.addEventListener('click',()=>{if(current&&scenarios.length<3){scenarios.push({values:{...current},fields:Object.fromEntries(inputs.map(input=>[input.name,input.value]))});renderComparison()}});
   reset.addEventListener('click',()=>{form.reset();formatInputs();render()});
   // Do not rerender on blur: moving the next button between touch-down and click
   // cancels the first tap in Safari. Input events already keep the result current.
