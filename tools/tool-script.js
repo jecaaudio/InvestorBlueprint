@@ -25,15 +25,16 @@
   if(typeof window!=='undefined')window.IBParseFinanceNumber=parseFinanceNumber;
   // Percentages, months and counts never use thousands separators, so 7.125 stays
   // 7.125 (a common US rate) and a decimal comma (7,5) is also accepted.
-  const parseRatioNumber=value=>{
+  const parseRatioNumber=(name,value)=>{
     if(typeof value==='number')return Number.isFinite(value)?value:NaN;
-    let clean=String(value??'').trim().replace(/\s*%$/,'');if(!clean)return 0;
+    let clean=String(value??'').trim();if(!clean)return 0;
+    if(!/(months|count)$/i.test(name))clean=clean.replace(/\s*%$/,'');
     if(/^[+-]?\d+,\d+$/.test(clean))clean=clean.replace(',','.');
     if(!/^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(clean))return NaN;
     const parsed=Number(clean);return Number.isFinite(parsed)?parsed:NaN;
   };
   const isRatioField=name=>/(pct|rate|points|months|count|yield|occupancy|roi|return)$/i.test(String(name||''));
-  const parseFieldNumber=(name,value)=>isRatioField(name)?parseRatioNumber(value):parseFinanceNumber(value);
+  const parseFieldNumber=(name,value)=>isRatioField(name)?parseRatioNumber(name,value):parseFinanceNumber(value);
   if(typeof window!=='undefined')window.IBParseFieldNumber=parseFieldNumber;
   // Pure flip model; full-draw interest is a conservative simplified estimate.
   const calculateFlipFinance = (x) => {

@@ -19,11 +19,13 @@ const installedBrowser = await install({
   platform
 });
 
-const lhciBin = process.platform === 'win32'
-  ? path.join(rootDir, 'node_modules', '.bin', 'lhci.cmd')
-  : path.join(rootDir, 'node_modules', '.bin', 'lhci');
+const lhciBin = path.join(rootDir, 'node_modules', '@lhci', 'cli', 'src', 'cli.js');
 
-const child = spawn(lhciBin, ['autorun', '--config=./lighthouserc.json'], {
+const args = [lhciBin, 'autorun', '--config=./lighthouserc.json'];
+if (process.platform === 'win32') {
+  args.push('--collect.startServerCommand=python -u -m http.server 4173 --bind 127.0.0.1 --directory ..');
+}
+const child = spawn(process.execPath, args, {
   cwd: rootDir,
   stdio: 'inherit',
   shell: false,

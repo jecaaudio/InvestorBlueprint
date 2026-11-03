@@ -163,5 +163,6 @@ test('rates, months and counts keep dot decimals and accept decimal commas',()=>
  for(const [name,text,value] of [['interestRate','7.125',7.125],['interestRate','7,125',7.125],['pointsPct','2.5',2.5],['vacancyRate','5 %',5],['holdingMonths','4,5',4.5],['months','12',12],['occupancy','95',95]])
   assert.equal(parse(name,text),value,name+' '+text);
  assert.equal(parse('purchasePrice','250.000'),250000);
- for(const text of ['1.000.5','7.1.2','abc'])assert.ok(Number.isNaN(parse('interestRate',text)),text);
+ for(const name of ['months','holdingMonths','drawCount'])assert.ok(Number.isNaN(parse(name,'12%')),name);
+ for(const text of ['1.000.5','7.1.2','abc','%'])assert.ok(Number.isNaN(parse('interestRate',text)),text);
 });

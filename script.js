@@ -6,9 +6,10 @@
     const header=menuToggle.closest('.navbar');
     const preferences=document.createElement('div');preferences.className='mobile-nav-preferences';
     nav.append(preferences);
+    const compactHeader=window.matchMedia('(max-width: 840px)');
     const syncPreferences=()=>{
       const language=header.querySelector('.lang-switcher'),theme=header.querySelector('#siteThemeToggle');
-      const mobile=window.innerWidth<=840;
+      const mobile=compactHeader.matches;
       for(const control of [language,theme])if(control)(mobile?preferences:header).append(control);
       preferences.hidden=!mobile;
     };
@@ -33,9 +34,9 @@
       }
     });
 
-    window.addEventListener('resize', () => {
+    compactHeader.addEventListener('change', () => {
       syncPreferences();
-      if (window.innerWidth > 840) {
+      if (!compactHeader.matches) {
         closeMenu();
       }
     });

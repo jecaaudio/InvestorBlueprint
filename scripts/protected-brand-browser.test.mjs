@@ -46,6 +46,7 @@ try {
     await page.goto(base+item.path,{waitUntil:'networkidle'});
     const mark=page.locator(item.selector);
     await mark.waitFor({state:'visible',timeout:10000});
+    await mark.evaluate(node=>node.decode());
     const naturalWidth=await mark.evaluate(node=>node.naturalWidth);
     assert.ok(naturalWidth>0,item.tool+': branded SVG failed to load');
     const favicon=await page.locator('link[rel="icon"][type="image/svg+xml"]').getAttribute('href');

@@ -46,7 +46,7 @@ test('tool page title is the localized name without a repeated beta suffix',asyn
 
 test('the public home catalog works without JavaScript and stays synchronized with its source',()=>{
  const html=fs.readFileSync('index.html','utf8');
- const block=html.match(/<!-- home-catalog:start -->\n([\s\S]*?)\n<!-- home-catalog:end -->/)[1];
+ const block=html.replace(/\r\n/g,'\n').match(/<!-- home-catalog:start -->\n([\s\S]*?)\n<!-- home-catalog:end -->/)[1];
  assert.equal(block,homeCatalog(tools),'Run node scripts/build-home-catalog.mjs after changing the catalog');
  const dom=new JSDOM(html),d=dom.window.document;
  const cards=[...d.querySelectorAll('.tool-grid article')];

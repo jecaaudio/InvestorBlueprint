@@ -54,7 +54,9 @@
   const moneyField=input=>!/(Pct|Rate|points|months|Months)$/.test(input.name);
   const formatInput=input=>{
    const value=parse(input.name,input.value);
-   if(input.value.trim()&&moneyField(input)&&Number.isFinite(value)&&value>=0&&value<=Number.MAX_SAFE_INTEGER)input.value=new Intl.NumberFormat('en-US',{maximumFractionDigits:20}).format(value);
+   if(!input.value.trim()||!moneyField(input)||!Number.isFinite(value)||value<0||value>Number.MAX_SAFE_INTEGER)return;
+   const formatted=new Intl.NumberFormat('en-US',{maximumFractionDigits:20}).format(value);
+   if(parse(input.name,formatted)===value)input.value=formatted;
   };
   const formatInputs=()=>inputs.forEach(formatInput);
   const scenarios=[];
@@ -85,7 +87,7 @@
      moneyField(input)?money(values[input.name]):String(values[input.name])])];
     rows.forEach(([label,value])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;details.append(dt,dd)});
     const restore=document.createElement('button');restore.type='button';restore.className='btn';restore.textContent=L('Usar escenario','Use scenario');
-    restore.addEventListener('click',()=>{inputs.forEach(input=>{input.value=String(values[input.name])});formatInputs();render()});
+    restore.addEventListener('click',()=>{inputs.forEach(input=>{const value=values[input.name];input.value=String(value);if(parse(input.name,input.value)!==value)input.value=value.toExponential()});formatInputs();render()});
     const remove=document.createElement('button');remove.type='button';remove.className='btn';remove.textContent=L('Quitar','Remove');
     remove.addEventListener('click',()=>{scenarios.splice(index,1);renderComparison()});
     card.append(details,restore,remove);comparison.append(card);
@@ -98,7 +100,7 @@
     const value=parse(input.name,input.value);
     const echo=input.parentElement.querySelector('small');
     const plain=Number(String(input.value).replace(/[$,\s%]/g,''));
-    if(!input.value.trim()||!Number.isFinite(value)||value<0||value>Number.MAX_SAFE_INTEGER||(/(Pct|Rate)$/.test(input.name)&&value>100)){
+    if(!input.value.trim()||!Number.isFinite(value)||value<0||value>Number.MAX_SAFE_INTEGER||(/(Pct|Rate|points)$/.test(input.name)&&value>100)){
      invalid=true;input.setAttribute('aria-invalid','true');if(echo)echo.textContent=L('Número no válido','Not a valid number');continue}
     input.removeAttribute('aria-invalid');
     if(echo)echo.textContent=value!==plain?L('Se lee como ','Read as ')+new Intl.NumberFormat('en-US',{maximumFractionDigits:4}).format(value):'';
