@@ -149,6 +149,8 @@ test('seller chart labels partial results honestly and erases invalid numbers',a
 
 test('formatting and restoring a scenario preserve ambiguous fractional amounts',async()=>{
  const dom=await open('venta'),w=dom.window,d=w.document,price=d.getElementById('q-price');
+ const rate=d.getElementById('q-commissionPct');
+ rate.value='0.0000001';
  price.value='1.234e0';
  price.dispatchEvent(new w.Event('input',{bubbles:true}));
  const original=result(dom);
@@ -157,6 +159,7 @@ test('formatting and restoring a scenario preserve ambiguous fractional amounts'
  d.querySelector('.lp-scenario-actions button').click();
  d.querySelector('.lp-comparison article button').click();
  assert.equal(w.IBParseFieldNumber('price',price.value),1.234);
+ assert.equal(rate.value,'0.0000001');
  assert.equal(result(dom),original);
  dom.window.close();
 });
